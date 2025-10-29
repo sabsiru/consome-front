@@ -1,10 +1,18 @@
 <template>
   <header class="header">
     <h1>콘소메</h1>
+    <div class="nav">
+      <!-- ✅ 로그인 안 한 상태 -->
+      <template v-if="!nickname || nickname.length === 0">
+        <RouterLink to="/login" class="link">로그인</RouterLink>
+        <RouterLink to="/register" class="link">회원가입</RouterLink>
+      </template>
 
-    <div class="user-info" v-if="nickname && nickname.length > 0">
-      <span>{{ nickname }} 님 · {{ point }}P</span>
-      <button class="logout-btn" @click="logout">로그아웃</button>
+      <!-- ✅ 로그인 한 상태 -->
+      <template v-else>
+        <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
+        <button class="logout-btn" @click="logout">로그아웃</button>
+      </template>
     </div>
   </header>
 </template>
@@ -12,15 +20,19 @@
 <script setup>
 import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
+import { RouterLink } from 'vue-router'
 
 const store = useUserStore()
 const { nickname, point } = storeToRefs(store)
 
-// 로그아웃 함수
-const logout = () => {
-  store.clearUser()
-  // 필요 시 페이지 리로드 or 메인으로 이동
-  window.location.href = '/'
+const logout = (event) => {
+  if (!event || event.type !== 'click') return
+  event.preventDefault()
+
+  if (confirm('로그아웃 하시겠습니까?')) {
+    store.clearUser()
+    window.location.href = '/'
+  }
 }
 </script>
 
@@ -30,8 +42,8 @@ const logout = () => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background: transparent; /* ✅ 투명 배경 */
-  color: white;
+  background: transparent;
+  color: #777;
   position: fixed;
   width: 100%;
   top: 0;
@@ -39,10 +51,20 @@ const logout = () => {
   z-index: 10;
 }
 
-.user-info {
+.nav {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.link {
+  color: #777;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
 
 .logout-btn {
