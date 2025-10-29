@@ -38,9 +38,14 @@ const login = async () => {
       password: password.value,
     })
 
-    console.log('로그인 응답', data)
-    store.setUserData(data) // ✅ 여기가 핵심
-    router.push('/')
+    localStorage.setItem('accessToken', data.accessToken)
+
+    store.setUserData(data)
+    if (data.role === 'ADMIN') {
+      await router.push('/admin')
+    } else {
+      await router.push('/')
+    }
   } catch (err) {
     error.value = err.response?.data?.message || '로그인에 실패하였습니다.'
   }
