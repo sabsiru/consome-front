@@ -5,6 +5,7 @@
 
     <button @click="goToBoardManage" class="admin-btn">게시판 관리</button>
     <button @click="goToUserManage" class="admin-btn">회원 관리</button>
+    <button @click="goToUserManage" class="admin-btn">매너지 관리</button>
     <button @click="goToUserManage" class="admin-btn">관리1</button>
     <button @click="goToUserManage" class="admin-btn">관리2</button>
   </div>
