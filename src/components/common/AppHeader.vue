@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h1>콘소메</h1>
+    <h1 @click="goHome" class="title">콘소메</h1>
     <div class="nav">
       <!-- ✅ 로그인 안 한 상태 -->
       <template v-if="!nickname || nickname.length === 0">
@@ -11,6 +11,8 @@
       <!-- ✅ 로그인 한 상태 -->
       <template v-else>
         <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
+        <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
+        <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
         <button class="logout-btn" @click="logout">로그아웃</button>
       </template>
     </div>
@@ -21,9 +23,10 @@
 import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
+import router from '@/router/index.js'
 
 const store = useUserStore()
-const { nickname, point } = storeToRefs(store)
+const { nickname, point, role } = storeToRefs(store)
 
 const logout = (event) => {
   if (!event || event.type !== 'click') return
@@ -34,6 +37,15 @@ const logout = (event) => {
     window.location.href = '/'
   }
 }
+
+const goHome = () => {
+  router.push('/')
+}
+
+const goAdmin = () => {
+  router.push('/admin')
+}
+console.log('🔎 AppHeader role:', role.value)
 </script>
 
 <style scoped>
@@ -78,5 +90,9 @@ const logout = (event) => {
 
 .logout-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  cursor: pointer;
 }
 </style>
