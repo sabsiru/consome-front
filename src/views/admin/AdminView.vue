@@ -5,9 +5,8 @@
 
     <button @click="goToBoardManage" class="admin-btn">게시판 관리</button>
     <button @click="goToUserManage" class="admin-btn">회원 관리</button>
-    <button @click="goToUserManage" class="admin-btn">매너지 관리</button>
-    <button @click="goToUserManage" class="admin-btn">관리1</button>
-    <button @click="goToUserManage" class="admin-btn">관리2</button>
+    <button @click="goToUserManage" class="admin-btn">매니저관리</button>
+    <button @click="goHome" class="admin-btn">메인 페이지</button>
   </div>
 </template>
 
@@ -21,6 +20,9 @@ const goToBoardManage = () => {
 }
 const goToUserManage = () => {
   router.push('/admin/users')
+}
+const goHome = () => {
+  router.push('/')
 }
 </script>
 
