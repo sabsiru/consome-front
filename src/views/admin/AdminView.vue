@@ -1,9 +1,12 @@
 <template>
   <div class="admin-view">
     <h1>관리자 페이지</h1>
-    <p>여기서 게시판, 섹션, 카테고리를 관리할 수 있습니다.</p>
+    <p>게시판, 회원관리 등 추가 될 예정</p>
 
     <button @click="goToBoardManage" class="admin-btn">게시판 관리</button>
+    <button @click="goToUserManage" class="admin-btn">회원 관리</button>
+    <button @click="goToUserManage" class="admin-btn">매니저관리</button>
+    <button @click="goHome" class="admin-btn">메인 페이지</button>
   </div>
 </template>
 
@@ -14,6 +17,12 @@ const router = useRouter()
 
 const goToBoardManage = () => {
   router.push('/admin/boards')
+}
+const goToUserManage = () => {
+  router.push('/admin/users')
+}
+const goHome = () => {
+  router.push('/')
 }
 </script>
 
