@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    userId: localStorage.getItem('userId') || '',
     nickname: localStorage.getItem('nickname') || '',
     point: Number(localStorage.getItem('point')) || 0,
     token: localStorage.getItem('accessToken') || '',
@@ -11,7 +12,9 @@ export const useUserStore = defineStore('user', {
     setUserData(data) {
       this.nickname = data.nickname
       this.point = data.point
-      this.token = data.accessToken;
+      this.token = data.accessToken
+      this.userId = data.userId
+      localStorage.setItem('userId', data.userId)
       localStorage.setItem('nickname', data.nickname);
       localStorage.setItem('point', data.point);
       localStorage.setItem('accessToken', data.accessToken);
@@ -21,6 +24,8 @@ export const useUserStore = defineStore('user', {
       this.nickname = ''
       this.point = 0
       this.token = ''
+      this.userId = ''
+      localStorage.removeItem('userId')
       localStorage.removeItem('nickname');
       localStorage.removeItem('point');
       localStorage.removeItem('accessToken')
