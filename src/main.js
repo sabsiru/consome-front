@@ -7,6 +7,7 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { useUserStore } from '@/stores/userStore'
 import api from '@/api/axios'
+import './assets/base.css'
 
 
 const app = createApp(App)
