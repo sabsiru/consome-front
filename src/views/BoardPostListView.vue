@@ -1,52 +1,67 @@
 <template>
-  <div class="board-post-list">
-    <h2 class="board-title">
-      {{ boardName }}
-    </h2>
-    <table class="post-table">
+  <div class="page-board">
+    <div class="page-board__header">
+      <div class="page-board__title-row">
+        <h2 class="page-board__title">{{ boardName }}</h2>
+
+        <!-- 글쓰기 버튼 -->
+        <button class="btn btn-primary" @click="goPost">글쓰기</button>
+      </div>
+
+      <!-- 선택: 메타 라인(필요 없으면 제거) -->
+      <div class="page-board__meta">{{ totalElements }}개 · {{ page + 1 }} / {{ totalPages }}</div>
+    </div>
+
+    <!-- 선택: 탭/필터 바(지금 기능 없으면 버튼만 둬도 됨) -->
+    <div class="page-board__tabs">
+      <div class="page-board__tab is-active">전체</div>
+      <div class="page-board__tab">개발중</div>
+      <div class="page-board__tab">공지</div>
+    </div>
+
+    <table class="board-table">
       <thead>
-      <tr>
-        <th>번호</th>
-        <th>제목</th>
-        <th>작성자</th>
-        <th>조회수</th>
-        <th>댓글수</th>
-        <th>좋아요</th>
-        <th>싫어요</th>
-        <th>작성일</th>
-      </tr>
+        <tr>
+          <th class="col-category">카테고리</th>
+          <th class="col-title">제목</th>
+          <th class="col-author">작성자</th>
+          <th class="col-views">조회수</th>
+          <th class="col-like">좋아요</th>
+          <th class="col-dislike">싫어요</th>
+          <th class="col-date">작성일</th>
+        </tr>
       </thead>
+
       <tbody>
-      <tr v-for="post in posts" :key="post.postId">
-        <td>{{ post.postId }}</td>
-        <td>
-          <span class="post-link" @click="goPostDetail(post.postId)">
-            {{ post.title }}
-          </span>
-        </td>
-        <td>{{ post.authorNickName }}</td>
-        <td>{{ post.viewCount }}</td>
-        <td>{{ post.commentCount }}</td>
-        <td>{{ post.likeCount }}</td>
-        <td>{{ post.dislikeCount }}</td>
-        <td>{{ formatDate(post.createdAt) }}</td>
-      </tr>
-      <tr v-if="posts.length === 0">
-        <td colspan="8" class="empty">게시글이 없습니다.</td>
-      </tr>
+        <tr v-for="post in posts" :key="post.postId" @click="goPostDetail(post.postId)">
+          <td class="col-category">{{ post.categoryName }}</td>
+          <td class="col-title">
+              {{ post.title }}
+              <span v-if="post.commentCount > 0" class="post-comment-count">
+                [{{ post.commentCount }}]
+              </span>
+          </td>
+          <td class="col-author">{{ post.authorNickName }}</td>
+          <td class="col-views">{{ post.viewCount }}</td>
+          <td class="col-like">{{ post.likeCount }}</td>
+          <td class="col-dislike">{{ post.dislikeCount }}</td>
+          <td class="col-date">{{ formatDate(post.createdAt) }}</td>
+        </tr>
+
+        <tr v-if="posts.length === 0">
+          <td class="board-empty" colspan="8">게시글이 없습니다.</td>
+        </tr>
       </tbody>
     </table>
-    <button class="post-btn" @click="goPost">
-      글쓰기
-    </button>
-    <div class="pagination">
-      <button :disabled="page === 0" @click="movePage(page - 1)">
-        이전
-      </button>
-      <span>{{ page + 1 }} / {{ totalPages }}</span>
-      <button :disabled="page + 1 >= totalPages" @click="movePage(page + 1)">
-        다음
-      </button>
+
+    <div class="page-board__footer">
+      <div class="pagination">
+        <button class="btn" :disabled="page === 0" @click="movePage(page - 1)">이전</button>
+        <span>{{ page + 1 }} / {{ totalPages }}</span>
+        <button class="btn" :disabled="page + 1 >= totalPages" @click="movePage(page + 1)">
+          다음
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -56,6 +71,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api/axios.js'
 import router from '@/router/index.js'
+import '@/assets/styles/components.css'
+import '@/assets/styles/pages/board.css'
 
 const route = useRoute()
 
@@ -108,7 +125,7 @@ const formatDate = (isoString) => {
 }
 
 const goPost = () => {
-  router.push({name: 'Post', params:{boardId:boardId.value}})
+  router.push({ name: 'Post', params: { boardId: boardId.value } })
 }
 
 const goPostDetail = (postId) => {
@@ -129,60 +146,3 @@ watch(
   },
 )
 </script>
-
-<style scoped>
-.board-post-list {
-  padding: 80px 24px 24px; /* 헤더 fixed 고려해서 위쪽 여백 */
-}
-
-.board-title {
-  margin-bottom: 16px;
-}
-
-.post-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 16px;
-  color: black;
-}
-.post-table tbody:hover{
-  background-color: #f5f5f5
-}
-
-.post-table th,
-.post-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.post-table thead {
-  background: #f5f5f5;
-}
-
-.empty {
-  text-align: center;
-  color: #999;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.post-btn{
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-}
-
-.post-link {
-  cursor: pointer;
-  text-decoration: none;   /* 밑줄 제거 */
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-</style>

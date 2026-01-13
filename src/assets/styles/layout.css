@@ -1,0 +1,31 @@
+:root {
+  /* layout tokens */
+  --app-max-width: 1200px;
+  --app-padding-x: 16px;
+  --app-padding-y: 24px;
+
+  /* fixed header height (AppHeader가 fixed일 때만 의미 있음) */
+  --app-header-height: 80px;
+}
+
+/* App.vue에서 RouterView를 감싸는 중앙 컨테이너 */
+.app-shell {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: var(--app-padding-y) var(--app-padding-x);
+}
+
+/* 헤더가 fixed면 콘텐츠를 아래로 밀어줌 */
+.app-content {
+  padding-top: var(--app-header-height);
+  min-height: calc(100vh - var(--app-header-height));
+}
+
+/* PC에서 좌우 여백/폭만 조정 */
+@media (min-width: 1024px) {
+  :root {
+    --app-max-width: 1200px;
+    --app-padding-x: 24px;
+    --app-padding-y: 32px;
+  }
+}
