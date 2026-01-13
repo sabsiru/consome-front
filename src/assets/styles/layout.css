@@ -1,11 +1,10 @@
 :root {
-  /* layout tokens */
   --app-max-width: 1200px;
   --app-padding-x: 16px;
   --app-padding-y: 24px;
 
   /* fixed header height (AppHeader가 fixed일 때만 의미 있음) */
-  --app-header-height: 80px;
+  --app-header-height: 60px;
 }
 
 /* App.vue에서 RouterView를 감싸는 중앙 컨테이너 */

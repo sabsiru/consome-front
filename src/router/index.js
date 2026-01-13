@@ -14,7 +14,7 @@ const router = createRouter({
     { path: '/', name: 'home', component: HomeView },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/login', name: 'login', component: LoginView },
-    { path: '/boards/:boardId', name: 'BoardPosts', component: BoardPostListView, props: true },
+    { path: '/boards/:boardId', name: 'BoardPosts', component: BoardPostListView, props: route =>({boardId: Number(route.params.boardId)}) },
     { path: '/boards/:boardId/post', name: 'Post', component: PostView, props: true },
     { path: '/posts/:postId', name: 'PostDetail', component: PostDetail, props: true },
     ...AdminRoutes,

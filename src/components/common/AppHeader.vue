@@ -21,7 +21,6 @@
                   :key="board.boardId"
                   class="board-item"
                 >
-                  <!-- 실제 라우팅 규칙에 맞게 to 경로만 수정 -->
                   <RouterLink
                     :to="`/boards/${board.boardId}`"
                     class="board-link"
@@ -77,8 +76,7 @@ const headerSections = ref([])
 
 const loadHeaderNavigation = async () => {
   try {
-    const res = await api.get('/navigation/header') // baseURL이 /api/v1 이라면 /api/v1/navigation/header로 나감
-    console.log('[AppHeader] header navigation', res.data)
+    const res = await api.get('/navigation/header')
     headerSections.value = res.data
   } catch (e) {
     console.error('[AppHeader] 헤더 네비게이션 조회 실패', e)
