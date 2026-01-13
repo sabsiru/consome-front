@@ -33,24 +33,34 @@
       </p>
     </div>
 
-    <!-- 추천 / 비추천 버튼 (내용 아래, 중앙 정렬) -->
-    <div class="post-reactions" v-if="post">
-      <button type="button" class="btn reaction" @click="onLike">
-        추천
-      </button>
-      <button type="button" class="btn reaction" @click="onDislike">
-        비추천
-      </button>
+    <!-- 추천 / 비추천 + 수정 / 삭제 (같은 행) -->
+    <div class="post-bottom" v-if="post">
+      <div class="post-reactions">
+        <button type="button" class="btn reaction" @click="onLike">
+          추천
+        </button>
+        <button type="button" class="btn reaction" @click="onDislike">
+          비추천
+        </button>
+      </div>
+
+      <!-- 작성자일 때만 오른쪽에 수정/삭제 노출 -->
+      <div class="post-actions" v-if="isAuthor">
+        <button type="button" class="btn" @click="goEdit">
+          수정
+        </button>
+        <button type="button" class="btn danger" @click="onDelete">
+          삭제
+        </button>
+      </div>
     </div>
 
-    <!-- 수정 / 삭제 버튼 (작성자 == 현재 사용자일 때만, 맨 아래) -->
-    <div class="post-actions" v-if="isAuthor && post">
-      <button type="button" class="btn" @click="goEdit">
-        수정
-      </button>
-      <button type="button" class="btn danger" @click="onDelete">
-        삭제
-      </button>
+    <!-- 댓글 영역 (추후 구현 예정) -->
+    <div class="post-comments" v-if="post">
+      <div class="post-comments-header">
+        댓글
+      </div>
+      <!-- TODO: 댓글 리스트 & 입력 폼 -->
     </div>
 
     <!-- 로딩 / 에러 표시 (선택 사항) -->
@@ -262,11 +272,51 @@ onMounted(() => {
   font-size: 12px;
 }
 
+.post-content {
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.content-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* 본문 아래: 추천/비추천 + (작성자인 경우) 수정/삭제 한 줄 */
+.post-bottom {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-reactions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.btn.reaction {
+  min-width: 80px;
+}
+
 .post-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 8px;
-  margin-bottom: 24px;
+}
+
+/* 댓글 영역 자리 */
+.post-comments {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.post-comments-header {
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
 .btn {
@@ -289,28 +339,6 @@ onMounted(() => {
 
 .btn.danger:hover {
   background: #ffeaea;
-}
-
-.post-content {
-  padding-top: 16px;
-  border-top: 1px solid #e5e5e5;
-}
-
-.content-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
-  font-size: 15px;
-}
-
-.post-reactions {
-  margin-top: 24px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.btn.reaction {
-  min-width: 80px;
 }
 
 .status-text {
