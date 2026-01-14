@@ -19,13 +19,6 @@
   gap: 12px;
 }
 
-.page-board__title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.92);
-}
-
 .page-board__meta {
   margin-top: 6px;
   font-size: 12px;
@@ -54,8 +47,8 @@
 }
 
 .page-board__tab.is-active {
-  background: rgba(255,82,82,0.15);
-  border-color: rgba(255,82,82,0.45);
+  background: rgb(82, 182, 255);
+  border-color: rgb(82, 182, 255);
   color: rgba(255,255,255,0.92);
 }
 
