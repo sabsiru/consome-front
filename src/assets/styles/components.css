@@ -35,12 +35,12 @@
 
 /* primary (글쓰기 같은 주요 액션) */
 .btn-primary {
-  background: #ff5252;
-  border-color: #ff5252;
+  background: #52b6ff;
+  border-color: #7fc2f3;
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #ff6868;
-  border-color: #ff6868;
+  background: #52b6ff;
+  border-color: #7fc2f3;
 }

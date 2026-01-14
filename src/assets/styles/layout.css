@@ -27,4 +27,20 @@
     --app-padding-x: 24px;
     --app-padding-y: 32px;
   }
+
+  .layout {
+    width: 100%;
+  }
+
+  .layout__container {
+    /* 전역에서 이미 max-width를 잡고 있으면 이 부분 제거하세요. */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .text-muted {
+    color: #ffffff;
+    font-size: 13px;
+  }
 }

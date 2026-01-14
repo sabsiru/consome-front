@@ -2,10 +2,9 @@
   <div class="page-board">
     <div class="page-board__header">
       <div class="page-board__title-row">
-        <h2 class="page-board__title" @click="goBoardPosts">{{ boardName }}</h2>
+        <div class="page-board__meta">{{ totalElements }}개 · {{ page + 1 }} / {{ totalPages }}</div>
         <button class="btn btn-primary" @click="emitWrite">글쓰기</button>
       </div>
-      <div class="page-board__meta">{{ totalElements }}개 · {{ page + 1 }} / {{ totalPages }}</div>
     </div>
 
     <div class="page-board__tabs">
@@ -35,8 +34,7 @@
           <th class="col-title">제목</th>
           <th class="col-author">작성자</th>
           <th class="col-views">조회수</th>
-          <th class="col-like">좋아요</th>
-          <th class="col-dislike">싫어요</th>
+          <th class="col-like">추천</th>
           <th class="col-date">작성일</th>
         </tr>
       </thead>
@@ -58,8 +56,7 @@
           </td>
           <td class="col-author">{{ post.authorNickName }}</td>
           <td class="col-views">{{ post.viewCount }}</td>
-          <td class="col-like">{{ post.likeCount }}</td>
-          <td class="col-dislike">{{ post.dislikeCount }}</td>
+          <td class="col-like">{{ post.likeCount-post.dislikeCount }}</td>
           <td class="col-date">{{ formatDate(post.createdAt) }}</td>
         </tr>
 
@@ -83,12 +80,9 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/axios.js'
 import '@/assets/styles/components.css'
-import '@/assets/styles/pages/board.css'
-const route = useRoute()
-const router = useRouter()
+import '@/assets/styles/board/board.css'
 
 const props = defineProps({
   boardId: { type: Number, required: true },
@@ -175,18 +169,6 @@ watch(
   },
 )
 
-const goBoardPosts = () => {
-  // “자유게시판(현재 게시판)”의 목록(페이징)으로 이동
-  router.push({
-    name: 'BoardPosts',
-    params: { boardId: props.boardId},
-    query: {
-      page: route.query.page,
-      size: route.query.size,
-    },
-  })
-}
-
 // ===== UI handlers =====
 const movePage = (targetPage) => {
   if (targetPage < 0 || targetPage >= totalPages.value) return
@@ -203,6 +185,24 @@ const emitWrite = () => emit('write-click')
 
 const formatDate = (isoString) => {
   if (!isoString) return ''
-  return isoString.replace('T', ' ').substring(0, 16)
+
+  const createdAt = new Date(isoString)
+  const now = new Date()
+
+  const diffMs = now - createdAt
+  const diffHours = diffMs / (1000 * 60 * 60)
+
+  // 24시간 이내 → 시간만
+  if (diffHours < 24) {
+    const hh = String(createdAt.getHours()).padStart(2, '0')
+    const mm = String(createdAt.getMinutes()).padStart(2, '0')
+    return `${hh}:${mm}`
+  }
+
+  // 24시간 초과 → 날짜만
+  const yyyy = createdAt.getFullYear()
+  const mm = String(createdAt.getMonth() + 1).padStart(2, '0')
+  const dd = String(createdAt.getDate()).padStart(2, '0')
+  return `${yyyy}.${mm}.${dd}`
 }
 </script>

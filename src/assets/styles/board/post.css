@@ -1,0 +1,70 @@
+/* 메타 라인: 작성자 왼쪽 / 나머지 오른쪽 정렬 (캔버스 수정본) */
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 18px;
+
+  font-size: 12px;
+  color: rgb(255, 255, 255);
+}
+
+/* 작성자는 항상 왼쪽 */
+.post-meta__author {
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  white-space: nowrap;
+}
+
+/* 작성자 뒤부터 전부 오른쪽으로 밀기 */
+.post-meta__author + .post-meta__sep {
+  margin-left: auto;
+}
+
+/* 구분자 */
+.post-meta__sep {
+  color: rgb(255, 255, 255);
+  user-select: none;
+}
+
+/* 오른쪽 영역 요소들 */
+.post-meta__stat,
+.post-meta__date {
+  white-space: nowrap;
+}
+
+/* 추천/비추천 강조 유지 */
+.post-meta__stat--like {
+  color: rgba(3, 255, 74, 0.95);
+  font-weight: 600;
+}
+
+.post-meta__stat--dislike {
+  color: rgb(253, 15, 15);
+  font-weight: 600;
+}
+
+.post-actions {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+/* 가운데 추천/비추천 */
+.post-actions__center {
+  grid-column: 2;
+  display: inline-flex;
+  gap: 12px;
+}
+
+/* 우측 수정/삭제 */
+.post-actions__right {
+  grid-column: 3;
+  justify-self: end;
+}

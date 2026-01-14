@@ -1,51 +1,40 @@
 <template>
   <header class="header">
-    <h1 @click="goHome" class="title">콘소메</h1>
+    <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
     <div class="nav">
-        <!-- 🔹 섹션 + 게시판 네비 -->
-        <nav class="nav-sections">
-          <ul class="section-list">
-            <li
-              v-for="section in headerSections"
-              :key="section.sectionId"
-              class="section-item"
-            >
+      <!-- 🔹 섹션 + 게시판 네비 -->
+      <nav class="nav-sections">
+        <ul class="section-list">
+          <li v-for="section in headerSections" :key="section.sectionId" class="section-item">
             <span class="section-name">
               {{ section.sectionName }}
             </span>
 
-              <!-- 섹션 아래 게시판 목록 -->
-              <ul class="board-list">
-                <li
-                  v-for="board in section.boards"
-                  :key="board.boardId"
-                  class="board-item"
-                >
-                  <RouterLink
-                    :to="`/boards/${board.boardId}`"
-                    class="board-link"
-                  >
-                    {{ board.boardName }}
-                  </RouterLink>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </nav>
+            <!-- 섹션 아래 게시판 목록 -->
+            <ul class="board-list">
+              <li v-for="board in section.boards" :key="board.boardId" class="board-item">
+                <RouterLink :to="`/boards/${board.boardId}`" class="board-link">
+                  {{ board.boardName }}
+                </RouterLink>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
       <!-- ✅ 로그인 안 한 상태 -->
       <div class="nav-auth">
-      <template v-if="!nickname || nickname.length === 0">
-        <RouterLink to="/login" class="link">로그인</RouterLink>
-        <RouterLink to="/register" class="link">회원가입</RouterLink>
-      </template>
+        <template v-if="!nickname || nickname.length === 0">
+          <RouterLink to="/login" class="link">로그인</RouterLink>
+          <RouterLink to="/register" class="link">회원가입</RouterLink>
+        </template>
 
-      <!-- ✅ 로그인 한 상태 -->
-      <template v-else>
-        <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
-        <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
-        <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
-        <button class="logout-btn" @click="logout">로그아웃</button>
-      </template>
+        <!-- ✅ 로그인 한 상태 -->
+        <template v-else>
+          <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
+          <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
+          <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
+          <button class="logout-btn" @click="logout">로그아웃</button>
+        </template>
       </div>
     </div>
   </header>
@@ -118,7 +107,7 @@ onMounted(() => {
 .nav {
   display: flex;
   align-items: center;
-  flex: 1;           /* 제목 옆에서 나머지 폭을 차지 */
+  flex: 1; /* 제목 옆에서 나머지 폭을 차지 */
   margin-left: 24px; /* 로고와 약간 간격 */
 }
 
@@ -177,7 +166,7 @@ onMounted(() => {
 
 /* 로그인/유저 영역: 오른쪽으로 밀기 */
 .nav-auth {
-  margin-left: auto;  /* 🔹 이게 포인트: 나머지 공간 다 먹고 오른쪽 끝으로 밀림 */
+  margin-left: auto; /* 🔹 이게 포인트: 나머지 공간 다 먹고 오른쪽 끝으로 밀림 */
   display: flex;
   align-items: center;
   gap: 10px;
@@ -205,5 +194,10 @@ onMounted(() => {
 
 .logout-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  height: 32px; /* 필요하면 24~32 조절 */
+  width: auto;
 }
 </style>
