@@ -80,7 +80,7 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore'
 import '@/assets/styles/components.css'
-import '@/assets/styles/pages/post.css'
+import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
 
 const route = useRoute()
