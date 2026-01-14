@@ -1,0 +1,25 @@
+.board-header {
+  border-bottom: 1px solid #77787a;
+}
+
+.board-header__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.board-header__desc {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.board-header__meta {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.board-header__admin {
+  font-weight: 600;
+}
