@@ -44,19 +44,24 @@
         </section>
 
         <section class="post-comments" v-if="post">
-          <div class="post-comments__header">
-            <div class="post-comments__title">댓글</div>
-          </div>
-
-          <!-- 댓글 리스트 -->
-          <div class="comment-list">
-            <!-- v-for 자리 -->
-          </div>
-
-          <!-- 댓글 입력 -->
-          <div class="comment-editor">
-            <!-- textarea / 등록 버튼 자리 -->
-          </div>
+          <PostCommentSection
+            :post-id="postId"
+            :comments="comments"
+            :page="commentPage"
+            :size="commentSize"
+            :total-pages="commentTotalPages"
+            :total-elements="commentTotalElements"
+            :can-write="isLoggedIn"
+            :current-user-id="userStore.userId || null"
+            :post-author-id="post.authorId"
+            @page-change="loadComments"
+            @create-comment="createComment"
+            @edit-comment="editComment"
+            @delete-comment="deleteComment"
+            @like-comment="likeComment"
+            @dislike-comment="dislikeComment"
+            @login-required="onLoginRequired"
+          />
         </section>
         <section class="post-related-list" v-if="post">
           <BoardPostList
@@ -65,6 +70,7 @@
             :size="size"
             :active-post-id="post.postId"
             @post-click="goPostDetailFromList"
+            @write-click="onWriteClick"
           />
         </section>
         <div v-if="loading" class="post-status">불러오는 중...</div>
@@ -78,10 +84,11 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/axios.js'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/userStore.js'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
+import PostCommentSection from '@/components/board/PostCommentSection.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,18 +96,179 @@ const userStore = useUserStore()
 
 const page = computed(() => Number(route.query.page ?? 0))
 const size = computed(() => Number(route.query.size ?? 20))
-
 const postId = computed(() => Number(route.params.postId))
 
 const post = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
+// 댓글 상태
+const comments = ref([])
+const commentPage = ref(0)
+const commentSize = ref(20)
+const commentTotalPages = ref(0)
+const commentTotalElements = ref(0)
+
+// 댓글 목록 조회
+const loadComments = async (p = 0) => {
+  try {
+    const { data } = await api.get(`/posts/${postId.value}/comments`, {
+      params: {
+        page: p,
+        size: commentSize.value,
+      },
+    })
+
+    comments.value = Array.isArray(data?.comments) ? data.comments : []
+    commentPage.value = Number.isFinite(data?.currentPage) ? data.currentPage : p
+    commentTotalPages.value = Number.isFinite(data?.totalPages) ? data.totalPages : 0
+    commentTotalElements.value = typeof data?.totalElements === 'number' ? data.totalElements : 0
+  } catch (e) {
+    console.error(e)
+    comments.value = []
+    commentPage.value = p
+    commentTotalPages.value = 0
+    commentTotalElements.value = 0
+  }
+}
+
+// 댓글 작성
+const createComment = async (payload, done, fail) => {
+  if (!isLoggedIn.value) {
+    alert('로그인 후 이용 가능합니다.')
+    fail?.()
+    return
+  }
+
+  try {
+    await api.post(`/posts/${postId.value}/comments`, {
+      userId: userStore.userId,
+      parentId: payload.parentId ?? null,
+      content: payload.content,
+    })
+
+    done?.()
+
+    // 정책: 새 댓글이 보이도록 0페이지로 이동
+    await loadComments(0)
+
+    // 화면의 댓글 수 즉시 반영
+    if (post.value) post.value.commentCount = (post.value.commentCount ?? 0) + 1
+  } catch (e) {
+    alert(e?.response?.data?.message || '댓글 등록에 실패했습니다.')
+    fail?.()
+  }
+}
+
+// 댓글 수정
+const editComment = async (payload, done, fail) => {
+  if (!isLoggedIn.value) {
+    alert('로그인 후 이용 가능합니다.')
+    fail?.()
+    return
+  }
+
+  try {
+    await api.put(`/posts/${postId.value}/comments/${payload.commentId}`, {
+      userId: userStore.userId,
+      content: payload.content,
+    })
+
+    done?.()
+
+    // 수정 반영
+    await loadComments(commentPage.value)
+  } catch (e) {
+    alert(e?.response?.data?.message || '댓글 수정에 실패했습니다.')
+    fail?.()
+  }
+}
+
 // 작성자 == 현재 로그인 유저 인지 여부
 const isAuthor = computed(() => {
   if (!post.value || !userStore.userId) return false
   return post.value.authorId === userStore.userId
 })
+
+// 댓글 삭제
+const deleteComment = async (commentId, done, fail) => {
+  if (!isLoggedIn.value) {
+    alert('로그인 후 이용 가능합니다.')
+    fail?.()
+    return
+  }
+
+  if (!confirm('댓글을 삭제하시겠습니까?')) {
+    fail?.()
+    return
+  }
+
+  try {
+    await api.delete(`/posts/${postId.value}/comments/${commentId}`, {
+      params: { userId: userStore.userId },
+    })
+
+    done?.()
+
+    // 삭제 반영
+    await loadComments(commentPage.value)
+
+    // 화면의 댓글 수 즉시 반영(단순 감소)
+    if (post.value) post.value.commentCount = Math.max(0, (post.value.commentCount ?? 0) - 1)
+  } catch (e) {
+    alert(e?.response?.data?.message || '댓글 삭제에 실패했습니다.')
+    fail?.()
+  }
+}
+
+// 로그인 페이지로 이동
+const goToLogin = () => {
+  const currentPath = route.fullPath
+  router.push({ path: '/login', query: { redirect: currentPath } })
+}
+
+// 로그인 필요 시 처리
+const onLoginRequired = () => {
+  if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+    goToLogin()
+  }
+}
+
+// 댓글 추천
+const likeComment = async (commentId) => {
+  if (!userStore.userId) {
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      goToLogin()
+    }
+    return
+  }
+  try {
+    await api.post(`/posts/${postId.value}/comments/${commentId}/like`, null, {
+      params: { userId: userStore.userId },
+    })
+    await loadComments(commentPage.value)
+  } catch (e) {
+    alert(e?.response?.data?.message || '추천에 실패했습니다.')
+  }
+}
+
+// 댓글 비추천
+const dislikeComment = async (commentId) => {
+  if (!userStore.userId) {
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      goToLogin()
+    }
+    return
+  }
+  try {
+    await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`, null, {
+      params: { userId: userStore.userId },
+    })
+    await loadComments(commentPage.value)
+  } catch (e) {
+    alert(e?.response?.data?.message || '비추천에 실패했습니다.')
+  }
+}
 
 // 상세 조회
 const loadPost = async () => {
@@ -161,7 +329,9 @@ const onDelete = async () => {
 const onLike = async () => {
   if (!post.value) return
   if (!userStore.userId) {
-    alert('로그인 후 이용 가능합니다.')
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      goToLogin()
+    }
     return
   }
 
@@ -186,7 +356,9 @@ const onLike = async () => {
 const onDislike = async () => {
   if (!post.value) return
   if (!userStore.userId) {
-    alert('로그인 후 이용 가능합니다.')
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      goToLogin()
+    }
     return
   }
 
@@ -224,6 +396,7 @@ onMounted(() => {
     return
   }
   loadPost()
+  loadComments(0)
 })
 
 watch(
@@ -231,6 +404,7 @@ watch(
   (next, prev) => {
     if (!next || next === prev) return
     loadPost()
+    loadComments(0)
     // 선택: 화면 맨 위로
     // window.scrollTo({ top: 0, behavior: 'auto' })
   },
@@ -245,4 +419,10 @@ const goPostDetailFromList = (postId) => {
     },
   })
 }
+
+const onWriteClick = () => {
+  router.push({ name: 'PostWrite', params: { boardId: post.boardId } })
+}
+
+const isLoggedIn = computed(() => !!userStore.userId)
 </script>
