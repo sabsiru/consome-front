@@ -39,8 +39,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/api/axios'
-import { useUserStore } from '@/stores/userStore' // refUserId 용
+import api from '@/api/axios.js'
+import { useUserStore } from '@/stores/userStore.js' // refUserId 용
 
 const route = useRoute()
 const router = useRouter()

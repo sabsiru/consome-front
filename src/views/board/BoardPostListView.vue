@@ -77,7 +77,7 @@ const onCategoryChange = (nextCategoryId) => {
 }
 
 const onWriteClick = () => {
-  router.push({ name: 'Post', params: { boardId: boardId.value } })
+  router.push({ name: 'PostWrite', params: { boardId: boardId.value } })
 }
 
 const onPostClick = (postId) => {
