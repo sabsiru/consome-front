@@ -22,10 +22,11 @@
 <script setup>
 import { ref } from 'vue'
 import axios from '@/api/axios'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore.js'
 
 const router = useRouter()
+const route = useRoute()
 const loginId = ref('')
 const password = ref('')
 const error = ref('')
@@ -41,7 +42,9 @@ const login = async () => {
     localStorage.setItem('accessToken', data.accessToken)
 
     store.setUserData(data)
-    if (data.role === 'ADMIN') {
+    if (route.query.redirect) {
+      await router.push(route.query.redirect)
+    } else if (data.role === 'ADMIN') {
       await router.push('/admin')
     } else {
       await router.push('/')
