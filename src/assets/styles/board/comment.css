@@ -1,0 +1,306 @@
+.comment {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.comment__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.comment__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ===== 댓글 목록 ===== */
+.comment__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-item {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.comment-item__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.60);
+  margin-bottom: 6px;
+}
+
+.comment-item__meta-right {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 시간과 버튼 간격 */
+}
+
+.comment-item__author {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.comment-item__sep {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+
+.comment-item__date {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* 답글 버튼: 기본 브라우저 흰 배경 제거 */
+.comment-item__reply-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-item__reply-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.comment-item__reply-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.comment-item__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  word-break: break-word;
+}
+
+.comment-item__content-text {
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+.comment__empty {
+  padding: 16px 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.50);
+}
+
+/* ===== 댓글 페이징 ===== */
+.comment__paging {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.comment__page {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ===== 댓글 입력 ===== */
+.comment__write {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  position: relative;
+}
+
+.comment__textarea {
+  width: 100%;
+  resize: none;
+  min-height: 78px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  line-height: 1.55;
+  outline: none;
+
+}
+
+.comment__textarea:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.comment__textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.comment__write-actions {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+
+  display: none;        /* 기본 숨김 */
+  align-items: center;
+  gap: 8px;
+}
+
+.comment__hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.comment__write:focus-within .comment__write-actions {
+  display: flex;
+}
+
+.comment-badge--author {
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid rgba(229, 231, 235, 0);   /* 연한 회색 */
+  color: #4b5563;             /* 회색 텍스트 */
+  background-color: rgba(249, 250, 251, 0);  /* 거의 흰색 */
+}
+
+.comment-badge--edited {
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 1px 6px;
+  border: none;
+  color: rgba(255, 255, 255, 0.70);
+  background: rgba(0, 0, 0, 0.10);
+  margin-left: 6px;
+}
+
+/* ===== 댓글 작성자 액션(hover 시 노출): 수정/삭제 ===== */
+.comment-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  /* 기본 숨김: hover 시만 보이게 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.comment-item:hover .comment-item__actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.comment-item__edit-btn,
+.comment-item__delete-btn {
+  flex: 0 0 auto;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-item__edit-btn:hover,
+.comment-item__delete-btn:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.comment-item__edit-btn:disabled,
+.comment-item__delete-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== 답글(대댓글) 입력 영역 ===== */
+.comment-reply {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.10);
+}
+
+/* 답글 입력창은 본댓글보다 살짝 작게 */
+.comment__textarea--reply {
+  min-height: 56px;
+}
+
+/* 답글 액션 버튼은 absolute/숨김 규칙을 무력화하고 항상 보이게 */
+.comment__write-actions--reply {
+  position: static;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.comment-item__edit {
+  flex: 1;
+}
+
+.comment__textarea--edit {
+  min-height: 56px;
+}
+
+.comment-item__edit-actions {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.comment-item__vote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.60);
+  cursor: pointer;
+}
+
+.comment-item__vote-btn:hover {
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.comment-item__vote-btn--like:hover {
+  color: rgba(3, 255, 74, 0.95);
+}
+
+.comment-item__vote-btn--dislike:hover {
+  color: rgb(253, 15, 15);
+}
+
+.comment-item__vote-count {
+  font-size: 11px;
+}
+
+.comment-item__parent-author {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  margin-right: 6px;
+}
