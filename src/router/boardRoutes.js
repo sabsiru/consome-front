@@ -1,7 +1,7 @@
 import BoardLayout from '@/layouts/BoardLayout.vue'
-import BoardPostListView from '@/views/BoardPostListView.vue'
-import PostView from '@/views/PostView.vue'
-import PostDetail from '@/views/PostDetail.vue'
+import BoardPostListView from '@/views/board/BoardPostListView.vue'
+import PostView from '@/views/board/PostView.vue'
+import PostDetail from '@/views/board/PostDetail.vue'
 
 export default [
   {
