@@ -16,9 +16,11 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BoardPostList from '@/components/board/BoardPostList.vue'
+import { useUserStore } from '@/stores/userStore.js'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const boardId = computed(() => Number(route.params.boardId))
 const page = computed(() => Number(route.query.page ?? 0))
@@ -77,6 +79,12 @@ const onCategoryChange = (nextCategoryId) => {
 }
 
 const onWriteClick = () => {
+  if (!userStore.token) {
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      router.push({ name: 'login', query: { redirect: route.fullPath } })
+    }
+    return
+  }
   router.push({ name: 'PostWrite', params: { boardId: boardId.value } })
 }
 
