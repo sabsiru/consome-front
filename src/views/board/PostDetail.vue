@@ -27,7 +27,7 @@
 
         <section class="post-body" v-if="post">
           <div class="post-content">
-            {{ post.content }}
+            <div v-html="post.content"></div>
           </div>
         </section>
 
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
@@ -281,6 +281,8 @@ const loadPost = async () => {
       },
     })
     post.value = data
+    await nextTick()
+    await processEmbeds()
   } catch (e) {
     error.value = e?.response?.data?.message || '게시글을 불러오지 못했습니다.'
   } finally {
@@ -293,7 +295,7 @@ const goEdit = () => {
   if (!post.value) return
 
   router.push({
-    name: 'Post',
+    name: 'PostWrite',
     params: {
       boardId: post.value.boardId,
     },
@@ -425,4 +427,62 @@ const onWriteClick = () => {
 }
 
 const isLoggedIn = computed(() => !!userStore.userId)
+
+const loadScript = (src, id, forceReload = false) =>
+  new Promise((resolve) => {
+    const existing = document.getElementById(id)
+    if (existing && forceReload) {
+      existing.remove()
+    }
+    if (document.getElementById(id)) {
+      resolve()
+      return
+    }
+    const script = document.createElement('script')
+    script.id = id
+    script.src = src
+    script.async = true
+    script.onload = () => resolve()
+    script.onerror = () => resolve()
+    document.body.appendChild(script)
+  })
+
+const markYoutubeAspect = async () => {
+  const iframes = document.querySelectorAll('.post-content iframe[src*="youtube.com/embed/"]')
+  await Promise.all(
+    Array.from(iframes).map(async (iframe) => {
+      const src = iframe.getAttribute('src')
+      if (!src) return
+      if (src.includes('ytshorts=1')) {
+        iframe.classList.add('yt-vertical')
+        return
+      }
+      const id = src.split('/embed/')[1]?.split('?')[0]
+      if (!id) return
+      try {
+        const res = await fetch(
+          `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`,
+        )
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.thumbnail_width && data.thumbnail_height && data.thumbnail_height > data.thumbnail_width) {
+          iframe.classList.add('yt-vertical')
+        }
+      } catch {
+        // ignore oEmbed failures
+      }
+    }),
+  )
+}
+
+const processEmbeds = async () => {
+  await loadScript('https://platform.twitter.com/widgets.js', 'embed-twitter')
+  await loadScript('https://www.instagram.com/embed.js', 'embed-instagram')
+  await loadScript('https://www.tiktok.com/embed.js', 'embed-tiktok', true)
+  await loadScript('https://www.threads.net/embed.js', 'embed-threads', true)
+
+  window.twttr?.widgets?.load()
+  window.instgrm?.Embeds?.process()
+  await markYoutubeAspect()
+}
 </script>

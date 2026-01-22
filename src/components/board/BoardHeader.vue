@@ -14,7 +14,6 @@
 </template>
 
 <script setup>
-import '@/assets/styles/board/BoardHeader.css'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
