@@ -1,40 +1,42 @@
 <template>
   <header class="header">
-    <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
-    <div class="nav">
-      <!-- 🔹 섹션 + 게시판 네비 -->
-      <nav class="nav-sections">
-        <ul class="section-list">
-          <li v-for="section in headerSections" :key="section.sectionId" class="section-item">
-            <span class="section-name">
-              {{ section.sectionName }}
-            </span>
+    <div class="header__inner">
+      <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
+      <div class="nav">
+        <!-- 🔹 섹션 + 게시판 네비 -->
+        <nav class="nav-sections">
+          <ul class="section-list">
+            <li v-for="section in headerSections" :key="section.sectionId" class="section-item">
+              <span class="section-name">
+                {{ section.sectionName }}
+              </span>
 
-            <!-- 섹션 아래 게시판 목록 -->
-            <ul class="board-list">
-              <li v-for="board in section.boards" :key="board.boardId" class="board-item">
-                <RouterLink :to="`/boards/${board.boardId}`" class="board-link">
-                  {{ board.boardName }}
-                </RouterLink>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-      <!-- ✅ 로그인 안 한 상태 -->
-      <div class="nav-auth">
-        <template v-if="!nickname || nickname.length === 0">
-          <RouterLink to="/login" class="link">로그인</RouterLink>
-          <RouterLink to="/register" class="link">회원가입</RouterLink>
-        </template>
+              <!-- 섹션 아래 게시판 목록 -->
+              <ul class="board-list">
+                <li v-for="board in section.boards" :key="board.boardId" class="board-item">
+                  <RouterLink :to="`/boards/${board.boardId}`" class="board-link">
+                    {{ board.boardName }}
+                  </RouterLink>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <!-- ✅ 로그인 안 한 상태 -->
+        <div class="nav-auth">
+          <template v-if="!nickname || nickname.length === 0">
+            <RouterLink to="/login" class="link">로그인</RouterLink>
+            <RouterLink to="/register" class="link">회원가입</RouterLink>
+          </template>
 
-        <!-- ✅ 로그인 한 상태 -->
-        <template v-else>
-          <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
-          <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
-          <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
-          <button class="logout-btn" @click="logout">로그아웃</button>
-        </template>
+          <!-- ✅ 로그인 한 상태 -->
+          <template v-else>
+            <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
+            <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
+            <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
+            <button class="logout-btn" @click="logout">로그아웃</button>
+          </template>
+        </div>
       </div>
     </div>
   </header>
@@ -86,17 +88,22 @@ onMounted(() => {
 
 <style scoped>
 .header {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  background: transparent;
-  color: #777;
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 10;
-  /* 기존 justify-content: space-between 제거 */
+  background: transparent;
+  color: #777;
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 10px var(--app-padding-x);
 }
 
 .title {
@@ -108,7 +115,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   flex: 1; /* 제목 옆에서 나머지 폭을 차지 */
-  margin-left: 24px; /* 로고와 약간 간격 */
+  margin-left: 16px; /* 로고와 약간 간격 */
 }
 
 /* 섹션/게시판 네비: 왼쪽 정렬 */
