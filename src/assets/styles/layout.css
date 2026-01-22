@@ -14,6 +14,12 @@
   padding: var(--app-padding-y) var(--app-padding-x);
 }
 
+.layout__container {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 0;
+}
+
 /* 헤더가 fixed면 콘텐츠를 아래로 밀어줌 */
 .app-content {
   padding-top: var(--app-header-height);
@@ -30,13 +36,6 @@
 
   .layout {
     width: 100%;
-  }
-
-  .layout__container {
-    /* 전역에서 이미 max-width를 잡고 있으면 이 부분 제거하세요. */
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
   }
 
   .text-muted {
