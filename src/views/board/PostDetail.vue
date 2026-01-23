@@ -33,8 +33,8 @@
 
         <section class="post-actions" v-if="post">
           <div class="post-actions__center">
-            <button type="button" class="btn" @click="onLike">추천</button>
-            <button type="button" class="btn" @click="onDislike">비추천</button>
+            <button type="button" class="btn" :class="{ 'btn--voted': hasLiked }" :disabled="hasLiked" @click="onLike">추천</button>
+            <button type="button" class="btn" :class="{ 'btn--voted-dislike': hasDisliked }" :disabled="hasDisliked" @click="onDislike">비추천</button>
           </div>
 
           <div class="post-actions__right" v-if="isAuthor">
@@ -102,6 +102,10 @@ const post = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
+// 투표 상태
+const hasLiked = ref(false)
+const hasDisliked = ref(false)
+
 // 댓글 상태
 const comments = ref([])
 const commentPage = ref(0)
@@ -116,6 +120,7 @@ const loadComments = async (p = 0) => {
       params: {
         page: p,
         size: commentSize.value,
+        userId: userStore.userId,
       },
     })
 
@@ -242,12 +247,28 @@ const likeComment = async (commentId) => {
     }
     return
   }
+
+  // 해당 댓글 찾기
+  const comment = comments.value.find((c) => c.commentId === commentId)
+  if (!comment) return
+
+  // Optimistic UI: 즉시 상태 토글
+  const prevHasLiked = comment.hasLiked
+  const prevLikeCount = comment.likeCount
+  comment.hasLiked = !comment.hasLiked
+  comment.likeCount = comment.hasLiked ? (comment.likeCount ?? 0) + 1 : Math.max(0, (comment.likeCount ?? 0) - 1)
+
   try {
-    await api.post(`/posts/${postId.value}/comments/${commentId}/like`, null, {
+    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/like`, null, {
       params: { userId: userStore.userId },
     })
-    await loadComments(commentPage.value)
+    // 백엔드 응답이 있으면 반영
+    if (data?.likeCount !== undefined) comment.likeCount = data.likeCount
+    if (data?.hasLiked !== undefined) comment.hasLiked = data.hasLiked
   } catch (e) {
+    // 실패 시 원복
+    comment.hasLiked = prevHasLiked
+    comment.likeCount = prevLikeCount
     alert(e?.response?.data?.message || '추천에 실패했습니다.')
   }
 }
@@ -260,12 +281,28 @@ const dislikeComment = async (commentId) => {
     }
     return
   }
+
+  // 해당 댓글 찾기
+  const comment = comments.value.find((c) => c.commentId === commentId)
+  if (!comment) return
+
+  // Optimistic UI: 즉시 상태 토글
+  const prevHasDisliked = comment.hasDisliked
+  const prevDislikeCount = comment.dislikeCount
+  comment.hasDisliked = !comment.hasDisliked
+  comment.dislikeCount = comment.hasDisliked ? (comment.dislikeCount ?? 0) + 1 : Math.max(0, (comment.dislikeCount ?? 0) - 1)
+
   try {
-    await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`, null, {
+    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`, null, {
       params: { userId: userStore.userId },
     })
-    await loadComments(commentPage.value)
+    // 백엔드 응답이 있으면 반영
+    if (data?.dislikeCount !== undefined) comment.dislikeCount = data.dislikeCount
+    if (data?.hasDisliked !== undefined) comment.hasDisliked = data.hasDisliked
   } catch (e) {
+    // 실패 시 원복
+    comment.hasDisliked = prevHasDisliked
+    comment.dislikeCount = prevDislikeCount
     alert(e?.response?.data?.message || '비추천에 실패했습니다.')
   }
 }
@@ -281,6 +318,9 @@ const loadPost = async () => {
       },
     })
     post.value = data
+    // 투표 상태 로드 (백엔드에서 반환 시)
+    hasLiked.value = data.hasLiked ?? false
+    hasDisliked.value = data.hasDisliked ?? false
     await nextTick()
     await processEmbeds()
   } catch (e) {
@@ -337,6 +377,10 @@ const onLike = async () => {
     return
   }
 
+  // Optimistic UI: 즉시 상태 토글
+  const prevLiked = hasLiked.value
+  hasLiked.value = !hasLiked.value
+
   try {
     const { data } = await api.post(`/posts/${postId.value}/like`, null, {
       params: {
@@ -350,7 +394,12 @@ const onLike = async () => {
       post.value.likeCount = data.likeCount
       post.value.dislikeCount = data.dislikeCount
     }
+    // 백엔드 응답에 투표 상태가 있으면 반영
+    if (data.hasLiked !== undefined) hasLiked.value = data.hasLiked
+    if (data.hasDisliked !== undefined) hasDisliked.value = data.hasDisliked
   } catch (e) {
+    // 실패 시 원복
+    hasLiked.value = prevLiked
     alert(e?.response?.data?.message || '추천에 실패했습니다.')
   }
 }
@@ -364,6 +413,10 @@ const onDislike = async () => {
     return
   }
 
+  // Optimistic UI: 즉시 상태 토글
+  const prevDisliked = hasDisliked.value
+  hasDisliked.value = !hasDisliked.value
+
   try {
     const { data } = await api.post(`/posts/${postId.value}/dislike`, null, {
       params: {
@@ -376,7 +429,12 @@ const onDislike = async () => {
       post.value.likeCount = data.likeCount
       post.value.dislikeCount = data.dislikeCount
     }
+    // 백엔드 응답에 투표 상태가 있으면 반영
+    if (data.hasLiked !== undefined) hasLiked.value = data.hasLiked
+    if (data.hasDisliked !== undefined) hasDisliked.value = data.hasDisliked
   } catch (e) {
+    // 실패 시 원복
+    hasDisliked.value = prevDisliked
     alert(e?.response?.data?.message || '비추천에 실패했습니다.')
   }
 }
