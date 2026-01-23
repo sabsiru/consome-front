@@ -1,21 +1,24 @@
-/* 메타 라인: 작성자 왼쪽 / 나머지 오른쪽 정렬 (캔버스 수정본) */
+/* Developer Console Theme - Post Styles */
+
+/* 메타 라인: 작성자 왼쪽 / 나머지 오른쪽 정렬 */
 .post-meta {
   display: flex;
   align-items: center;
   gap: 8px;
 
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 18px;
 
+  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: rgb(255, 255, 255);
+  color: var(--text-secondary);
 }
 
 /* 작성자는 항상 왼쪽 */
 .post-meta__author {
   font-weight: 600;
-  color: rgb(255, 255, 255);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -26,7 +29,7 @@
 
 /* 구분자 */
 .post-meta__sep {
-  color: rgb(255, 255, 255);
+  color: var(--text-muted);
   user-select: none;
 }
 
@@ -34,16 +37,17 @@
 .post-meta__stat,
 .post-meta__date {
   white-space: nowrap;
+  color: var(--text-muted);
 }
 
-/* 추천/비추천 강조 유지 */
+/* 추천/비추천 강조 */
 .post-meta__stat--like {
-  color: rgba(3, 255, 74, 0.95);
+  color: var(--accent);
   font-weight: 600;
 }
 
 .post-meta__stat--dislike {
-  color: rgb(253, 15, 15);
+  color: var(--danger);
   font-weight: 600;
 }
 
@@ -83,73 +87,88 @@
 }
 
 .board-post-write label {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
   font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .board-post-write input,
 .board-post-write select {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
   font-size: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .board-post-write input:focus,
 .board-post-write select:focus {
   outline: none;
-  box-shadow: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
 }
 
 .board-post-write .editor-wrapper {
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   overflow: hidden;
+  background: var(--bg-secondary);
 }
 
 .board-post-write .toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: 8px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #ccc;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .board-post-write .toolbar button {
-  padding: 4px 8px;
-  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background: #fff;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  transition: all 0.2s ease;
 }
 
 .board-post-write .toolbar button:hover {
-  background: #e0e0e0;
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .board-post-write .toolbar button.active {
-  background: #333;
-  color: #fff;
-  border-color: #333;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
 }
 
 .board-post-write .toolbar .divider {
   width: 1px;
-  background: #ccc;
-  margin: 0 4px;
+  background: var(--border-color);
+  margin: 0 6px;
 }
 
 .board-post-write .editor-content {
   min-height: 360px;
-  padding: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
 }
 
 .board-post-write .editor-content :deep(.ProseMirror) {
   outline: none;
   min-height: 360px;
   border: none;
+  color: var(--text-primary);
 }
 
 .board-post-write .editor-content :deep(.ProseMirror p) {
@@ -160,25 +179,31 @@
 .board-post-write .editor-content :deep(.ProseMirror h2),
 .board-post-write .editor-content :deep(.ProseMirror h3) {
   margin: 16px 0 8px;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
 }
 
 .board-post-write .editor-content :deep(.ProseMirror code) {
-  background: #f0f0f0;
-  padding: 2px 4px;
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
   border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
 }
 
 .board-post-write .editor-content :deep(.ProseMirror pre) {
-  background: #1e1e1e;
-  color: #fff;
-  padding: 12px;
-  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 16px;
+  border-radius: 6px;
   overflow-x: auto;
+  border: 1px solid var(--border-color);
 }
 
 .board-post-write .editor-content :deep(.ProseMirror img) {
   max-width: 100%;
   height: auto;
+  border-radius: 6px;
 }
 
 .board-post-write .editor-content :deep(iframe) {
@@ -186,6 +211,7 @@
   max-width: 100%;
   border: 0;
   display: block;
+  border-radius: 6px;
 }
 
 .board-post-write .editor-content:focus,
@@ -200,6 +226,12 @@
 .board-post-write video {
   max-width: 100%;
   display: block;
+  border-radius: 6px;
+}
+
+.post-content {
+  color: var(--text-primary);
+  line-height: 1.7;
 }
 
 .post-content iframe {
@@ -207,6 +239,7 @@
   max-width: 100%;
   border: 0;
   display: block;
+  border-radius: 6px;
 }
 
 .post-content iframe[src*="youtube.com/embed/"] {
@@ -223,6 +256,7 @@
 .post-content video {
   max-width: 100%;
   display: block;
+  border-radius: 6px;
 }
 
 .board-post-write .editor-content :deep(iframe[src*="youtube.com/embed/"]),
@@ -246,8 +280,10 @@
 }
 
 .board-post-write .error {
-  color: #d33;
+  color: var(--danger);
   margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
 }
 
 .board-post-write .actions {
@@ -262,19 +298,20 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(10, 10, 15, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .drop-zone {
   width: 400px;
   height: 250px;
-  border: 2px dashed #666;
+  border: 2px dashed var(--border-color);
   border-radius: 12px;
-  background: #1a1a1a;
+  background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,26 +321,29 @@
 }
 
 .drop-zone.drag-over {
-  border-color: #4a9eff;
-  background: #1a2a3a;
+  border-color: var(--accent);
+  background: var(--accent-dim);
 }
 
 .drop-zone p {
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .drop-zone button {
-  padding: 8px 16px;
-  border: 1px solid #666;
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: #333;
-  color: #fff;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
   cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s ease;
 }
 
 .drop-zone button:hover {
-  background: #444;
+  background: var(--bg-hover);
+  border-color: var(--accent);
 }
 
 /* 영상 변환 중 오버레이 */
@@ -313,11 +353,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(10, 10, 15, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1001;
+  backdrop-filter: blur(4px);
 }
 
 .converting-content {
@@ -325,15 +366,16 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  color: #fff;
-  font-size: 16px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #333;
-  border-top-color: #4a9eff;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -342,4 +384,23 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* 투표 버튼 활성화 상태 */
+.btn--voted {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--bg-primary) !important;
+}
+
+.btn--voted-dislike {
+  background: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: #fff !important;
+}
+
+.btn--voted:disabled,
+.btn--voted-dislike:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
