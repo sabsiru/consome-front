@@ -1,31 +1,33 @@
 <template>
-  <section style="padding: 20px">
-    <h2>회원가입</h2>
+  <div class="register-view">
+    <section class="register-container">
+      <h2>회원가입</h2>
 
-    <form @submit.prevent="register">
-      <div style="margin-bottom: 10px">
-        <label>아이디:</label>
-        <input v-model="loginId" type="text" required />
-      </div>
+      <form @submit.prevent="register">
+        <div class="form-group">
+          <label for="loginId">아이디</label>
+          <input id="loginId" v-model="loginId" type="text" required />
+        </div>
 
-      <div style="margin-bottom: 10px">
-        <label>닉네임:</label>
-        <input v-model="nickname" type="text" required />
-      </div>
+        <div class="form-group">
+          <label for="nickname">닉네임</label>
+          <input id="nickname" v-model="nickname" type="text" required />
+        </div>
 
-      <div style="margin-bottom: 10px">
-        <label>비밀번호:</label>
-        <input v-model="password" type="password" required />
-      </div>
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input id="password" v-model="password" type="password" required />
+        </div>
 
-      <button type="submit">회원가입</button>
-    </form>
-  </section>
+        <button type="submit">회원가입</button>
+      </form>
+    </section>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import axios from '@/api/axios' // 이미 만든 axios 인스턴스 import
+import axios from '@/api/axios'
 
 const loginId = ref('')
 const nickname = ref('')
@@ -41,7 +43,6 @@ const register = async () => {
 
     console.log('회원가입 성공:', response.data)
     alert('회원가입이 완료되었습니다.')
-    // 회원가입 성공 시 메인 페이지로 이동
     window.location.href = '/'
   } catch (error) {
     console.error('회원가입 실패:', error)
@@ -62,3 +63,84 @@ const register = async () => {
   }
 }
 </script>
+
+<style scoped>
+.register-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 20px;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.register-container h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.register-container button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 8px;
+}
+
+.register-container button[type="submit"]:hover {
+  background: #00e6b8;
+}
+</style>

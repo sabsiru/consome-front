@@ -31,7 +31,7 @@
 
           <!-- ✅ 로그인 한 상태 -->
           <template v-else>
-            <span class="user-info">{{ nickname }} 님 · {{ point }}P</span>
+            <span class="user-info">{{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
             <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
             <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
             <button class="logout-btn" @click="logout">로그아웃</button>
@@ -89,8 +89,8 @@ onMounted(() => {
 <style scoped>
 .header {
   width: 100%;
-  background: transparent;
-  color: #777;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header__inner {
@@ -99,7 +99,7 @@ onMounted(() => {
   width: 100%;
   max-width: var(--app-max-width);
   margin: 0 auto;
-  padding: 10px var(--app-padding-x);
+  padding: 12px var(--app-padding-x);
 }
 
 .title {
@@ -110,8 +110,8 @@ onMounted(() => {
 .nav {
   display: flex;
   align-items: center;
-  flex: 1; /* 제목 옆에서 나머지 폭을 차지 */
-  margin-left: 16px; /* 로고와 약간 간격 */
+  flex: 1;
+  margin-left: 20px;
 }
 
 /* 섹션/게시판 네비: 왼쪽 정렬 */
@@ -122,30 +122,51 @@ onMounted(() => {
 
 .section-list {
   display: flex;
-  gap: 16px;
+  gap: 24px;
 }
 
 .section-item {
   position: relative;
+  padding: 8px 0;
 }
 
 .section-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-primary);
   cursor: pointer;
+  transition: color 0.2s ease;
+  display: block;
+}
+
+.section-name:hover {
+  color: var(--accent);
 }
 
 /* 드롭다운 게시판 목록 */
 .board-list {
   display: none;
   position: absolute;
-  top: 24px;
-  left: 0; /* 섹션 이름 기준 왼쪽 정렬 */
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 4px 0;
-  min-width: 120px;
+  top: calc(100% - 4px);
+  left: -12px;
+  min-width: 160px;
   z-index: 20;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 투명한 브릿지 영역 - hover 유지 */
+.board-list::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
 }
 
 .section-item:hover .board-list {
@@ -158,49 +179,90 @@ onMounted(() => {
 
 .board-link {
   display: block;
-  padding: 4px 12px;
-  color: #555;
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
   text-decoration: none;
+  transition: all 0.15s ease;
 }
 
 .board-link:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
+  color: var(--accent);
 }
 
 /* 로그인/유저 영역: 오른쪽으로 밀기 */
 .nav-auth {
-  margin-left: auto; /* 🔹 이게 포인트: 나머지 공간 다 먹고 오른쪽 끝으로 밀림 */
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
-/* 기존 링크/버튼 스타일은 그대로 유지 */
+.user-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.user-info .point {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 링크 스타일 */
 .link {
-  color: #777;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .link:hover {
-  text-decoration: underline;
+  color: var(--accent);
+  background: var(--accent-dim);
+  text-decoration: none;
+}
+
+/* 버튼 스타일 */
+.nav-auth button {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-auth button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
 }
 
 .logout-btn {
-  background: transparent;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 4px 10px;
-  cursor: pointer;
-  transition: 0.2s;
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-muted) !important;
 }
 
 .logout-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: transparent !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
 }
 
 .logo {
-  height: 32px; /* 필요하면 24~32 조절 */
+  height: 32px;
   width: auto;
+  filter: brightness(1.1);
 }
 </style>

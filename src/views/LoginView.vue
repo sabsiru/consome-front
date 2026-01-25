@@ -13,6 +13,8 @@ import LoginForm from '@/components/LoginForm.vue'
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 20px;
 }
 </style>
