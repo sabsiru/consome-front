@@ -1,29 +1,34 @@
+/* Developer Console Theme - Button Styles */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
 
-  background: var(--color-background-soft);
-  color: var(--color-text);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 
+  font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
+  font-weight: 500;
   line-height: 1;
 
   cursor: pointer;
   user-select: none;
+  transition: all 0.2s ease;
 }
 
 /* hover/focus */
 .btn:hover {
-  background: var(--color-background-mute);
+  background: var(--bg-tertiary);
+  border-color: var(--text-muted);
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--color-border-hover);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -33,14 +38,103 @@
   cursor: not-allowed;
 }
 
-/* primary (글쓰기 같은 주요 액션) */
+/* primary (주요 액션 - 시안 액센트) */
 .btn-primary {
-  background: #52b6ff;
-  border-color: #7fc2f3;
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
-  background: #52b6ff;
-  border-color: #7fc2f3;
+  background: #00e6b8;
+  border-color: #00e6b8;
+}
+
+/* secondary (보조 액션) */
+.btn-secondary {
+  background: transparent;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-secondary:hover {
+  background: var(--accent-dim);
+}
+
+/* danger (삭제 등 위험 액션) */
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #ff5577;
+  border-color: #ff5577;
+}
+
+/* ghost (최소화된 버튼) */
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* small size */
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.badge-accent {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.badge-danger {
+  background: rgba(255, 68, 102, 0.15);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Card styles */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.card-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
 }

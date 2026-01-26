@@ -1,42 +1,51 @@
+/* Developer Console Theme - Board Styles */
 .page-board {
-  background: #1b1b1b;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   overflow: hidden;
 }
 
 /* 보드 헤더 */
 .board-header {
-  border-bottom: 1px solid #77787a;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .board-header__title {
+  font-family: 'Outfit', sans-serif;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.board-header__title:hover {
+  color: var(--accent);
 }
 
 .board-header__desc {
   margin-top: 6px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .board-header__meta {
   margin-top: 10px;
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .board-header__admin {
   font-weight: 600;
+  color: var(--accent);
 }
 
 /* 상단 헤더(채널명/메타/액션) */
 .page-board__header {
   padding: 14px 16px;
-  background: #202020;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-board__title-row {
@@ -48,35 +57,44 @@
 
 .page-board__meta {
   margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: rgba(255,255,255,0.55);
+  color: var(--text-muted);
 }
 
-/* 상단 탭/필터 바(스크린샷의 탭 느낌) */
+/* 상단 탭/필터 바 */
 .page-board__tabs {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #1f1f1f;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-board__tab {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
-  color: rgba(255,255,255,0.70);
-  background: #2a2a2a;
-  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   cursor: pointer;
   user-select: none;
+  transition: all 0.2s ease;
+}
+
+.page-board__tab:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
 }
 
 .page-board__tab.is-active {
-  background: rgb(82, 182, 255);
-  border-color: rgb(82, 182, 255);
-  color: rgba(255,255,255,0.92);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
 }
 
 /* 테이블(게시글 리스트) */
@@ -87,43 +105,49 @@
 }
 
 .board-table thead {
-  background: #2a2a2a;
+  background: var(--bg-tertiary);
 }
 
 .board-table th,
 .board-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
 .board-table th {
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
-  color: rgba(255,255,255,0.65);
+  color: var(--text-secondary);
   text-align: left;
   white-space: nowrap;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .board-table tbody tr {
-  background: #222;
+  background: var(--bg-secondary);
+  transition: background 0.15s ease;
+  cursor: pointer;
 }
 
 .board-table tbody tr:nth-child(even) {
-  background: #262626;
+  background: var(--bg-tertiary);
 }
 
 .board-table tbody tr:hover {
-  background: #303030;
+  background: var(--bg-hover);
 }
 
 /* 현재 보고 있는 게시글 row 하이라이트 */
 .board-table tbody tr.is-active {
-  background: #303030; /* hover 톤업과 동일하게 */
+  background: var(--bg-hover);
+  border-left: 2px solid var(--accent);
 }
 
-/* hover랑 겹칠 때도 유지 */
 .board-table tbody tr.is-active:hover {
-  background: #303030;
+  background: var(--bg-hover);
 }
 
 .board-table th.col-category,
@@ -139,32 +163,34 @@
   text-align: center;
 }
 
-/* 컬럼 폭(스크린샷 비슷하게) */
-.col-category { width: 64px; text-align: center; color: rgba(255,255,255,0.75); }
-.col-title { width: auto; }
-.col-author { width: 140px; color: rgba(255,255,255,0.80); }
+/* 컬럼 폭 */
+.col-category { width: 72px; text-align: center; color: var(--text-muted); }
+.col-title { width: auto; color: var(--text-primary); }
+.col-author { width: 140px; color: var(--text-secondary); }
 .col-views,
 .col-comments,
 .col-like,
-.col-dislike { width: 72px; text-align: right; color: rgba(255,255,255,0.75); }
-.col-date { width: 96px; color: rgba(255,255,255,0.65); }
+.col-dislike { width: 72px; text-align: right; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.col-date { width: 96px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 
 .post-link:hover {
-  background: rgba(255,255,255,0.06);
+  background: var(--bg-hover);
 }
 
 /* 제목 옆 댓글 수 */
 .post-comment-count {
-  margin-left: 4px;
-  font-size: 12px;
-  color: rgba(255, 180, 180, 0.85);
+  margin-left: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
 }
 
 /* 빈 상태 */
 .board-empty {
   text-align: center;
-  padding: 24px 0;
-  color: rgba(255,255,255,0.55);
+  padding: 32px 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
 /* 하단 액션/페이지네이션 */
@@ -174,19 +200,20 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  background: #202020;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-color);
 }
 
 .pagination {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,0.70);
+  gap: 12px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
 }
 
-/* 모바일: 표는 유지하되 컬럼 최소화하고 싶으면 여기서 숨김 처리 */
+/* 모바일: 표는 유지하되 컬럼 최소화 */
 @media (max-width: 640px) {
   .col-author,
   .col-like,
