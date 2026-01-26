@@ -1,0 +1,360 @@
+/* ==============================================
+   Board Manager (BoardManageView.vue)
+   ============================================== */
+
+.board-manage {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 32px;
+}
+
+/* Split Panel Layout */
+.split-panel {
+  display: flex;
+  gap: 24px;
+  min-height: calc(100vh - 140px);
+}
+
+.panel-left {
+  flex: 1;
+  max-width: 420px;
+}
+
+.panel-right {
+  flex: 1;
+}
+
+/* Action Bar & Back Button (same height) */
+.action-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.action-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.action-btn .btn-icon {
+  margin-right: 6px;
+}
+
+/* Tree Container */
+.tree-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  flex: 1;
+  min-height: 400px;
+}
+
+/* Tree Node */
+.tree-node {
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.tree-node:hover {
+  background: var(--bg-hover);
+}
+
+.tree-node.selected {
+  background: var(--accent-dim);
+}
+
+.tree-node.selected .node-name {
+  color: var(--accent);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.drag-handle {
+  color: var(--text-muted);
+  cursor: grab;
+  font-size: 10px;
+  letter-spacing: -2px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.node-icon {
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 12px;
+}
+
+.section-node > .node-header .node-icon {
+  color: var(--accent);
+}
+
+.node-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.node-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--text-muted);
+}
+
+/* Nested Containers */
+.boards-container {
+  margin-left: 20px;
+  border-left: 1px solid var(--border-color);
+}
+
+.categories-container {
+  margin-left: 20px;
+  border-left: 1px dashed var(--border-color);
+}
+
+.category-node .node-header {
+  padding: 6px 12px;
+}
+
+/* Empty Tree */
+.empty-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-muted);
+}
+
+.empty-tree .empty-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+/* Detail Panel */
+.detail-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+  flex: 1;
+  min-height: 400px;
+}
+
+.panel-header {
+  margin-bottom: 28px;
+}
+
+.panel-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.panel-header h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 12px 0 0;
+}
+
+/* Form (local names for BoardManageView) */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-input.small {
+  width: 100px;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+/* Meta Info */
+.meta-info {
+  display: flex;
+  gap: 24px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.meta-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Buttons (local names for BoardManageView) */
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-content {
+  text-align: center;
+}
+
+.empty-content .empty-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.empty-content p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: var(--text-muted) !important;
+  margin-top: 4px !important;
+}

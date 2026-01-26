@@ -21,7 +21,12 @@
         </div>
 
         <div class="tree-container">
-          <draggable v-model="treeData" item-key="id" @end="onDragEnd('section', treeData)" handle=".drag-handle">
+          <draggable
+            v-model="treeData"
+            item-key="id"
+            @end="onDragEnd('section', treeData)"
+            handle=".drag-handle"
+          >
             <template #item="{ element: section }">
               <div
                 :class="['tree-node section-node', { selected: isSelected('section', section.id) }]"
@@ -62,7 +67,10 @@
                       >
                         <template #item="{ element: category }">
                           <div
-                            :class="['tree-node category-node', { selected: isSelected('category', category.id) }]"
+                            :class="[
+                              'tree-node category-node',
+                              { selected: isSelected('category', category.id) },
+                            ]"
                             @click.stop="selectItem('category', category)"
                           >
                             <span class="drag-handle">⋮⋮</span>
@@ -87,6 +95,9 @@
 
       <!-- 우측: 상세/편집 패널 -->
       <div class="panel-right">
+        <div class="action-bar">
+          <button class="back-btn" @click="$router.back()">뒤로가기</button>
+        </div>
         <!-- 생성 모드 -->
         <div v-if="mode === 'create'" class="detail-panel create-mode">
           <div class="panel-header">
@@ -117,8 +128,12 @@
 
           <div class="form-group" v-if="createType === 'board'">
             <label>Description</label>
-            <textarea v-model="description" class="form-textarea" placeholder="Enter description..."
-                      rows="3"></textarea>
+            <textarea
+              v-model="description"
+              class="form-textarea"
+              placeholder="Enter description..."
+              rows="3"
+            ></textarea>
           </div>
 
           <div class="form-group">
@@ -163,14 +178,8 @@
           </div>
 
           <div class="panel-actions">
-            <button class="btn btn-danger" @click="deleteSelected">
-              Delete
-            </button>
-            <button
-              class="btn btn-primary"
-              @click="saveItem"
-              :disabled="!canSave"
-            >
+            <button class="btn btn-danger" @click="deleteSelected">Delete</button>
+            <button class="btn btn-primary" @click="saveItem" :disabled="!canSave">
               Save Changes
             </button>
           </div>
@@ -190,9 +199,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import draggable from 'vuedraggable'
 import api from '@/api/axios'
+import '@/assets/styles/admin/admin.css'
+import '@/assets/styles/admin/board-manage.css'
 
 // 트리 데이터
 const treeData = ref([])
@@ -236,7 +247,7 @@ const selectItem = (type, item) => {
   selectedItem.value = { type, data: item }
   editForm.value = {
     name: item.name,
-    description: item.description || ''
+    description: item.description || '',
   }
 }
 
@@ -271,7 +282,9 @@ const updateDisplayOrder = () => {
     const section = treeData.value.find((s) => s.id === selectedSectionId.value)
     allOrders = section?.boards?.map((b) => b.displayOrder) || []
   } else if (createType.value === 'category') {
-    const board = treeData.value.flatMap((s) => s.boards || []).find((b) => b.id === selectedBoardId.value)
+    const board = treeData.value
+      .flatMap((s) => s.boards || [])
+      .find((b) => b.id === selectedBoardId.value)
     allOrders = board?.categories?.map((c) => c.displayOrder) || []
   }
   displayOrder.value = (Math.max(...allOrders, 0) || 0) + 1
@@ -319,13 +332,13 @@ const saveItem = async () => {
   try {
     await api.patch(`/admin/boards/${selectedItem.value.data.id}`, {
       name: editForm.value.name,
-      description: editForm.value.description
+      description: editForm.value.description,
     })
     await loadTree()
     // 선택 유지
     const updated = treeData.value
-      .flatMap(s => s.boards || [])
-      .find(b => b.id === selectedItem.value.data.id)
+      .flatMap((s) => s.boards || [])
+      .find((b) => b.id === selectedItem.value.data.id)
     if (updated) selectItem('board', updated)
   } catch (err) {
     console.error(err)
@@ -351,12 +364,21 @@ const onDragEnd = async (type, data) => {
       await api.put('/admin/sections/reorder', { orders })
     } else if (type === 'board') {
       const parent = treeData.value.find((s) => s.boards.some((b) => b.id === data[0]?.id))
-      const orders = data.map((item, i) => ({ sectionId: parent?.id, boardId: item.id, displayOrder: i + 1 }))
+      const orders = data.map((item, i) => ({
+        sectionId: parent?.id,
+        boardId: item.id,
+        displayOrder: i + 1,
+      }))
       await api.put('/admin/boards/reorder', { orders })
     } else if (type === 'category') {
-      const parent = treeData.value.flatMap((s) => s.boards || []).find((b) => b.categories?.some((c) => c.id ===
-        data[0]?.id))
-      const orders = data.map((item, i) => ({ boardId: parent?.id, categoryId: item.id, displayOrder: i + 1 }))
+      const parent = treeData.value
+        .flatMap((s) => s.boards || [])
+        .find((b) => b.categories?.some((c) => c.id === data[0]?.id))
+      const orders = data.map((item, i) => ({
+        boardId: parent?.id,
+        categoryId: item.id,
+        displayOrder: i + 1,
+      }))
       await api.put('/admin/categories/reorder', { orders })
     }
     await loadTree()
@@ -369,381 +391,3 @@ const onDragEnd = async (type, data) => {
 watch(selectedSectionId, updateDisplayOrder)
 watch(selectedBoardId, updateDisplayOrder)
 </script>
-
-<style scoped>
-.board-manage {
-  font-family: 'Outfit', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  padding: 32px;
-}
-
-/* Header */
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  margin: 0;
-}
-
-.page-header .accent {
-  color: var(--accent);
-}
-
-.subtitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 4px 0 0;
-}
-
-/* Split Panel */
-.split-panel {
-  display: flex;
-  gap: 24px;
-  min-height: calc(100vh - 140px);
-}
-
-.panel-left {
-  flex: 1;
-  max-width: 420px;
-}
-
-.panel-right {
-  flex: 1;
-}
-
-/* Action Bar */
-.action-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.action-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 10px 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.action-btn:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-color: var(--text-muted);
-}
-
-.action-btn.active {
-  background: var(--accent-dim);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.action-btn .btn-icon {
-  margin-right: 6px;
-}
-
-/* Tree */
-.tree-container {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  min-height: 400px;
-}
-
-.tree-node {
-  border-radius: 6px;
-  transition: all 0.15s ease;
-}
-
-.node-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  cursor: pointer;
-}
-
-.tree-node:hover {
-  background: var(--bg-hover);
-}
-
-.tree-node.selected {
-  background: var(--accent-dim);
-}
-
-.tree-node.selected .node-name {
-  color: var(--accent);
-}
-
-.drag-handle {
-  color: var(--text-muted);
-  cursor: grab;
-  font-size: 10px;
-  letter-spacing: -2px;
-}
-
-.drag-handle:active {
-  cursor: grabbing;
-}
-
-.node-icon {
-  font-size: 10px;
-  color: var(--text-muted);
-  width: 12px;
-}
-
-.section-node > .node-header .node-icon {
-  color: var(--accent);
-}
-
-.node-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.node-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  background: var(--bg-tertiary);
-  padding: 2px 8px;
-  border-radius: 10px;
-  color: var(--text-muted);
-}
-
-.boards-container {
-  margin-left: 20px;
-  border-left: 1px solid var(--border-color);
-}
-
-.categories-container {
-  margin-left: 20px;
-  border-left: 1px dashed var(--border-color);
-}
-
-.category-node .node-header {
-  padding: 6px 12px;
-}
-
-.empty-tree {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-  color: var(--text-muted);
-}
-
-.empty-tree .empty-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-/* Detail Panel */
-.detail-panel {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 28px;
-  min-height: 400px;
-}
-
-.panel-header {
-  margin-bottom: 28px;
-}
-
-.panel-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--accent);
-  background: var(--accent-dim);
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
-.panel-header h2 {
-  font-size: 22px;
-  font-weight: 500;
-  margin: 12px 0 0;
-}
-
-/* Form */
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.form-input,
-.form-select,
-.form-textarea {
-  width: 100%;
-  padding: 12px 14px;
-  font-family: inherit;
-  font-size: 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-primary);
-  transition: border-color 0.15s ease;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.form-input.small {
-  width: 100px;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-select {
-  cursor: pointer;
-}
-
-/* Meta Info */
-.meta-info {
-  display: flex;
-  gap: 24px;
-  padding: 16px;
-  background: var(--bg-tertiary);
-  border-radius: 6px;
-  margin-bottom: 24px;
-}
-
-.meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.meta-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.meta-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-/* Buttons */
-.panel-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 12px 20px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
-}
-
-.btn-ghost:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: var(--bg-primary);
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  background: transparent;
-  border: 1px solid var(--danger);
-  color: var(--danger);
-}
-
-.btn-danger:hover {
-  background: var(--danger);
-  color: white;
-}
-
-/* Empty State */
-.empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.empty-content {
-  text-align: center;
-}
-
-.empty-content .empty-icon {
-  font-size: 48px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  display: block;
-}
-
-.empty-content p {
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.empty-hint {
-  font-size: 12px;
-  color: var(--text-muted) !important;
-  margin-top: 4px !important;
-}
-</style>
