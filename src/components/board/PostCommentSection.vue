@@ -29,6 +29,8 @@
               v-if="!isDeletedComment(c)"
               type="button"
               class="comment-item__vote-btn comment-item__vote-btn--like"
+              :class="{ 'comment-item__vote-btn--voted': c.hasLiked }"
+              :disabled="c.hasLiked"
               @click="onLikeComment(c.commentId)"
               aria-label="댓글 추천"
             >
@@ -42,6 +44,8 @@
               v-if="!isDeletedComment(c)"
               type="button"
               class="comment-item__vote-btn comment-item__vote-btn--dislike"
+              :class="{ 'comment-item__vote-btn--voted-dislike': c.hasDisliked }"
+              :disabled="c.hasDisliked"
               @click="onDislikeComment(c.commentId)"
               aria-label="댓글 비추천"
             >
