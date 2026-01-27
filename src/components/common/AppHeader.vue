@@ -3,24 +3,16 @@
     <div class="header__inner">
       <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
       <div class="nav">
-        <!-- 🔹 섹션 + 게시판 네비 -->
-        <nav class="nav-sections">
-          <ul class="section-list">
-            <li v-for="section in headerSections" :key="section.sectionId" class="section-item">
-              <span class="section-name">
-                {{ section.sectionName }}
-              </span>
-
-              <!-- 섹션 아래 게시판 목록 -->
-              <ul class="board-list">
-                <li v-for="board in section.boards" :key="board.boardId" class="board-item">
-                  <RouterLink :to="`/boards/${board.boardId}`" class="board-link">
-                    {{ board.boardName }}
-                  </RouterLink>
-                </li>
-              </ul>
-            </li>
-          </ul>
+        <!-- 보드 네비게이션 -->
+        <nav class="nav-boards">
+          <RouterLink
+            v-for="board in headerBoards"
+            :key="board.boardId"
+            :to="`/boards/${board.boardId}`"
+            class="board-link"
+          >
+            {{ board.boardName }}
+          </RouterLink>
         </nav>
         <!-- ✅ 로그인 안 한 상태 -->
         <div class="nav-auth">
@@ -63,12 +55,12 @@ const logout = (event) => {
   }
 }
 
-const headerSections = ref([])
+const headerBoards = ref([])
 
 const loadHeaderNavigation = async () => {
   try {
-    const res = await api.get('/navigation/header')
-    headerSections.value = res.data
+    const res = await api.get('/navigation/boards')
+    headerBoards.value = res.data
   } catch (e) {
     console.error('[AppHeader] 헤더 네비게이션 조회 실패', e)
   }
@@ -114,82 +106,32 @@ onMounted(() => {
   margin-left: 20px;
 }
 
-/* 섹션/게시판 네비: 왼쪽 정렬 */
-.nav-sections {
+/* 보드 네비게이션 */
+.nav-boards {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
-.section-list {
-  display: flex;
-  gap: 24px;
-}
-
-.section-item {
-  position: relative;
-  padding: 8px 0;
-}
-
-.section-name {
+.board-link {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
-  cursor: pointer;
-  transition: color 0.2s ease;
-  display: block;
-}
-
-.section-name:hover {
-  color: var(--accent);
-}
-
-/* 드롭다운 게시판 목록 */
-.board-list {
-  display: none;
-  position: absolute;
-  top: calc(100% - 4px);
-  left: -12px;
-  min-width: 160px;
-  z-index: 20;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px 0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-
-/* 투명한 브릿지 영역 - hover 유지 */
-.board-list::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 0;
-  right: 0;
-  height: 12px;
-}
-
-.section-item:hover .board-list {
-  display: block;
-}
-
-.board-item {
-  list-style: none;
-}
-
-.board-link {
-  display: block;
-  padding: 10px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-primary);
   text-decoration: none;
-  transition: all 0.15s ease;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .board-link:hover {
-  background: var(--bg-hover);
   color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.board-link.router-link-active {
+  color: var(--accent);
+  background: var(--accent-dim);
 }
 
 /* 로그인/유저 영역: 오른쪽으로 밀기 */

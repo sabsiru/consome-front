@@ -51,6 +51,12 @@
   margin-bottom: 8px;
 }
 
+.comment-item__meta-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .comment-item__meta-right {
   display: flex;
   align-items: center;
