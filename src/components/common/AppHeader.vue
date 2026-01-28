@@ -3,17 +3,22 @@
     <div class="header__inner">
       <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
       <div class="nav">
-        <!-- 보드 네비게이션 -->
-        <nav class="nav-boards">
-          <RouterLink
-            v-for="board in headerBoards"
-            :key="board.boardId"
-            :to="`/boards/${board.boardId}`"
-            class="board-link"
-          >
-            {{ board.boardName }}
-          </RouterLink>
-        </nav>
+        <!-- 게시판 검색 -->
+        <div class="board-search">
+          <input
+            v-model="searchKeyword"
+            @input="searchBoards"
+            @focus="showDropdown = true"
+            @blur="hideDropdown"
+            placeholder="게시판 검색"
+            class="search-input"
+          />
+          <ul v-if="showDropdown && searchResults.length" class="search-dropdown">
+            <li v-for="board in searchResults" :key="board.id" @mousedown="goToBoard(board.id)">
+              {{ board.name }}
+            </li>
+          </ul>
+        </div>
         <!-- ✅ 로그인 안 한 상태 -->
         <div class="nav-auth">
           <template v-if="!nickname || nickname.length === 0">
@@ -39,7 +44,7 @@ import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import api from '@/api/axios.js'
 
 const store = useUserStore()
@@ -55,16 +60,36 @@ const logout = (event) => {
   }
 }
 
-const headerBoards = ref([])
+const searchKeyword = ref('')
+const searchResults = ref([])
+const showDropdown = ref(false)
 
-const loadHeaderNavigation = async () => {
+const searchBoards = async () => {
+  if (!searchKeyword.value.trim()) {
+    searchResults.value = []
+    return
+  }
   try {
-    const res = await api.get('/navigation/boards')
-    headerBoards.value = res.data
+    const res = await api.get('/boards/search', {
+      params: { keyword: searchKeyword.value, size: 10 }
+    })
+    searchResults.value = res.data
   } catch (e) {
-    console.error('[AppHeader] 헤더 네비게이션 조회 실패', e)
+    console.error('[AppHeader] 게시판 검색 실패', e)
   }
 }
+
+const goToBoard = (id) => {
+  router.push(`/boards/${id}`)
+  showDropdown.value = false
+  searchKeyword.value = ''
+  searchResults.value = []
+}
+
+const hideDropdown = () => {
+  setTimeout(() => { showDropdown.value = false }, 150)
+}
+
 const goHome = () => {
   router.push('/')
 }
@@ -72,10 +97,6 @@ const goHome = () => {
 const goAdmin = () => {
   router.push('/admin')
 }
-
-onMounted(() => {
-  loadHeaderNavigation()
-})
 </script>
 
 <style scoped>
@@ -106,32 +127,61 @@ onMounted(() => {
   margin-left: 20px;
 }
 
-/* 보드 네비게이션 */
-.nav-boards {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* 게시판 검색 */
+.board-search {
+  position: relative;
 }
 
-.board-link {
+.search-input {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-  text-decoration: none;
   padding: 8px 14px;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  width: 200px;
   transition: all 0.2s ease;
 }
 
-.board-link:hover {
-  color: var(--accent);
-  background: var(--accent-dim);
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
-.board-link.router-link-active {
-  color: var(--accent);
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-dropdown li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.15s ease;
+}
+
+.search-dropdown li:hover {
   background: var(--accent-dim);
+  color: var(--accent);
 }
 
 /* 로그인/유저 영역: 오른쪽으로 밀기 */
