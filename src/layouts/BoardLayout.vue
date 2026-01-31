@@ -51,7 +51,7 @@ const loadBoardHeader = async () => {
 
     boardName.value = data.boardName ?? data.name ?? '게시판 이름'
     description.value = data.description ?? '게시판 설명'
-    adminName.value = data.adminName ?? data.admin ?? '관리자없음'
+    adminName.value = (data.managers ?? []).map(m => m.nickname).join(', ')
   } catch (e) {
     // 레이아웃은 페이지 흐름을 막지 않기 위해 최소한의 실패 처리만 합니다.
     loadError.value = '게시판 정보를 불러오지 못했습니다.'
