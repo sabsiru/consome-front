@@ -8,14 +8,15 @@
     <div class="split-panel">
       <!-- 좌측: 보드 리스트 -->
       <div class="panel-left">
-        <div class="search-bar">
+        <div class="search-bar" :class="{ 'search-bar--hidden': isManagerMode }">
           <input
             v-model="searchKeyword"
             class="search-input"
             placeholder="Search boards..."
             @keyup.enter="searchBoards"
+            :disabled="isManagerMode"
           />
-          <button class="search-btn" @click="searchBoards">검색</button>
+          <button class="search-btn" @click="searchBoards" :disabled="isManagerMode">검색</button>
         </div>
 
         <div class="board-list">
@@ -42,7 +43,7 @@
           <button :disabled="page >= totalPages - 1" @click="changePage(page + 1)">›</button>
         </div>
 
-        <button class="create-board-btn" @click="startCreateBoard">
+        <button v-if="!isManagerMode" class="create-board-btn" @click="startCreateBoard">
           <span class="btn-icon">+</span> 보드 생성
         </button>
       </div>
@@ -117,7 +118,7 @@
 
           <div class="form-group">
             <label>Name</label>
-            <input v-model="editForm.name" class="form-input" />
+            <input v-model="editForm.name" class="form-input" :disabled="isManagerMode" />
           </div>
 
           <div class="form-group">
@@ -133,7 +134,7 @@
           </div>
 
           <div class="panel-actions">
-            <button class="btn btn-danger" @click="deleteBoard">Delete</button>
+            <button v-if="!isManagerMode" class="btn btn-danger" @click="deleteBoard">Delete</button>
             <button class="btn btn-primary" @click="saveBoard">Save Changes</button>
           </div>
 
@@ -194,11 +195,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import draggable from 'vuedraggable'
 import api from '@/api/axios'
+import { useUserStore } from '@/stores/userStore'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
+
+const route = useRoute()
+const userStore = useUserStore()
+const isManagerMode = computed(() => route.path.startsWith('/manager'))
 
 // 보드 목록
 const boards = ref([])
@@ -230,18 +237,32 @@ onMounted(async () => {
 // 보드 목록 조회
 const loadBoards = async () => {
   try {
-    const res = await api.get('/admin/manage/boards', {
-      params: {
-        page: page.value,
-        size: size.value,
-      },
-    })
-   const data = res.data
-    boards.value = data.boards
-    page.value = data.page
-    size.value = data.size
-    totalElements.value = data.totalElements
-    totalPages.value = data.totalPages
+    if (isManagerMode.value) {
+      // MANAGER 모드: managedBoardIds로 필터링
+      const ids = userStore.managedBoardIds.map(id => Number(id))
+      if (ids.length === 0) {
+        boards.value = []
+        return
+      }
+      const res = await api.get('/admin/manage/boards', {
+        params: { page: 0, size: 100 },
+      })
+      boards.value = res.data.boards.filter(b => ids.includes(Number(b.id)))
+      totalPages.value = 1
+    } else {
+      const res = await api.get('/admin/manage/boards', {
+        params: {
+          page: page.value,
+          size: size.value,
+        },
+      })
+      const data = res.data
+      boards.value = data.boards
+      page.value = data.page
+      size.value = data.size
+      totalElements.value = data.totalElements
+      totalPages.value = data.totalPages
+    }
   } catch (err) {
     console.error(err)
   }
@@ -256,14 +277,20 @@ const searchBoards = async () => {
   }
   try {
     const res = await api.get('/admin/manage/boards/search', {
-      params: { keyword: searchKeyword.value, page: 0, size: 20 },
+      params: { keyword: searchKeyword.value, page: 0, size: 100 },
     })
-    const data = res.data
-    boards.value = data.boards
-    page.value = data.page
-    size.value = data.size
-    totalElements.value = data.totalElements
-    totalPages.value = data.totalPages
+    let data = res.data
+    if (isManagerMode.value) {
+      const ids = userStore.managedBoardIds
+      boards.value = data.boards.filter(b => ids.includes(b.id))
+      totalPages.value = 1
+    } else {
+      boards.value = data.boards
+      page.value = data.page
+      size.value = data.size
+      totalElements.value = data.totalElements
+      totalPages.value = data.totalPages
+    }
   } catch (err) {
     console.error(err)
   }
@@ -344,7 +371,7 @@ const createBoard = async () => {
 // 보드 저장 (변경된 필드만 전송)
 const saveBoard = async () => {
   const payload = {}
-  if (editForm.value.name !== selectedBoard.value.name) {
+  if (!isManagerMode.value && editForm.value.name !== selectedBoard.value.name) {
     payload.name = editForm.value.name
   }
   if (editForm.value.description !== (selectedBoard.value.description || '')) {

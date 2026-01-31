@@ -16,7 +16,6 @@ export async function adminGuard(to, next) {
     })
 
     if (data.role !== 'ADMIN') {
-      alert('관리자 전용 페이지입니다.')
       return next('/')
     }
   } catch (error) {
@@ -27,22 +26,11 @@ export async function adminGuard(to, next) {
   }
 }
 
-export async function redirectIfLoggedIn(to, next) {
+export function redirectIfLoggedIn(to, next) {
   const store = useUserStore()
-  const token = store.accessToken || localStorage.getItem('accessToken')
 
-  if (!token) await next()
+  if (!store.token) return next()
 
-  try {
-    const { data } = await axios.get('/users/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
-    if (data.role === 'ADMIN') return next('/admin')
-    else return next('/')
-  } catch (error) {
-    console.warn('redirectIfLoggedIn 오류:', error)
-    store.clearUser()
-    await next()
-  }
+  if (store.role === 'ADMIN') return next('/admin')
+  return next('/')
 }

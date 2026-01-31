@@ -25,6 +25,7 @@
           <th>닉네임</th>
           <th>권한</th>
           <th>포인트</th>
+          <th>관리</th>
         </tr>
       </thead>
       <tbody>
@@ -32,11 +33,17 @@
           <td>{{ user.userId }}</td>
           <td>{{ user.loginId }}</td>
           <td>{{ user.nickname }}</td>
-          <td>{{ user.role }}</td>
+          <td>
+            {{ user.role }}
+            <span v-if="user.managedBoards?.length" class="managed-boards">
+              ({{ user.managedBoards.map(b => b.boardName).join(', ') }})
+            </span>
+          </td>
           <td>{{ user.userPoint }}</td>
+          <td><button class="role-btn" @click="openRoleModal(user)">권한</button></td>
         </tr>
         <tr v-if="users.length === 0">
-          <td colspan="5" class="empty">조회된 회원이 없습니다.</td>
+          <td colspan="6" class="empty">조회된 회원이 없습니다.</td>
         </tr>
       </tbody>
     </table>
@@ -48,6 +55,43 @@
       <span> {{ page + 1 }} / {{ totalPages }} </span>
 
       <button :disabled="page + 1 >= totalPages" @click="movePage(page + 1)">다음</button>
+    </div>
+
+    <!-- 권한 관리 모달 -->
+    <div v-if="showRoleModal" class="role-modal-overlay" @click.self="closeRoleModal">
+      <div class="role-modal">
+        <h3>권한 관리</h3>
+        <p>User ID: {{ selectedUser.userId }} / 닉네임: {{ selectedUser.nickname }}</p>
+
+        <!-- 현재 관리 보드 -->
+        <div v-if="selectedUser.managedBoards?.length" class="current-boards">
+          <p>관리 중인 보드:</p>
+          <ul>
+            <li v-for="b in selectedUser.managedBoards" :key="b.boardId">
+              {{ b.boardName }} (ID: {{ b.boardId }})
+              <button @click="removeManager(b.boardId)">해제</button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 게시판 검색 -->
+        <div class="board-search-section">
+          <input v-model="boardSearchKeyword" placeholder="게시판 검색" @input="searchBoardsForRole" />
+          <ul v-if="boardSearchResults.length" class="board-search-results">
+            <li v-for="b in boardSearchResults" :key="b.id" @click="selectBoard(b)">
+              {{ b.name }} (ID: {{ b.id }})
+            </li>
+          </ul>
+        </div>
+
+        <!-- 선택된 보드 + 임명 버튼 -->
+        <div v-if="selectedBoard" class="assign-section">
+          <p>선택: {{ selectedBoard.name }} (ID: {{ selectedBoard.id }})</p>
+          <button @click="assignManager">관리자 임명</button>
+        </div>
+
+        <button class="close-btn" @click="closeRoleModal">닫기</button>
+      </div>
     </div>
   </div>
 </template>
@@ -68,6 +112,13 @@ const totalPages = ref(0)
 // 검색 조건
 const searchType = ref('keyword')
 const searchKeyword = ref('')
+
+// 권한 모달
+const showRoleModal = ref(false)
+const selectedUser = ref(null)
+const boardSearchKeyword = ref('')
+const boardSearchResults = ref([])
+const selectedBoard = ref(null)
 
 const loadUsers = async () => {
   try {
@@ -126,6 +177,64 @@ const resetSearch = () => {
   searchType.value = 'keyword'
   searchKeyword.value = ''
   reload()
+}
+
+// 권한 모달 함수
+const openRoleModal = (user) => {
+  selectedUser.value = user
+  showRoleModal.value = true
+}
+
+const searchBoardsForRole = async () => {
+  if (!boardSearchKeyword.value.trim()) {
+    boardSearchResults.value = []
+    return
+  }
+  try {
+    const res = await api.get('/boards/search', { params: { keyword: boardSearchKeyword.value } })
+    boardSearchResults.value = res.data
+  } catch (e) {
+    console.error('게시판 검색 실패', e)
+  }
+}
+
+const selectBoard = (board) => {
+  selectedBoard.value = board
+  boardSearchResults.value = []
+  boardSearchKeyword.value = ''
+}
+
+const assignManager = async () => {
+  if (!selectedBoard.value) return
+  try {
+    await api.post(`/admin/manage/users/${selectedUser.value.userId}/role`, null, {
+      params: { boardId: selectedBoard.value.id }
+    })
+    await loadUsers()
+    closeRoleModal()
+  } catch (e) {
+    console.error('관리자 임명 실패', e)
+  }
+}
+
+const removeManager = async (boardId) => {
+  try {
+    await api.delete(`/admin/manage/users/${selectedUser.value.userId}/role`, {
+      params: { boardId }
+    })
+    await loadUsers()
+    closeRoleModal()
+  } catch (e) {
+    console.error('관리자 해제 실패', e)
+  }
+}
+
+const closeRoleModal = () => {
+  showRoleModal.value = false
+  selectedUser.value = null
+  boardSearchKeyword.value = ''
+  boardSearchResults.value = []
+  selectedBoard.value = null
 }
 
 onMounted(() => {
