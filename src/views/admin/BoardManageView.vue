@@ -113,7 +113,10 @@
         <div v-else-if="selectedBoard" class="detail-panel edit-mode">
           <div class="panel-header">
             <span class="panel-tag">BOARD</span>
-            <h2>{{ editForm.name || 'Untitled' }}</h2>
+            <div class="panel-title-row">
+              <h2>{{ editForm.name || 'Untitled' }}</h2>
+              <button class="btn btn-link" @click="goToBoard">게시판 이동 →</button>
+            </div>
           </div>
 
           <div class="form-group">
@@ -196,7 +199,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
@@ -204,8 +207,15 @@ import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const isManagerMode = computed(() => route.path.startsWith('/manager'))
+
+const goToBoard = () => {
+  if (selectedBoard.value) {
+    router.push(`/boards/${selectedBoard.value.id}`)
+  }
+}
 
 // 보드 목록
 const boards = ref([])

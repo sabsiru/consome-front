@@ -196,6 +196,30 @@
   margin: 12px 0 0;
 }
 
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.panel-title-row h2 {
+  margin: 0;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
 /* Form (local names for BoardManageView) */
 .form-group {
   margin-bottom: 20px;
