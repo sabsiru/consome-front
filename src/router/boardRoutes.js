@@ -1,7 +1,7 @@
 import BoardLayout from '@/layouts/BoardLayout.vue'
 import BoardPostListView from '@/views/board/BoardPostListView.vue'
-import PostView from '@/views/board/PostView.vue'
-import PostDetail from '@/views/board/PostDetail.vue'
+import PostWriteView from '@/views/board/PostWriteView.vue'
+import PostDetailView from '@/views/board/PostDetailView.vue'
 
 export default [
   {
@@ -17,13 +17,13 @@ export default [
       {
         path: 'post', // 또는 posts/new
         name: 'PostWrite',
-        component: PostView,
+        component: PostWriteView,
         props: (route) => ({ boardId: Number(route.params.boardId) }),
       },
       {
         path: 'posts/:postId',
         name: 'PostDetail',
-        component: PostDetail,
+        component: PostDetailView,
         props: (route) => ({
           boardId: Number(route.params.boardId),
           postId: Number(route.params.postId),

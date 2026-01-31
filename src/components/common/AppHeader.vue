@@ -30,7 +30,7 @@
           <template v-else>
             <span class="user-info">{{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
             <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
-            <button v-if="nickname === '관리자'" @click="goAdmin">관리자페이지</button>
+            <button v-if="role === 'MANAGER'" @click="goManagerBoard">게시판관리</button>
             <button class="logout-btn" @click="logout">로그아웃</button>
           </template>
         </div>
@@ -96,6 +96,10 @@ const goHome = () => {
 
 const goAdmin = () => {
   router.push('/admin')
+}
+
+const goManagerBoard = () => {
+  router.push('/manager/boards')
 }
 </script>
 

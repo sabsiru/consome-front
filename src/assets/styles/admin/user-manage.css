@@ -143,3 +143,196 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Table Button */
+.role-btn {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Managed Boards */
+.managed-boards {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Role Modal */
+.role-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.role-modal {
+  background: var(--bg-secondary);
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 360px;
+  border: 1px solid var(--border-color);
+}
+
+.role-modal h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.role-modal p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.current-boards {
+  margin-bottom: 16px;
+}
+
+.current-boards ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.current-boards li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.current-boards li button {
+  padding: 4px 8px;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.current-boards li button:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.board-search-section {
+  margin-bottom: 16px;
+}
+
+.board-search-section input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.board-search-section input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.board-search-results {
+  list-style: none;
+  padding: 0;
+  margin-top: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: var(--bg-tertiary);
+}
+
+.board-search-results li {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.board-search-results li:last-child {
+  border-bottom: none;
+}
+
+.board-search-results li:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+.assign-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  border: 1px solid var(--accent-dim);
+}
+
+.assign-section p {
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.assign-section button {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.assign-section button:hover {
+  opacity: 0.9;
+}
+
+.close-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
+}
