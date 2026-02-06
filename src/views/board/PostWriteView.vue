@@ -145,8 +145,8 @@
       <p v-if="error" class="error">{{ error }}</p>
 
       <div class="actions">
-        <button type="button" @click="goBack">목록으로</button>
-        <button type="submit" :disabled="loading">
+        <button type="button" class="btn btn-ghost" @click="goBack">목록으로</button>
+        <button type="submit" class="btn btn-primary" :disabled="loading">
           {{ loading ? (isEditMode ? '수정 중...' : '작성 중...') : (isEditMode ? '수정' : '등록') }}
         </button>
       </div>

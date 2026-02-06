@@ -53,3 +53,44 @@
 
   --section-gap: 160px;
 }
+
+/* ========== THEME: Discord ========== */
+[data-theme="discord"] {
+  --bg-primary: #1e1f22;
+  --bg-secondary: #2b2d31;
+  --bg-tertiary: #313338;
+  --bg-hover: #3a3c41;
+  --border-color: #3f4147;
+  --text-primary: #f2f3f5;
+  --text-secondary: #b5bac1;
+  --text-muted: #6d6f78;
+  --accent: #5865f2;
+  --accent-dim: #5865f233;
+  --color-background: var(--bg-primary);
+  --color-background-soft: var(--bg-secondary);
+  --color-background-mute: var(--bg-tertiary);
+  --color-border: var(--border-color);
+  --color-text: var(--text-primary);
+}
+
+/* ========== THEME: Glass ========== */
+[data-theme="glass"] {
+  --bg-primary: #12121a;
+  --bg-secondary: rgba(255, 255, 255, 0.05);
+  --bg-tertiary: rgba(255, 255, 255, 0.08);
+  --bg-hover: rgba(255, 255, 255, 0.12);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --accent: #60a5fa;
+  --accent-dim: #60a5fa33;
+  --glass-blur: blur(16px);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --color-background: var(--bg-primary);
+  --color-background-soft: var(--bg-secondary);
+  --color-background-mute: var(--bg-tertiary);
+  --color-border: var(--border-color);
+  --color-text: var(--text-primary);
+}
+

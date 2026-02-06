@@ -69,6 +69,7 @@
             :page="page"
             :size="size"
             :active-post-id="post.postId"
+            @page-change="onPageChange"
             @post-click="goPostDetailFromList"
             @write-click="onWriteClick"
           />
@@ -481,7 +482,15 @@ const goPostDetailFromList = (postId) => {
 }
 
 const onWriteClick = () => {
-  router.push({ name: 'PostWrite', params: { boardId: post.boardId } })
+  router.push({ name: 'PostWrite', params: { boardId: post.value.boardId } })
+}
+
+const onPageChange = (newPage) => {
+  router.push({
+    name: 'PostDetail',
+    params: { postId: postId.value },
+    query: { ...route.query, page: newPage },
+  })
 }
 
 const isLoggedIn = computed(() => !!userStore.userId)
