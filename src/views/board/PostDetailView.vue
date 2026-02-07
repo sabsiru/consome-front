@@ -69,9 +69,12 @@
             :page="page"
             :size="size"
             :active-post-id="post.postId"
+            :keyword="keyword"
+            :search-type="searchType"
             @page-change="onPageChange"
             @post-click="goPostDetailFromList"
             @write-click="onWriteClick"
+            @search="onSearch"
           />
         </section>
         <div v-if="loading" class="post-status">불러오는 중...</div>
@@ -98,6 +101,8 @@ const userStore = useUserStore()
 const page = computed(() => Number(route.query.page ?? 0))
 const size = computed(() => Number(route.query.size ?? 20))
 const postId = computed(() => Number(route.params.postId))
+const keyword = computed(() => route.query.keyword ?? '')
+const searchType = computed(() => route.query.type ?? 'TITLE_CONTENT')
 
 const post = ref(null)
 const loading = ref(false)
@@ -471,12 +476,12 @@ watch(
   },
 )
 
-const goPostDetailFromList = (postId) => {
+const goPostDetailFromList = (pid) => {
   router.push({
     name: 'PostDetail',
-    params: { postId },
+    params: { postId: pid },
     query: {
-      ...route.query, // page/size 유지
+      ...route.query, // page/size/keyword/type 유지
     },
   })
 }
@@ -486,10 +491,23 @@ const onWriteClick = () => {
 }
 
 const onPageChange = (newPage) => {
+  const q = { ...route.query, page: newPage }
+  if (newPage === 0) delete q.page
   router.push({
     name: 'PostDetail',
     params: { postId: postId.value },
-    query: { ...route.query, page: newPage },
+    query: q,
+  })
+}
+
+const onSearch = ({ keyword: kw, type }) => {
+  const q = {}
+  if (kw) q.keyword = kw
+  if (kw && type && type !== 'TITLE_CONTENT') q.type = type
+  router.push({
+    name: 'PostDetail',
+    params: { postId: postId.value },
+    query: q,
   })
 }
 
