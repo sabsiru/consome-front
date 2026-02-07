@@ -196,12 +196,16 @@
 /* 하단 액션/페이지네이션 */
 .page-board__footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
   background: var(--bg-tertiary);
   border-top: 1px solid var(--border-color);
+}
+
+.page-board__footer .page-board__search {
+  align-self: flex-end;
 }
 
 .pagination {
@@ -211,6 +215,88 @@
   color: var(--text-secondary);
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
+}
+
+/* 숫자 페이징 */
+.pagination--numbered {
+  gap: 4px;
+}
+
+.pagination__btn,
+.pagination__num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 0;
+  min-width: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.pagination__btn:hover:not(:disabled),
+.pagination__num:hover:not(.is-active) {
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination__num.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+/* 검색 영역 */
+.page-board__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-board__search-select {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.page-board__search-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.page-board__search-input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  width: 140px;
+}
+
+.page-board__search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.page-board__search-input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* 모바일: 표는 유지하되 컬럼 최소화 */
