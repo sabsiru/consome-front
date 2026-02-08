@@ -4,11 +4,14 @@
     :page="page"
     :size="size"
     :category-id="categoryId"
+    :keyword="keyword"
+    :search-type="searchType"
     @loaded="onLoaded"
     @page-change="onPageChange"
     @category-change="onCategoryChange"
     @post-click="onPostClick"
     @write-click="onWriteClick"
+    @search="onSearch"
   />
 </template>
 
@@ -29,23 +32,29 @@ const categoryId = computed(() => {
   const v = route.query.categoryId
   return v === undefined || v === null || v === '' ? null : Number(v)
 })
+const keyword = computed(() => route.query.keyword ?? '')
+const searchType = computed(() => route.query.type ?? 'TITLE_CONTENT')
 
 const boardName = ref('')
 
 const DEFAULT_PAGE = 0
 const DEFAULT_SIZE = 20
 
-const buildQuery = ({ page, size, categoryId }) => {
+const buildQuery = ({ page, size, categoryId, keyword: kw, type }) => {
   const q = { ...route.query }
 
   delete q.page
   delete q.size
   delete q.categoryId
+  delete q.keyword
+  delete q.type
 
   // 기본값이 아니면만 query에 포함
   if (page !== DEFAULT_PAGE) q.page = String(page)
   if (size !== DEFAULT_SIZE) q.size = String(size)
   if (categoryId != null) q.categoryId = String(categoryId)
+  if (kw) q.keyword = kw
+  if (kw && type && type !== 'TITLE_CONTENT') q.type = type
 
   return q
 }
@@ -62,6 +71,8 @@ const onPageChange = (nextPage) => {
       page: nextPage,
       size: size.value,
       categoryId: categoryId.value,
+      keyword: keyword.value,
+      type: searchType.value,
     }),
   })
 }
@@ -74,6 +85,8 @@ const onCategoryChange = (nextCategoryId) => {
       page: 0, // 카테고리 바뀌면 첫 페이지
       size: size.value,
       categoryId: nextCategoryId,
+      keyword: keyword.value,
+      type: searchType.value,
     }),
   })
 }
@@ -88,11 +101,27 @@ const onWriteClick = () => {
   router.push({ name: 'PostWrite', params: { boardId: boardId.value } })
 }
 
+const onSearch = ({ keyword: kw, type }) => {
+  router.push({
+    name: route.name,
+    params: route.params,
+    query: buildQuery({
+      page: 0, // 검색하면 첫 페이지
+      size: size.value,
+      categoryId: categoryId.value,
+      keyword: kw,
+      type,
+    }),
+  })
+}
+
 const onPostClick = (postId) => {
   const q = buildQuery({
     page: page.value,
     size: size.value,
     categoryId: categoryId.value,
+    keyword: keyword.value,
+    type: searchType.value,
   })
 
   router.push({

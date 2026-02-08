@@ -67,19 +67,68 @@
     </table>
 
     <div class="page-board__footer">
-      <div class="pagination">
-        <button class="btn" :disabled="page === 0" @click="movePage(page - 1)">이전</button>
-        <span>{{ page + 1 }} / {{ totalPages }}</span>
-        <button class="btn" :disabled="page + 1 >= totalPages" @click="movePage(page + 1)">
-          다음
+      <div class="pagination pagination--numbered">
+        <button
+          class="pagination__btn"
+          :disabled="currentGroup === 0"
+          @click="movePage(currentGroup * 10 - 1)"
+        >
+          &lt;&lt;
         </button>
+        <button
+          class="pagination__btn"
+          :disabled="page === 0"
+          @click="movePage(page - 1)"
+        >
+          &lt;
+        </button>
+        <button
+          v-for="p in pageNumbers"
+          :key="p"
+          class="pagination__num"
+          :class="{ 'is-active': p === page }"
+          @click="movePage(p)"
+        >
+          {{ p + 1 }}
+        </button>
+        <button
+          class="pagination__btn"
+          :disabled="page + 1 >= totalPages"
+          @click="movePage(page + 1)"
+        >
+          &gt;
+        </button>
+        <button
+          class="pagination__btn"
+          :disabled="(currentGroup + 1) * 10 >= totalPages"
+          @click="movePage((currentGroup + 1) * 10)"
+        >
+          &gt;&gt;
+        </button>
+      </div>
+
+      <div class="page-board__search">
+        <select v-model="localSearchType" class="page-board__search-select">
+          <option value="TITLE_CONTENT">전체</option>
+          <option value="TITLE">제목</option>
+          <option value="CONTENT">내용</option>
+          <option value="NICKNAME">작성자</option>
+          <option value="COMMENT">댓글</option>
+        </select>
+        <input
+          v-model="localSearchKeyword"
+          class="page-board__search-input"
+          placeholder="검색어"
+          @keyup.enter="onSearch"
+        />
+        <button class="btn btn-primary" @click="onSearch">검색</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/board.css'
@@ -90,6 +139,8 @@ const props = defineProps({
   size: { type: Number, default: 20 },
   categoryId: { type: [Number, null], default: null },
   activePostId: { type: Number, default: null },
+  keyword: { type: String, default: '' },
+  searchType: { type: String, default: 'TITLE_CONTENT' },
 })
 
 const emit = defineEmits([
@@ -97,6 +148,7 @@ const emit = defineEmits([
   'category-change',
   'post-click',
   'write-click',
+  'search',
   'loaded', // { boardName, totalPages, totalElements }
 ])
 
@@ -116,6 +168,31 @@ watch(
   },
 )
 
+// 검색 로컬 상태
+const localSearchKeyword = ref(props.keyword)
+const localSearchType = ref(props.searchType)
+
+watch(
+  () => props.keyword,
+  (v) => {
+    localSearchKeyword.value = v
+  },
+)
+watch(
+  () => props.searchType,
+  (v) => {
+    localSearchType.value = v
+  },
+)
+
+// 숫자 페이징 computed
+const currentGroup = computed(() => Math.floor(props.page / 10))
+const pageNumbers = computed(() => {
+  const start = currentGroup.value * 10
+  const end = Math.min(start + 10, totalPages.value)
+  return Array.from({ length: end - start }, (_, i) => start + i)
+})
+
 // ===== API =====
 const loadPosts = async () => {
   if (!props.boardId) return
@@ -128,7 +205,14 @@ const loadPosts = async () => {
     params.categoryId = selectedCategoryId.value
   }
 
-  const res = await api.get(`/boards/${props.boardId}/posts`, { params })
+  let res
+  if (props.keyword) {
+    params.keyword = props.keyword
+    params.type = props.searchType
+    res = await api.get(`/boards/${props.boardId}/posts/search`, { params })
+  } else {
+    res = await api.get(`/boards/${props.boardId}/posts`, { params })
+  }
   const data = res.data
 
   posts.value = data.posts
@@ -162,7 +246,7 @@ onMounted(() => {
 })
 
 watch(
-  () => [props.boardId, props.page, props.size, props.categoryId],
+  () => [props.boardId, props.page, props.size, props.categoryId, props.keyword, props.searchType],
   () => {
     loadPosts()
     loadCategories()
@@ -182,6 +266,13 @@ const selectCategory = (categoryId) => {
 
 const emitPostClick = (postId) => emit('post-click', postId)
 const emitWrite = () => emit('write-click')
+
+const onSearch = () => {
+  emit('search', {
+    keyword: localSearchKeyword.value.trim(),
+    type: localSearchType.value,
+  })
+}
 
 const formatDate = (isoString) => {
   if (!isoString) return ''
