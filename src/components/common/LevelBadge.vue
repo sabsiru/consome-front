@@ -1,0 +1,24 @@
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  level: { type: Number, required: true },
+  role: { type: String, default: null }
+})
+
+const displayText = computed(() => {
+  if (props.role === 'ADMIN') return '시스템관리자'
+  if (props.role === 'MANAGER') return '완장'
+  return `Lv.${props.level}`
+})
+
+const badgeClass = computed(() => {
+  if (props.role === 'ADMIN') return 'level-badge--admin'
+  if (props.role === 'MANAGER') return 'level-badge--manager'
+  return `level-badge--${props.level}`
+})
+</script>
+
+<template>
+  <span class="level-badge" :class="badgeClass">{{ displayText }}</span>
+</template>
