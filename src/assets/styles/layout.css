@@ -45,6 +45,21 @@
   color: var(--danger);
 }
 
+/* Footer */
+.app-footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  padding: 24px var(--app-padding-x);
+}
+
+.app-footer__inner {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 /* PC에서 좌우 여백/폭만 조정 */
 @media (min-width: 1024px) {
   :root {
