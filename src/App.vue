@@ -14,6 +14,12 @@ import './assets/styles/layout.css'
       <RouterView />
     </main>
   </div>
+
+  <footer class="app-footer">
+    <div class="app-footer__inner">
+      <span>© 2026 Consome</span>
+    </div>
+  </footer>
 </template>
 
 <style scoped>
