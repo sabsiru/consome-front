@@ -28,7 +28,7 @@
 
           <!-- ✅ 로그인 한 상태 -->
           <template v-else>
-            <span class="user-info">{{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
+            <span class="user-info"><LevelBadge :level="level" :role="role" /> {{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
             <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
             <button v-if="role === 'MANAGER'" @click="goManagerBoard">게시판관리</button>
             <button class="logout-btn" @click="logout">로그아웃</button>
@@ -46,9 +46,10 @@ import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
 import { ref } from 'vue'
 import api from '@/api/axios.js'
+import LevelBadge from '@/components/common/LevelBadge.vue'
 
 const store = useUserStore()
-const { nickname, point, role } = storeToRefs(store)
+const { nickname, point, level, role } = storeToRefs(store)
 
 const logout = (event) => {
   if (!event || event.type !== 'click') return

@@ -54,7 +54,7 @@
               [{{ post.commentCount }}]
             </span>
           </td>
-          <td class="col-author">{{ post.authorNickName }}</td>
+          <td class="col-author"><LevelBadge :level="post.authorLevel" :role="post.authorRole" size="sm" /> {{ post.authorNickName }}</td>
           <td class="col-views">{{ post.viewCount }}</td>
           <td class="col-like">{{ post.likeCount-post.dislikeCount }}</td>
           <td class="col-date">{{ formatDate(post.createdAt) }}</td>
@@ -130,6 +130,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/api/axios.js'
+import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/board.css'
 

@@ -7,7 +7,7 @@
           <h1 class="post-title">{{ post.title }}</h1>
 
           <div class="post-meta" v-if="post">
-            <span class="post-meta__author">{{ post.authorNickname }}</span>
+            <span class="post-meta__author">{{ post.authorNickname }} <LevelBadge :level="post.authorLevel" :role="post.authorRole" /></span>
             <span class="post-meta__sep"></span>
             추천<span class="post-meta__stat post-meta__stat--like"> {{ post.likeCount }} </span>
             <span class="post-meta__sep">|</span>
@@ -93,6 +93,7 @@ import '@/assets/styles/components.css'
 import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
 import PostCommentSection from '@/components/board/PostCommentSection.vue'
+import LevelBadge from '@/components/common/LevelBadge.vue'
 
 const route = useRoute()
 const router = useRouter()

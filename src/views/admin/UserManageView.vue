@@ -32,7 +32,7 @@
         <tr v-for="user in users" :key="user.userId">
           <td>{{ user.userId }}</td>
           <td>{{ user.loginId }}</td>
-          <td>{{ user.nickname }}</td>
+          <td>{{ user.nickname }} <LevelBadge :level="user.level" :role="user.role" /></td>
           <td>
             {{ user.role }}
             <span v-if="user.managedBoards?.length" class="managed-boards">
@@ -99,6 +99,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '@/api/axios'
+import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/user-manage.css'
 
