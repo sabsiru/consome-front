@@ -3,7 +3,8 @@ import { computed } from 'vue'
 
 const props = defineProps({
   level: { type: Number, required: true },
-  role: { type: String, default: null }
+  role: { type: String, default: null },
+  size: { type: String, default: 'md' } // 'sm' | 'md'
 })
 
 const displayText = computed(() => {
@@ -20,5 +21,5 @@ const badgeClass = computed(() => {
 </script>
 
 <template>
-  <span class="level-badge" :class="badgeClass">{{ displayText }}</span>
+  <span class="level-badge" :class="[badgeClass, `level-badge--${props.size}`]">{{ displayText }}</span>
 </template>

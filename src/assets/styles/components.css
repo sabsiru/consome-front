@@ -138,3 +138,27 @@
   font-weight: 600;
   color: var(--text-primary);
 }
+
+/* Level Badge */
+.level-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+/* 사이즈 */
+.level-badge--sm { padding: 1px 4px; font-size: 10px; margin-right: 4px; }
+.level-badge--md { margin-left: 4px; }
+
+/* 레벨 구간별 색상 */
+.level-badge--1, .level-badge--2, .level-badge--3, .level-badge--4 { background: #e8e8e8; color: #666; }
+.level-badge--5, .level-badge--6, .level-badge--7, .level-badge--8 { background: #d4edda; color: #155724; }
+.level-badge--9, .level-badge--10, .level-badge--11, .level-badge--12 { background: #cce5ff; color: #004085; }
+.level-badge--13, .level-badge--14, .level-badge--15, .level-badge--16 { background: #fff3cd; color: #856404; }
+.level-badge--17, .level-badge--18, .level-badge--19, .level-badge--20 { background: #f8d7da; color: #721c24; }
+.level-badge--admin { background: #dc3545; color: #fff; }
+.level-badge--manager { background: #fd7e14; color: #fff; }
