@@ -15,7 +15,7 @@
       >
         <div class="comment-item__meta">
           <div class="comment-item__meta-left">
-            <span class="comment-item__author">{{ c.userNickname }}</span>
+            <span class="comment-item__author">{{ c.userNickname }} <LevelBadge :level="c.userLevel" :role="c.userRole" /></span>
             <span
               v-if="props.postAuthorId != null && c.userId === props.postAuthorId"
               class="comment-badge comment-badge--author"
@@ -188,6 +188,7 @@
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ThumbsUp, ThumbsDown } from 'lucide-vue-next'
+import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/board/comment.css'
 
 const router = useRouter()
