@@ -28,7 +28,7 @@
 
           <!-- ✅ 로그인 한 상태 -->
           <template v-else>
-            <span class="user-info"><LevelBadge :level="level" :role="role" /> {{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
+            <span class="user-info" @click="goMyProfile"><LevelBadge :level="level" :role="role" /> <span class="nickname-link">{{ nickname }}</span> <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
             <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
             <button v-if="role === 'MANAGER'" @click="goManagerBoard">게시판관리</button>
             <button class="logout-btn" @click="logout">로그아웃</button>
@@ -101,6 +101,10 @@ const goAdmin = () => {
 
 const goManagerBoard = () => {
   router.push('/manager/boards')
+}
+
+const goMyProfile = () => {
+  router.push(`/users/${store.userId}`)
 }
 </script>
 
@@ -201,6 +205,12 @@ const goManagerBoard = () => {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   color: var(--text-primary);
+  cursor: pointer;
+}
+
+.nickname-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .user-info .point {
