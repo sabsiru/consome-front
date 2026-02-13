@@ -4,6 +4,7 @@ import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import AdminRoutes from '@/router/adminRoutes.js'
 import BoardRoutes from '@/router/boardRoutes.js'
+import UserRoutes from '@/router/userRoutes.js'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
 import { adminGuard, redirectIfLoggedIn } from '@/router/guards/authGuards.js'
 import { useUserStore } from '@/stores/userStore.js'
@@ -16,6 +17,7 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     { path: '/manager/boards', name: 'manager-boards', component: BoardManageView },
     ...BoardRoutes,
+    ...UserRoutes,
     ...AdminRoutes,
   ],
 })
