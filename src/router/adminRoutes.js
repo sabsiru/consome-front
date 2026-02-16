@@ -1,6 +1,7 @@
 import AdminView from '@/views/admin/AdminView.vue'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
 import UserManageView from '@/views/admin/UserManageView.vue'
+import MainBoardManageView from '@/views/admin/MainBoardManageView.vue'
 
 export default [
   {
@@ -13,6 +14,12 @@ export default [
     path: '/admin/boards',
     name: 'boardManage',
     component: BoardManageView,
+    meta: { role: 'ADMIN' },
+  },
+  {
+    path: '/admin/main-boards',
+    name: 'mainBoardManage',
+    component: MainBoardManageView,
     meta: { role: 'ADMIN' },
   },
   {
