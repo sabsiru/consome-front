@@ -49,7 +49,7 @@
         >
           <td class="col-category">{{ post.categoryName }}</td>
           <td class="col-title">
-            {{ post.title }}
+            <span v-html="highlightKeyword(post.title, props.keyword)"></span>
             <span v-if="post.commentCount > 0" class="post-comment-count">
               [{{ post.commentCount }}]
             </span>
@@ -314,6 +314,17 @@ const openUserModal = (event, post) => {
 
 const closeUserModal = () => {
   userModal.value.visible = false
+}
+
+// 검색어 강조 (TITLE, TITLE_CONTENT일 때만)
+const highlightKeyword = (text, keyword) => {
+  if (!keyword || !text) return text
+  // 제목/내용 검색일 때만 강조
+  if (!['TITLE', 'TITLE_CONTENT'].includes(props.searchType)) return text
+  // 정규식 특수문자 이스케이프
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escaped})`, 'gi')
+  return text.replace(regex, '<mark>$1</mark>')
 }
 
 const formatDate = (isoString) => {
