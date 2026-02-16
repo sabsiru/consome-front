@@ -12,16 +12,16 @@
         <p>Section, Board, Category 관리</p>
       </div>
 
+      <div class="nav-card" @click="goToMainBoardManage">
+        <span class="nav-icon">★</span>
+        <h3>메인 게시판</h3>
+        <p>메인 게시판 순서 관리</p>
+      </div>
+
       <div class="nav-card" @click="goToUserManage">
         <span class="nav-icon">◇</span>
         <h3>회원 관리</h3>
         <p>사용자 조회 및 관리</p>
-      </div>
-
-      <div class="nav-card disabled">
-        <span class="nav-icon">○</span>
-        <h3>매니저 관리</h3>
-        <p>준비 중</p>
       </div>
 
       <div class="nav-card" @click="goHome">
@@ -45,6 +45,9 @@ const goToBoardManage = () => {
 }
 const goToUserManage = () => {
   router.push('/admin/users')
+}
+const goToMainBoardManage = () => {
+  router.push('/admin/main-boards')
 }
 const goHome = () => {
   router.push('/')
