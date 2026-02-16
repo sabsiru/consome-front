@@ -134,6 +134,15 @@
               <span class="meta-label">ID</span>
               <span class="meta-value">{{ selectedBoard.id }}</span>
             </div>
+            <div v-if="!isManagerMode" class="meta-item">
+              <span class="meta-label">메인 게시판</span>
+              <button
+                :class="['toggle-btn', { active: selectedBoard.isMain }]"
+                @click="toggleMainBoard"
+              >
+                {{ selectedBoard.isMain ? 'ON' : 'OFF' }}
+              </button>
+            </div>
           </div>
 
           <div class="panel-actions">
@@ -203,6 +212,7 @@ import { useRoute, useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
+import { eventBus } from '@/utils/eventBus.js'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
 
@@ -401,6 +411,24 @@ const saveBoard = async () => {
   } catch (err) {
     console.error(err)
     alert('저장 실패')
+  }
+}
+
+// 메인 게시판 토글
+const toggleMainBoard = async () => {
+  try {
+    const res = await api.patch(`/admin/boards/${selectedBoard.value.id}/main`)
+    const isMain = res.data.isMain ?? res.data.main
+    selectedBoard.value = { ...selectedBoard.value, isMain }
+    // boards 목록도 업데이트
+    const idx = boards.value.findIndex(b => b.id === selectedBoard.value.id)
+    if (idx !== -1) {
+      boards.value[idx] = { ...boards.value[idx], isMain }
+    }
+    eventBus.emit('main-boards-updated')
+  } catch (err) {
+    console.error(err)
+    alert('메인 게시판 설정 실패')
   }
 }
 
