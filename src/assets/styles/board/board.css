@@ -166,7 +166,9 @@
 /* 컬럼 폭 */
 .col-category { width: 72px; text-align: center; color: var(--text-muted); }
 .col-title { width: auto; color: var(--text-primary); }
-.col-author { width: 140px; color: var(--text-secondary); }
+.col-author { width: 140px; color: var(--text-secondary); cursor: pointer; }
+.col-author .author-link { display: inline-flex; align-items: center; gap: 4px; }
+.col-author .author-link:hover { color: var(--accent); }
 .col-views,
 .col-comments,
 .col-like,
