@@ -5,6 +5,7 @@ import LoginView from '../views/LoginView.vue'
 import AdminRoutes from '@/router/adminRoutes.js'
 import BoardRoutes from '@/router/boardRoutes.js'
 import UserRoutes from '@/router/userRoutes.js'
+import MessageRoutes from '@/router/messageRoutes.js'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
 import { adminGuard, redirectIfLoggedIn } from '@/router/guards/authGuards.js'
 import { useUserStore } from '@/stores/userStore.js'
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: '/manager/boards', name: 'manager-boards', component: BoardManageView },
     ...BoardRoutes,
     ...UserRoutes,
+    ...MessageRoutes,
     ...AdminRoutes,
   ],
 })
@@ -42,6 +44,16 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === '/login') {
     redirectIfLoggedIn(to, next)
   }
+
+  // 쪽지 인증 가드
+  if (to.meta.requiresAuth) {
+    const store = useUserStore()
+    if (!store.token) {
+      alert('로그인이 필요합니다.')
+      return next('/login')
+    }
+  }
+
   next()
 })
 
