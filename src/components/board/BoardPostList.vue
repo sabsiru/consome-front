@@ -54,7 +54,11 @@
               [{{ post.commentCount }}]
             </span>
           </td>
-          <td class="col-author"><LevelBadge :level="post.authorLevel" :role="post.authorRole" size="sm" /> {{ post.authorNickName }}</td>
+          <td class="col-author" @click.stop="openUserModal($event, post)">
+            <span class="author-link">
+              <LevelBadge :level="post.authorLevel" :role="post.authorRole" size="sm" /> {{ post.authorNickName }}
+            </span>
+          </td>
           <td class="col-views">{{ post.viewCount }}</td>
           <td class="col-like">{{ post.likeCount-post.dislikeCount }}</td>
           <td class="col-date">{{ formatDate(post.createdAt) }}</td>
@@ -124,6 +128,17 @@
         <button class="btn btn-primary" @click="onSearch">검색</button>
       </div>
     </div>
+
+    <!-- 유저 액션 모달 -->
+    <UserActionModal
+      :visible="userModal.visible"
+      :user-id="userModal.userId"
+      :nickname="userModal.nickname"
+      :level="userModal.level"
+      :role="userModal.role"
+      :position="userModal.position"
+      @close="closeUserModal"
+    />
   </div>
 </template>
 
@@ -131,6 +146,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
+import UserActionModal from '@/components/common/UserActionModal.vue'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/board.css'
 
@@ -273,6 +289,31 @@ const onSearch = () => {
     keyword: localSearchKeyword.value.trim(),
     type: localSearchType.value,
   })
+}
+
+// 유저 모달 상태
+const userModal = ref({
+  visible: false,
+  userId: 0,
+  nickname: '',
+  level: 1,
+  role: 'USER',
+  position: { x: 0, y: 0 }
+})
+
+const openUserModal = (event, post) => {
+  userModal.value = {
+    visible: true,
+    userId: post.authorId,
+    nickname: post.authorNickName,
+    level: post.authorLevel,
+    role: post.authorRole || 'USER',
+    position: { x: event.clientX, y: event.clientY }
+  }
+}
+
+const closeUserModal = () => {
+  userModal.value.visible = false
 }
 
 const formatDate = (isoString) => {

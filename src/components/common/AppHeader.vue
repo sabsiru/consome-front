@@ -28,7 +28,11 @@
 
           <!-- ✅ 로그인 한 상태 -->
           <template v-else>
-            <span class="user-info"><LevelBadge :level="level" :role="role" /> {{ nickname }} <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
+            <span class="user-info" @click="goMyProfile"><LevelBadge :level="level" :role="role" /> <span class="nickname-link">{{ nickname }}</span> <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
+            <button class="message-btn" @click="goMessages">
+              <Mail :size="16" />
+              <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+            </button>
             <button v-if="role === 'ADMIN'" @click="goAdmin">관리자페이지</button>
             <button v-if="role === 'MANAGER'" @click="goManagerBoard">게시판관리</button>
             <button class="logout-btn" @click="logout">로그아웃</button>
@@ -44,9 +48,11 @@ import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
+import { Mail } from 'lucide-vue-next'
+import { getUnreadCount } from '@/api/messageApi.js'
 
 const store = useUserStore()
 const { nickname, point, level, role } = storeToRefs(store)
@@ -102,6 +108,41 @@ const goAdmin = () => {
 const goManagerBoard = () => {
   router.push('/manager/boards')
 }
+
+const goMyProfile = () => {
+  router.push(`/users/${store.userId}`)
+}
+
+// 쪽지 관련
+const unreadCount = ref(0)
+
+const goMessages = () => {
+  router.push('/messages')
+}
+
+const fetchUnreadCount = async () => {
+  if (!store.userId) return
+  try {
+    const { data } = await getUnreadCount(store.userId)
+    unreadCount.value = data.count
+  } catch (e) {
+    console.error('[AppHeader] 안읽은 쪽지 조회 실패', e)
+  }
+}
+
+// 로그인 상태 변경 시 안읽은 쪽지 수 조회
+watch(() => store.userId, (newVal) => {
+  if (newVal) fetchUnreadCount()
+  else unreadCount.value = 0
+}, { immediate: true })
+
+// 30초마다 폴링
+onMounted(() => {
+  if (store.userId) fetchUnreadCount()
+  setInterval(() => {
+    if (store.userId) fetchUnreadCount()
+  }, 30000)
+})
 </script>
 
 <style scoped>
@@ -201,6 +242,12 @@ const goManagerBoard = () => {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   color: var(--text-primary);
+  cursor: pointer;
+}
+
+.nickname-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .user-info .point {
@@ -261,5 +308,39 @@ const goManagerBoard = () => {
   height: 32px;
   width: auto;
   filter: brightness(1.1);
+}
+
+/* 쪽지 버튼 */
+.message-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px !important;
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.message-btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: transparent !important;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--danger, #ef4444);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
