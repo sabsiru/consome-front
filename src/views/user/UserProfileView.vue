@@ -16,9 +16,15 @@
         <div class="user-profile__date">가입일: {{ profile.createdAt }}</div>
       </div>
 
-      <div v-if="isMyProfile" class="user-profile__actions">
-        <button class="btn btn-secondary" @click="showNicknameModal = true">닉네임 변경</button>
-        <button class="btn btn-secondary" @click="showPasswordModal = true">비밀번호 변경</button>
+      <div class="user-profile__actions">
+        <button v-if="canSendMessage" class="btn btn-primary" @click="goSendMessage">
+          <Mail :size="16" />
+          쪽지 보내기
+        </button>
+        <template v-if="isMyProfile">
+          <button class="btn btn-secondary" @click="showNicknameModal = true">닉네임 변경</button>
+          <button class="btn btn-secondary" @click="showPasswordModal = true">비밀번호 변경</button>
+        </template>
       </div>
     </div>
 
@@ -138,6 +144,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Mail } from 'lucide-vue-next'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
@@ -150,6 +157,7 @@ const userStore = useUserStore()
 
 const userId = computed(() => Number(route.params.userId))
 const isMyProfile = computed(() => userStore.userId === userId.value)
+const canSendMessage = computed(() => userStore.userId && !isMyProfile.value)
 
 const profile = ref({})
 const activeTab = ref('posts')
@@ -243,6 +251,10 @@ const onCommentClick = (comment) => {
   })
 }
 
+const goSendMessage = () => {
+  router.push({ name: 'MessageCompose', query: { to: userId.value } })
+}
+
 onMounted(() => {
   loadProfile()
 })
@@ -320,8 +332,15 @@ watch(userId, () => {
 
 .user-profile__actions {
   display: flex;
+  align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.user-profile__actions .btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ==========================================
