@@ -19,6 +19,21 @@
             </li>
           </ul>
         </div>
+
+        <!-- 메인 게시판 드롭다운 -->
+        <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
+          <button class="main-boards-trigger">
+            메인 게시판 <span class="arrow">▾</span>
+          </button>
+          <ul v-if="showMainDropdown" class="main-boards-menu">
+            <li v-for="board in mainBoards" :key="board.boardId">
+              <RouterLink :to="`/boards/${board.boardId}`" class="main-board-link">
+                {{ board.boardName }}
+              </RouterLink>
+            </li>
+            <li v-if="mainBoards.length === 0" class="empty">등록된 메인 게시판이 없습니다</li>
+          </ul>
+        </div>
         <!-- ✅ 로그인 안 한 상태 -->
         <div class="nav-auth">
           <template v-if="!nickname || nickname.length === 0">
@@ -48,11 +63,12 @@ import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import { Mail } from 'lucide-vue-next'
 import { getUnreadCount } from '@/api/messageApi.js'
+import { eventBus } from '@/utils/eventBus.js'
 
 const store = useUserStore()
 const { nickname, point, level, role } = storeToRefs(store)
@@ -64,6 +80,30 @@ const logout = (event) => {
   if (confirm('로그아웃 하시겠습니까?')) {
     store.clearUser()
     window.location.reload()
+  }
+}
+
+const mainBoards = ref([])
+const showMainDropdown = ref(false)
+let hideDropdownTimer = null
+
+const openMainDropdown = () => {
+  clearTimeout(hideDropdownTimer)
+  showMainDropdown.value = true
+}
+
+const closeMainDropdown = () => {
+  hideDropdownTimer = setTimeout(() => {
+    showMainDropdown.value = false
+  }, 150)
+}
+
+const fetchMainBoards = async () => {
+  try {
+    const res = await api.get('/navigation/main-boards')
+    mainBoards.value = res.data
+  } catch (e) {
+    console.error('[AppHeader] 메인 게시판 조회 실패', e)
   }
 }
 
@@ -138,10 +178,16 @@ watch(() => store.userId, (newVal) => {
 
 // 30초마다 폴링
 onMounted(() => {
+  fetchMainBoards()
   if (store.userId) fetchUnreadCount()
   setInterval(() => {
     if (store.userId) fetchUnreadCount()
   }, 30000)
+  eventBus.on('main-boards-updated', fetchMainBoards)
+})
+
+onUnmounted(() => {
+  eventBus.off('main-boards-updated', fetchMainBoards)
 })
 </script>
 
@@ -171,6 +217,77 @@ onMounted(() => {
   align-items: center;
   flex: 1;
   margin-left: 20px;
+}
+
+/* 메인 게시판 드롭다운 */
+.main-boards-dropdown {
+  position: relative;
+  margin-left: 12px;
+}
+
+.main-boards-trigger {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.main-boards-trigger:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.main-boards-trigger .arrow {
+  font-size: 10px;
+}
+
+.main-boards-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  margin-top: 4px;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.main-boards-menu li {
+  padding: 0;
+}
+
+.main-board-link {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: 10px 14px;
+  transition: all 0.15s ease;
+}
+
+.main-board-link:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.main-boards-menu .empty {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 10px 14px;
 }
 
 /* 게시판 검색 */
