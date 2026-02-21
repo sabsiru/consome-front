@@ -20,6 +20,9 @@
           </ul>
         </div>
 
+        <!-- 전체 게시판 버튼 -->
+        <RouterLink to="/boards" class="all-boards-btn">전체 게시판</RouterLink>
+
         <!-- 메인 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger">
@@ -345,6 +348,24 @@ onUnmounted(() => {
 .search-dropdown li:hover {
   background: var(--accent-dim);
   color: var(--accent);
+}
+
+/* 전체 게시판 버튼 */
+.all-boards-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.all-boards-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* 로그인/유저 영역: 오른쪽으로 밀기 */
