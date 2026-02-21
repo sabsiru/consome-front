@@ -43,7 +43,7 @@
           </div>
         </section>
 
-        <section class="post-comments" v-if="post">
+        <section class="post-comments" v-if="post && !post.sectionAdminOnly">
           <PostCommentSection
             :post-id="postId"
             :comments="comments"
@@ -62,6 +62,9 @@
             @dislike-comment="dislikeComment"
             @login-required="onLoginRequired"
           />
+        </section>
+        <section class="post-comments post-comments--disabled" v-else-if="post && post.sectionAdminOnly">
+          <p class="comment-disabled-notice">관리자 전용 섹션에서는 댓글이 허용되지 않습니다.</p>
         </section>
         <section class="post-related-list" v-if="post">
           <BoardPostList
@@ -319,11 +322,7 @@ const loadPost = async () => {
   loading.value = true
   error.value = null
   try {
-    const { data } = await api.get(`/posts/${postId.value}`, {
-      params: {
-        userId: userStore.userId, // 조회수 집계에 필요하면 사용
-      },
-    })
+    const { data } = await api.get(`/posts/${postId.value}`)
     post.value = data
     // 투표 상태 로드 (백엔드에서 반환 시)
     hasLiked.value = data.hasLiked ?? false

@@ -62,6 +62,16 @@
           </div>
 
           <div class="form-group">
+            <label>Section <span class="required">*</span></label>
+            <select v-model="createForm.sectionId" class="form-select">
+              <option value="">섹션 선택</option>
+              <option v-for="section in sections" :key="section.id" :value="section.id">
+                {{ section.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label>Name</label>
             <input v-model="createForm.name" class="form-input" placeholder="Enter name..." />
           </div>
@@ -213,6 +223,7 @@ import draggable from 'vuedraggable'
 import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
 import { eventBus } from '@/utils/eventBus.js'
+import { getAdminSections } from '@/api/sectionApi.js'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
 
@@ -240,8 +251,11 @@ const mode = ref(null)
 const selectedBoard = ref(null)
 const categories = ref([])
 
+// 섹션 목록
+const sections = ref([])
+
 // 생성 폼
-const createForm = ref({ name: '', description: '' })
+const createForm = ref({ name: '', description: '', sectionId: '' })
 
 // 편집 폼
 const editForm = ref({ name: '', description: '' })
@@ -252,7 +266,18 @@ const editingCategoryName = ref('')
 
 onMounted(async () => {
   await loadBoards()
+  await loadSections()
 })
+
+// 섹션 목록 조회
+const loadSections = async () => {
+  try {
+    const { data } = await getAdminSections()
+    sections.value = data
+  } catch (err) {
+    console.error('[BoardManage] 섹션 조회 실패', err)
+  }
+}
 
 // 보드 목록 조회
 const loadBoards = async () => {
@@ -356,7 +381,7 @@ const loadCategories = async (boardId) => {
 const startCreateBoard = () => {
   mode.value = 'create-board'
   selectedBoard.value = null
-  createForm.value = { name: '', description: '' }
+  createForm.value = { name: '', description: '', sectionId: '' }
 }
 
 // 카테고리 생성 시작
@@ -375,16 +400,21 @@ const cancelCreate = () => {
 
 // 보드 생성
 const createBoard = async () => {
+  if (!createForm.value.sectionId) {
+    alert('섹션을 선택해주세요.')
+    return
+  }
   try {
     await api.post('/admin/boards', {
       name: createForm.value.name,
       description: createForm.value.description,
+      sectionId: createForm.value.sectionId,
     })
     mode.value = null
     await loadBoards()
   } catch (err) {
     console.error(err)
-    alert('보드 생성 실패')
+    alert(err.response?.data?.message || '보드 생성 실패')
   }
 }
 

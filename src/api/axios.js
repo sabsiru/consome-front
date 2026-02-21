@@ -14,4 +14,16 @@ api.interceptors.request.use((config) => {
 },
   (error) => Promise.reject(error));
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // 토큰 만료 또는 유효하지 않은 사용자 - localStorage 초기화
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
