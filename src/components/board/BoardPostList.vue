@@ -3,7 +3,7 @@
     <div class="page-board__header">
       <div class="page-board__title-row">
         <div class="page-board__meta">{{ totalElements }}개 · {{ page + 1 }} / {{ totalPages }}</div>
-        <button class="btn btn-primary" @click="emitWrite">글쓰기</button>
+        <button v-if="canWrite" class="btn btn-primary" @click="emitWrite">글쓰기</button>
       </div>
     </div>
 
@@ -147,6 +147,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
+import { useUserStore } from '@/stores/userStore.js'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/board.css'
 
@@ -169,11 +170,19 @@ const emit = defineEmits([
   'loaded', // { boardName, totalPages, totalElements }
 ])
 
+const userStore = useUserStore()
+
 const posts = ref([])
 const totalElements = ref(0)
 const totalPages = ref(0)
 const boardName = ref('')
 const categories = ref([])
+const sectionAdminOnly = ref(false)
+
+const canWrite = computed(() => {
+  if (!sectionAdminOnly.value) return true
+  return userStore.role === 'ADMIN'
+})
 
 // 내부 선택 상태는 props로부터 동기화
 const selectedCategoryId = ref(props.categoryId ?? null)
@@ -236,11 +245,13 @@ const loadPosts = async () => {
   totalElements.value = data.totalElements
   totalPages.value = data.totalPages
   boardName.value = data.boardName
+  sectionAdminOnly.value = data.sectionAdminOnly ?? false
 
   emit('loaded', {
     boardName: boardName.value,
     totalPages: totalPages.value,
     totalElements: totalElements.value,
+    sectionAdminOnly: sectionAdminOnly.value,
   })
 }
 

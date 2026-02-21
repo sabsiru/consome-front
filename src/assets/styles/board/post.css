@@ -404,3 +404,19 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+/* 관리자 전용 섹션 댓글 비활성화 */
+.post-comments--disabled {
+  padding: 24px;
+  text-align: center;
+}
+
+.comment-disabled-notice {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+}

@@ -4,7 +4,7 @@
       <!-- 🔹 카테고리: DB 조회 결과를 select로 표시 -->
       <div class="form-row">
         <select id="category" v-model="categoryId">
-          <option v-for="category in categories" :key="category.id" :value="String(category.id)">
+          <option v-for="category in filteredCategories" :key="category.id" :value="String(category.id)">
             {{ category.name }}
           </option>
         </select>
@@ -178,6 +178,11 @@ const isEditMode = computed(() => route.query.mode === 'edit')
 const boardName = ref('')
 const categoryId = ref('')
 const categories = ref([])
+const canUseNotice = computed(() => userStore.role === 'ADMIN' || userStore.role === 'MANAGER')
+const filteredCategories = computed(() => {
+  if (canUseNotice.value) return categories.value
+  return categories.value.filter(c => c.name !== '공지사항')
+})
 
 const title = ref('')
 const loading = ref(false)
@@ -681,8 +686,8 @@ const loadCategories = async () => {
   try {
     const res = await api.get(`/boards/${boardId.value}/categories`)
     categories.value = res.data
-    if (categories.value.length > 0 && !categoryId.value) {
-      categoryId.value = String(categories.value[0].id)
+    if (filteredCategories.value.length > 0 && !categoryId.value) {
+      categoryId.value = String(filteredCategories.value[0].id)
     }
   } catch (e) {
     console.error('[PostView] 카테고리 목록 조회 실패', e)
@@ -720,6 +725,10 @@ onBeforeUnmount(() => {
 })
 
 const submit = async () => {
+  if (!userStore.userId) {
+    error.value = '로그인이 필요합니다.'
+    return
+  }
   if (!title.value.trim()) {
     error.value = '제목을 입력하세요.'
     return
