@@ -5,6 +5,31 @@
       <p class="subtitle">Management Console</p>
     </header>
 
+    <!-- 통계 카드 섹션 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📊</span>
+        <div class="stat-content">
+          <p class="stat-label">누적 방문자</p>
+          <p class="stat-value">{{ stats.totalVisitors.toLocaleString() }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📅</span>
+        <div class="stat-content">
+          <p class="stat-label">오늘 방문자</p>
+          <p class="stat-value">{{ stats.todayVisitors.toLocaleString() }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">👤</span>
+        <div class="stat-content">
+          <p class="stat-label">현재 접속자</p>
+          <p class="stat-value accent">{{ stats.onlineCount }}</p>
+        </div>
+      </div>
+    </div>
+
     <div class="nav-grid">
       <div class="nav-card" @click="goToSectionManage">
         <span class="nav-icon">▣</span>
@@ -41,10 +66,31 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { getAdminStatistics } from '@/api/statisticsApi.js'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/admin-dashboard.css'
 
 const router = useRouter()
+
+const stats = ref({
+  totalVisitors: 0,
+  todayVisitors: 0,
+  onlineCount: 0
+})
+
+const fetchStats = async () => {
+  try {
+    const { data } = await getAdminStatistics()
+    stats.value = data
+  } catch (e) {
+    console.error('[Admin] 통계 조회 실패', e)
+  }
+}
+
+onMounted(() => {
+  fetchStats()
+})
 
 const goToSectionManage = () => {
   router.push('/admin/sections')
