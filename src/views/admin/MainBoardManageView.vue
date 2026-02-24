@@ -1,8 +1,8 @@
 <template>
   <div class="main-board-manage">
     <header class="page-header">
-      <h1>Main<span class="accent">.</span>Boards</h1>
-      <p class="subtitle">메인 게시판 순서 관리</p>
+      <h1>Featured<span class="accent">.</span>Boards</h1>
+      <p class="subtitle">주요 게시판 관리</p>
     </header>
 
     <div class="content-panel">
@@ -24,6 +24,24 @@
             <span class="drag-handle">⋮⋮</span>
             <span class="order-number">{{ index + 1 }}</span>
             <span class="board-name">{{ board.boardName }}</span>
+            <div class="board-toggles">
+              <button
+                class="toggle-btn"
+                :class="{ active: board.writeEnabled }"
+                @click="toggleWrite(board)"
+                title="글쓰기 허용"
+              >
+                ✎
+              </button>
+              <button
+                class="toggle-btn"
+                :class="{ active: board.commentEnabled }"
+                @click="toggleComment(board)"
+                title="댓글 허용"
+              >
+                💬
+              </button>
+            </div>
             <button class="btn-sm btn-danger" @click="removeFromMain(board)">제거</button>
           </div>
         </template>
@@ -31,8 +49,8 @@
 
       <div v-if="!mainBoards.length" class="empty-list">
         <span class="empty-icon">∅</span>
-        <p>메인 게시판이 없습니다</p>
-        <p class="empty-hint">게시판 관리에서 메인 게시판을 설정하세요</p>
+        <p>주요 게시판이 없습니다</p>
+        <p class="empty-hint">게시판 관리에서 주요 게시판을 설정하세요</p>
       </div>
 
       <div class="panel-actions">
@@ -96,7 +114,7 @@ const saveOrder = async () => {
 }
 
 const removeFromMain = async (board) => {
-  if (!confirm(`'${board.boardName}'을(를) 메인 게시판에서 제거하시겠습니까?`)) return
+  if (!confirm(`'${board.boardName}'을(를) 주요 게시판에서 제거하시겠습니까?`)) return
   try {
     await api.patch(`/admin/boards/${board.boardId}/main`)
     await loadMainBoards()
@@ -104,6 +122,26 @@ const removeFromMain = async (board) => {
   } catch (err) {
     console.error(err)
     alert('제거 실패')
+  }
+}
+
+const toggleWrite = async (board) => {
+  try {
+    const res = await api.patch(`/admin/boards/${board.boardId}/write-enabled`)
+    board.writeEnabled = res.data.writeEnabled
+  } catch (err) {
+    console.error(err)
+    alert('글쓰기 설정 변경 실패')
+  }
+}
+
+const toggleComment = async (board) => {
+  try {
+    const res = await api.patch(`/admin/boards/${board.boardId}/comment-enabled`)
+    board.commentEnabled = res.data.commentEnabled
+  } catch (err) {
+    console.error(err)
+    alert('댓글 설정 변경 실패')
   }
 }
 </script>

@@ -145,7 +145,7 @@
               <span class="meta-value">{{ selectedBoard.id }}</span>
             </div>
             <div v-if="!isManagerMode" class="meta-item">
-              <span class="meta-label">메인 게시판</span>
+              <span class="meta-label">주요 게시판</span>
               <button
                 :class="['toggle-btn', { active: selectedBoard.isMain }]"
                 @click="toggleMainBoard"
@@ -444,7 +444,7 @@ const saveBoard = async () => {
   }
 }
 
-// 메인 게시판 토글
+// 주요 게시판 토글
 const toggleMainBoard = async () => {
   try {
     const res = await api.patch(`/admin/boards/${selectedBoard.value.id}/main`)
@@ -458,7 +458,7 @@ const toggleMainBoard = async () => {
     eventBus.emit('main-boards-updated')
   } catch (err) {
     console.error(err)
-    alert('메인 게시판 설정 실패')
+    alert('주요 게시판 설정 실패')
   }
 }
 

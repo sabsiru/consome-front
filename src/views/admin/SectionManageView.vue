@@ -29,15 +29,6 @@
                 {{ section.name }}
                 <span class="board-count">({{ section.boards.length }})</span>
               </span>
-              <label class="admin-toggle" :title="section.adminOnly ? '관리자 전용' : '일반 섹션'">
-                <input
-                  type="checkbox"
-                  :checked="section.adminOnly"
-                  @change="toggleAdminOnly(section)"
-                />
-                <span class="toggle-slider"></span>
-                <span class="toggle-label">{{ section.adminOnly ? 'ADMIN' : 'PUBLIC' }}</span>
-              </label>
               <div class="section-actions">
                 <button class="btn-sm btn-ghost" @click="openEditModal(section)">수정</button>
                 <button class="btn-sm btn-danger" @click="deleteSection(section)">삭제</button>
@@ -82,10 +73,6 @@
           class="modal-input"
           @keyup.enter="submitModal"
         />
-        <label class="modal-checkbox">
-          <input type="checkbox" v-model="modalAdminOnly" />
-          <span>관리자 전용 섹션 (ADMIN만 글쓰기 가능)</span>
-        </label>
         <div class="modal-actions">
           <button class="btn btn-ghost" @click="closeModal">취소</button>
           <button class="btn btn-primary" @click="submitModal">{{ isEdit ? '수정' : '추가' }}</button>
@@ -116,7 +103,6 @@ const showModal = ref(false)
 const isEdit = ref(false)
 const editingId = ref(null)
 const modalName = ref('')
-const modalAdminOnly = ref(false)
 
 const hasChanges = computed(() => {
   if (sections.value.length !== originalOrder.value.length) return true
@@ -164,7 +150,6 @@ const openCreateModal = () => {
   isEdit.value = false
   editingId.value = null
   modalName.value = ''
-  modalAdminOnly.value = false
   showModal.value = true
 }
 
@@ -172,14 +157,12 @@ const openEditModal = (section) => {
   isEdit.value = true
   editingId.value = section.id
   modalName.value = section.name
-  modalAdminOnly.value = section.adminOnly
   showModal.value = true
 }
 
 const closeModal = () => {
   showModal.value = false
   modalName.value = ''
-  modalAdminOnly.value = false
 }
 
 const submitModal = async () => {
@@ -189,25 +172,15 @@ const submitModal = async () => {
   }
   try {
     if (isEdit.value) {
-      await updateSection(editingId.value, modalName.value, modalAdminOnly.value)
+      await updateSection(editingId.value, modalName.value)
     } else {
-      await createSection(modalName.value, modalAdminOnly.value)
+      await createSection(modalName.value)
     }
     closeModal()
     await loadSections()
   } catch (err) {
     console.error(err)
     alert(err.response?.data?.message || '요청 실패')
-  }
-}
-
-const toggleAdminOnly = async (section) => {
-  try {
-    await updateSection(section.id, section.name, !section.adminOnly)
-    await loadSections()
-  } catch (err) {
-    console.error(err)
-    alert(err.response?.data?.message || '변경 실패')
   }
 }
 
@@ -441,72 +414,4 @@ const deleteSection = async (section) => {
   border-top: 1px solid var(--border-color);
 }
 
-/* Admin Toggle */
-.admin-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.admin-toggle input {
-  display: none;
-}
-
-.toggle-slider {
-  width: 32px;
-  height: 18px;
-  background: var(--border-color);
-  border-radius: 9px;
-  position: relative;
-  transition: background 0.2s;
-}
-
-.toggle-slider::after {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background: var(--text-muted);
-  border-radius: 50%;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.admin-toggle input:checked + .toggle-slider {
-  background: var(--accent-dim);
-}
-
-.admin-toggle input:checked + .toggle-slider::after {
-  transform: translateX(14px);
-  background: var(--accent);
-}
-
-.toggle-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-muted);
-  min-width: 45px;
-}
-
-.admin-toggle input:checked ~ .toggle-label {
-  color: var(--accent);
-}
-
-/* Modal checkbox */
-.modal-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-.modal-checkbox input {
-  accent-color: var(--accent);
-}
 </style>
