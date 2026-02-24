@@ -23,18 +23,27 @@
         <!-- 전체 게시판 버튼 -->
         <RouterLink to="/boards" class="all-boards-btn">전체 게시판</RouterLink>
 
-        <!-- 메인 게시판 드롭다운 -->
+        <!-- 주요 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger">
-            메인 게시판 <span class="arrow">▾</span>
+            주요 게시판 <span class="arrow">▾</span>
           </button>
           <ul v-if="showMainDropdown" class="main-boards-menu">
-            <li v-for="board in mainBoards" :key="board.boardId">
+            <!-- 관리자 지정 게시판 -->
+            <li v-for="board in featuredBoards.pinnedBoards" :key="'pinned-' + board.boardId">
+              <RouterLink :to="`/boards/${board.boardId}`" class="main-board-link pinned">
+                {{ board.boardName }}
+              </RouterLink>
+            </li>
+            <!-- 구분선 -->
+            <li v-if="featuredBoards.pinnedBoards?.length && featuredBoards.popularBoards?.length" class="divider"></li>
+            <!-- 인기 게시판 -->
+            <li v-for="board in featuredBoards.popularBoards" :key="'popular-' + board.boardId">
               <RouterLink :to="`/boards/${board.boardId}`" class="main-board-link">
                 {{ board.boardName }}
               </RouterLink>
             </li>
-            <li v-if="mainBoards.length === 0" class="empty">등록된 메인 게시판이 없습니다</li>
+            <li v-if="!featuredBoards.pinnedBoards?.length && !featuredBoards.popularBoards?.length" class="empty">등록된 주요 게시판이 없습니다</li>
           </ul>
         </div>
 
@@ -87,7 +96,7 @@ const logout = (event) => {
   }
 }
 
-const mainBoards = ref([])
+const featuredBoards = ref({ pinnedBoards: [], popularBoards: [] })
 const showMainDropdown = ref(false)
 let hideDropdownTimer = null
 
@@ -102,12 +111,12 @@ const closeMainDropdown = () => {
   }, 150)
 }
 
-const fetchMainBoards = async () => {
+const fetchFeaturedBoards = async () => {
   try {
-    const res = await api.get('/navigation/main-boards')
-    mainBoards.value = res.data
+    const res = await api.get('/navigation/featured-boards')
+    featuredBoards.value = res.data
   } catch (e) {
-    console.error('[AppHeader] 메인 게시판 조회 실패', e)
+    console.error('[AppHeader] 주요 게시판 조회 실패', e)
   }
 }
 
@@ -182,7 +191,7 @@ watch(() => store.userId, (newVal) => {
 
 // 30초마다 폴링
 onMounted(() => {
-  fetchMainBoards()
+  fetchFeaturedBoards()
   if (store.userId) {
     fetchUnreadCount()
   }
@@ -191,11 +200,11 @@ onMounted(() => {
       fetchUnreadCount()
     }
   }, 30000)
-  eventBus.on('main-boards-updated', fetchMainBoards)
+  eventBus.on('main-boards-updated', fetchFeaturedBoards)
 })
 
 onUnmounted(() => {
-  eventBus.off('main-boards-updated', fetchMainBoards)
+  eventBus.off('main-boards-updated', fetchFeaturedBoards)
 })
 </script>
 
@@ -296,6 +305,17 @@ onUnmounted(() => {
   font-size: 12px;
   color: var(--text-muted);
   padding: 10px 14px;
+}
+
+.main-boards-menu .divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 10px;
+  padding: 0;
+}
+
+.main-board-link.pinned {
+  color: var(--accent);
 }
 
 /* 게시판 검색 */
