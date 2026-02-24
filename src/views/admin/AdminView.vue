@@ -45,8 +45,8 @@
 
       <div class="nav-card" @click="goToMainBoardManage">
         <span class="nav-icon">★</span>
-        <h3>메인 게시판</h3>
-        <p>메인 게시판 순서 관리</p>
+        <h3>주요 게시판</h3>
+        <p>주요 게시판 관리</p>
       </div>
 
       <div class="nav-card" @click="goToUserManage">
