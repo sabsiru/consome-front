@@ -177,10 +177,15 @@ const totalElements = ref(0)
 const totalPages = ref(0)
 const boardName = ref('')
 const categories = ref([])
-const sectionAdminOnly = ref(false)
+const writeEnabled = ref(true)
 
 const canWrite = computed(() => {
-  if (!sectionAdminOnly.value) return true
+  // 게시판 레벨 설정이 우선 (writeEnabled가 명시적으로 설정된 경우)
+  // writeEnabled=true면 sectionAdminOnly 무시하고 글쓰기 허용
+  if (writeEnabled.value) {
+    return true
+  }
+  // writeEnabled=false면 ADMIN만 가능
   return userStore.role === 'ADMIN'
 })
 
@@ -245,13 +250,13 @@ const loadPosts = async () => {
   totalElements.value = data.totalElements
   totalPages.value = data.totalPages
   boardName.value = data.boardName
-  sectionAdminOnly.value = data.sectionAdminOnly ?? false
+  writeEnabled.value = data.writeEnabled ?? true
 
   emit('loaded', {
     boardName: boardName.value,
     totalPages: totalPages.value,
     totalElements: totalElements.value,
-    sectionAdminOnly: sectionAdminOnly.value,
+    writeEnabled: writeEnabled.value,
   })
 }
 
