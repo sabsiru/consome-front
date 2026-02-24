@@ -46,7 +46,7 @@ const loadBoardHeader = async () => {
   try {
     // 기대 응답 예시:
     // { boardId: 1, boardName: '자유게시판', description: '...', adminName: '관리자' }
-    const res = await api.get(`/boards/${boardId.value}/posts`)
+    const res = await api.get(`/boards/${boardId.value}/posts`, { params: { headerOnly: true } })
     const data = res.data
 
     boardName.value = data.boardName ?? data.name ?? '게시판 이름'
