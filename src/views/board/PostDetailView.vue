@@ -43,7 +43,7 @@
           </div>
         </section>
 
-        <section class="post-comments" v-if="post && !post.sectionAdminOnly">
+        <section class="post-comments" v-if="post && post.commentEnabled">
           <PostCommentSection
             :post-id="postId"
             :comments="comments"
@@ -63,8 +63,8 @@
             @login-required="onLoginRequired"
           />
         </section>
-        <section class="post-comments post-comments--disabled" v-else-if="post && post.sectionAdminOnly">
-          <p class="comment-disabled-notice">관리자 전용 섹션에서는 댓글이 허용되지 않습니다.</p>
+        <section class="post-comments post-comments--disabled" v-else-if="post && !post.commentEnabled">
+          <p class="comment-disabled-notice">이 게시판에서는 댓글이 허용되지 않습니다.</p>
         </section>
         <section class="post-related-list" v-if="post">
           <BoardPostList
