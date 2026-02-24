@@ -37,6 +37,7 @@
             <li v-if="mainBoards.length === 0" class="empty">등록된 메인 게시판이 없습니다</li>
           </ul>
         </div>
+
         <!-- ✅ 로그인 안 한 상태 -->
         <div class="nav-auth">
           <template v-if="!nickname || nickname.length === 0">
@@ -182,9 +183,13 @@ watch(() => store.userId, (newVal) => {
 // 30초마다 폴링
 onMounted(() => {
   fetchMainBoards()
-  if (store.userId) fetchUnreadCount()
+  if (store.userId) {
+    fetchUnreadCount()
+  }
   setInterval(() => {
-    if (store.userId) fetchUnreadCount()
+    if (store.userId) {
+      fetchUnreadCount()
+    }
   }, 30000)
   eventBus.on('main-boards-updated', fetchMainBoards)
 })
