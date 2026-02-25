@@ -138,6 +138,7 @@
       :role="userModal.role"
       :position="userModal.position"
       @close="closeUserModal"
+      @report="onReport"
     />
   </div>
 </template>
@@ -168,6 +169,7 @@ const emit = defineEmits([
   'write-click',
   'search',
   'loaded', // { boardName, totalPages, totalElements }
+  'report', // { targetType, targetId }
 ])
 
 const userStore = useUserStore()
@@ -330,6 +332,10 @@ const openUserModal = (event, post) => {
 
 const closeUserModal = () => {
   userModal.value.visible = false
+}
+
+const onReport = (payload) => {
+  emit('report', payload)
 }
 
 // 검색어 강조 (TITLE, TITLE_CONTENT일 때만)

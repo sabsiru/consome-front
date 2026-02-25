@@ -119,6 +119,21 @@
               삭제
             </button>
           </div>
+          <!-- 신고 버튼 (본인 댓글 아닐 때만) -->
+          <div
+            v-if="
+              editingId !== c.commentId &&
+              canWrite &&
+              !isDeletedComment(c) &&
+              props.currentUserId != null &&
+              c.userId !== props.currentUserId
+            "
+            class="comment-item__actions"
+          >
+            <button type="button" class="comment-item__report-btn" @click="onReport(c.commentId)">
+              신고
+            </button>
+          </div>
         </div>
 
         <div
@@ -218,6 +233,7 @@ const emit = defineEmits([
   'like-comment', // (commentId)
   'dislike-comment', // (commentId)
   'login-required', // 비로그인 시 로그인 필요
+  'report-comment', // (commentId)
 ])
 
 const onCommentAreaClick = () => {
@@ -357,6 +373,10 @@ const onDelete = (commentId) => {
     () => {},
     () => {},
   )
+}
+
+const onReport = (commentId) => {
+  emit('report-comment', commentId)
 }
 
 const onLikeComment = (commentId) => {
