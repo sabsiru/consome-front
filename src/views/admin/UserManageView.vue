@@ -40,7 +40,10 @@
             </span>
           </td>
           <td>{{ user.userPoint }}</td>
-          <td><button class="role-btn" @click="openRoleModal(user)">권한</button></td>
+          <td>
+            <button class="role-btn" @click="openRoleModal(user)">권한</button>
+            <button class="suspend-btn" @click="openSuspendModal(user)">제재</button>
+          </td>
         </tr>
         <tr v-if="users.length === 0">
           <td colspan="6" class="empty">조회된 회원이 없습니다.</td>
@@ -93,12 +96,42 @@
         <button class="close-btn" @click="closeRoleModal">닫기</button>
       </div>
     </div>
+
+    <!-- 제재 모달 -->
+    <div v-if="showSuspendModal" class="role-modal-overlay" @click.self="closeSuspendModal">
+      <div class="role-modal suspend-modal">
+        <h3>사용자 제재</h3>
+        <p>{{ suspendTarget?.nickname }} (ID: {{ suspendTarget?.userId }})</p>
+
+        <div class="suspend-options">
+          <label v-for="opt in suspensionTypes" :key="opt.value" class="suspend-option">
+            <input type="radio" :value="opt.value" v-model="selectedSuspensionType" />
+            <span>{{ opt.label }}</span>
+          </label>
+        </div>
+
+        <div class="suspend-reason">
+          <input v-model="suspendReason" placeholder="제재 사유 (선택)" />
+        </div>
+
+        <div class="suspend-actions">
+          <button class="cancel-btn" @click="closeSuspendModal">취소</button>
+          <button class="confirm-btn" :disabled="!selectedSuspensionType" @click="confirmSuspend">
+            제재 적용
+          </button>
+          <button v-if="suspendTarget?.suspensionType" class="unsuspend-btn" @click="confirmUnsuspend">
+            제재 해제
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '@/api/axios'
+import { suspendUser, unsuspendUser } from '@/api/adminApi.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/user-manage.css'
@@ -236,6 +269,64 @@ const closeRoleModal = () => {
   boardSearchKeyword.value = ''
   boardSearchResults.value = []
   selectedBoard.value = null
+}
+
+// 제재 모달
+const showSuspendModal = ref(false)
+const suspendTarget = ref(null)
+const selectedSuspensionType = ref('')
+const suspendReason = ref('')
+
+const suspensionTypes = [
+  { value: 'DAY_1', label: '1일 정지' },
+  { value: 'DAY_2', label: '2일 정지' },
+  { value: 'DAY_3', label: '3일 정지' },
+  { value: 'DAY_7', label: '7일 정지' },
+  { value: 'DAY_15', label: '15일 정지' },
+  { value: 'DAY_30', label: '30일 정지' },
+  { value: 'PERMANENT', label: '영구 정지' }
+]
+
+const openSuspendModal = (user) => {
+  suspendTarget.value = user
+  selectedSuspensionType.value = ''
+  suspendReason.value = ''
+  showSuspendModal.value = true
+}
+
+const closeSuspendModal = () => {
+  showSuspendModal.value = false
+  suspendTarget.value = null
+  selectedSuspensionType.value = ''
+  suspendReason.value = ''
+}
+
+const confirmSuspend = async () => {
+  if (!selectedSuspensionType.value) return
+  const typeLabel = suspensionTypes.find(t => t.value === selectedSuspensionType.value)?.label
+  if (!confirm(`${suspendTarget.value.nickname}님을 ${typeLabel} 처리하시겠습니까?`)) return
+
+  try {
+    await suspendUser(suspendTarget.value.userId, selectedSuspensionType.value, suspendReason.value)
+    alert('제재가 적용되었습니다.')
+    await loadUsers()
+    closeSuspendModal()
+  } catch (e) {
+    alert(e.response?.data?.message || '제재 적용에 실패했습니다.')
+  }
+}
+
+const confirmUnsuspend = async () => {
+  if (!confirm(`${suspendTarget.value.nickname}님의 제재를 해제하시겠습니까?`)) return
+
+  try {
+    await unsuspendUser(suspendTarget.value.userId)
+    alert('제재가 해제되었습니다.')
+    await loadUsers()
+    closeSuspendModal()
+  } catch (e) {
+    alert(e.response?.data?.message || '제재 해제에 실패했습니다.')
+  }
 }
 
 onMounted(() => {

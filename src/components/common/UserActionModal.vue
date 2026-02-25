@@ -16,6 +16,10 @@
             <Mail :size="16" />
             쪽지 보내기
           </button>
+          <button v-if="canReport" class="report-btn" @click="reportUser">
+            <Flag :size="16" />
+            신고하기
+          </button>
         </div>
       </div>
     </div>
@@ -25,7 +29,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { User, Mail } from 'lucide-vue-next'
+import { User, Mail, Flag } from 'lucide-vue-next'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import { useUserStore } from '@/stores/userStore.js'
 
@@ -38,7 +42,7 @@ const props = defineProps({
   position: { type: Object, default: () => ({ x: 0, y: 0 }) }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'report'])
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -46,6 +50,10 @@ const userStore = useUserStore()
 const isMe = computed(() => userStore.userId === props.userId)
 
 const canSendMessage = computed(() => {
+  return userStore.userId && !isMe.value
+})
+
+const canReport = computed(() => {
   return userStore.userId && !isMe.value
 })
 
@@ -64,6 +72,11 @@ const goProfile = () => {
 
 const sendMessage = () => {
   router.push({ name: 'MessageCompose', query: { to: props.userId } })
+  close()
+}
+
+const reportUser = () => {
+  emit('report', { targetType: 'USER', targetId: props.userId })
   close()
 }
 </script>
@@ -133,5 +146,10 @@ const sendMessage = () => {
 .modal-actions button:hover {
   background: var(--accent-dim);
   color: var(--accent);
+}
+
+.modal-actions .report-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
 }
 </style>

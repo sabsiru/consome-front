@@ -341,3 +341,130 @@
   background: var(--bg-hover);
   border-color: var(--text-muted);
 }
+
+/* Suspend Button */
+.suspend-btn {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--danger);
+  border-radius: 4px;
+  color: var(--danger);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+}
+
+.suspend-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Suspend Modal */
+.suspend-modal {
+  min-width: 400px;
+}
+
+.suspend-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.suspend-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: all 0.15s;
+}
+
+.suspend-option:hover {
+  border-color: var(--danger);
+}
+
+.suspend-option:has(input:checked) {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.suspend-option input {
+  accent-color: var(--danger);
+}
+
+.suspend-reason {
+  margin-bottom: 16px;
+}
+
+.suspend-reason input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.suspend-reason input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.suspend-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.suspend-actions .cancel-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.suspend-actions .confirm-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--danger);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.suspend-actions .confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.suspend-actions .unsuspend-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--success);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}

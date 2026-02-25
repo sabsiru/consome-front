@@ -1,24 +1,36 @@
 <template>
-  <BoardPostList
-    :board-id="boardId"
-    :page="page"
-    :size="size"
-    :category-id="categoryId"
-    :keyword="keyword"
-    :search-type="searchType"
-    @loaded="onLoaded"
-    @page-change="onPageChange"
-    @category-change="onCategoryChange"
-    @post-click="onPostClick"
-    @write-click="onWriteClick"
-    @search="onSearch"
-  />
+  <div>
+    <BoardPostList
+      :board-id="boardId"
+      :page="page"
+      :size="size"
+      :category-id="categoryId"
+      :keyword="keyword"
+      :search-type="searchType"
+      @loaded="onLoaded"
+      @page-change="onPageChange"
+      @category-change="onCategoryChange"
+      @post-click="onPostClick"
+      @write-click="onWriteClick"
+      @search="onSearch"
+      @report="onReport"
+    />
+
+    <ReportModal
+      :visible="showReportModal"
+      :target-type="reportTarget.type"
+      :target-id="reportTarget.id"
+      @close="closeReportModal"
+      @success="closeReportModal"
+    />
+  </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BoardPostList from '@/components/board/BoardPostList.vue'
+import ReportModal from '@/components/common/ReportModal.vue'
 import { useUserStore } from '@/stores/userStore.js'
 
 const route = useRoute()
@@ -36,6 +48,26 @@ const keyword = computed(() => route.query.keyword ?? '')
 const searchType = computed(() => route.query.type ?? 'TITLE_CONTENT')
 
 const boardName = ref('')
+
+// 신고 모달
+const showReportModal = ref(false)
+const reportTarget = ref({ type: '', id: null })
+
+const onReport = ({ targetType, targetId }) => {
+  if (!userStore.token) {
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      router.push({ name: 'login', query: { redirect: route.fullPath } })
+    }
+    return
+  }
+  reportTarget.value = { type: targetType, id: targetId }
+  showReportModal.value = true
+}
+
+const closeReportModal = () => {
+  showReportModal.value = false
+  reportTarget.value = { type: '', id: null }
+}
 
 const DEFAULT_PAGE = 0
 const DEFAULT_SIZE = 20

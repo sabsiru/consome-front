@@ -232,7 +232,8 @@
 }
 
 .comment-item__edit-btn,
-.comment-item__delete-btn {
+.comment-item__delete-btn,
+.comment-item__report-btn {
   flex: 0 0 auto;
 
   border: 1px solid var(--border-color);
@@ -251,7 +252,8 @@
   color: var(--accent);
 }
 
-.comment-item__delete-btn:hover {
+.comment-item__delete-btn:hover,
+.comment-item__report-btn:hover {
   border-color: var(--danger);
   color: var(--danger);
 }

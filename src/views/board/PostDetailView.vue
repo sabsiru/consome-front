@@ -37,9 +37,12 @@
             <button type="button" class="btn" :class="{ 'btn--voted-dislike': hasDisliked }" :disabled="hasDisliked" @click="onDislike">비추천</button>
           </div>
 
-          <div class="post-actions__right" v-if="isAuthor">
-            <button type="button" class="btn" @click="goEdit">수정</button>
-            <button type="button" class="btn btn-danger" @click="onDelete">삭제</button>
+          <div class="post-actions__right">
+            <template v-if="isAuthor">
+              <button type="button" class="btn" @click="goEdit">수정</button>
+              <button type="button" class="btn btn-danger" @click="onDelete">삭제</button>
+            </template>
+            <button v-else-if="isLoggedIn" type="button" class="btn btn-report" @click="openReportModal('POST', postId)">신고</button>
           </div>
         </section>
 
@@ -61,6 +64,7 @@
             @like-comment="likeComment"
             @dislike-comment="dislikeComment"
             @login-required="onLoginRequired"
+            @report-comment="(commentId) => openReportModal('COMMENT', commentId)"
           />
         </section>
         <section class="post-comments post-comments--disabled" v-else-if="post && !post.commentEnabled">
@@ -78,12 +82,21 @@
             @post-click="goPostDetailFromList"
             @write-click="onWriteClick"
             @search="onSearch"
+            @report="({ targetType, targetId }) => openReportModal(targetType, targetId)"
           />
         </section>
         <div v-if="loading" class="post-status">불러오는 중...</div>
         <div v-else-if="error" class="post-status post-status--error">{{ error }}</div>
       </article>
     </div>
+
+    <ReportModal
+      :visible="showReportModal"
+      :target-type="reportTarget.type"
+      :target-id="reportTarget.id"
+      @close="closeReportModal"
+      @success="closeReportModal"
+    />
   </div>
 </template>
 
@@ -97,6 +110,7 @@ import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
 import PostCommentSection from '@/components/board/PostCommentSection.vue'
 import LevelBadge from '@/components/common/LevelBadge.vue'
+import ReportModal from '@/components/common/ReportModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,6 +129,10 @@ const error = ref(null)
 // 투표 상태
 const hasLiked = ref(false)
 const hasDisliked = ref(false)
+
+// 신고 모달
+const showReportModal = ref(false)
+const reportTarget = ref({ type: '', id: null })
 
 // 댓글 상태
 const comments = ref([])
@@ -512,6 +530,23 @@ const onSearch = ({ keyword: kw, type }) => {
 }
 
 const isLoggedIn = computed(() => !!userStore.userId)
+
+// 게시글 신고
+const openReportModal = (targetType, targetId) => {
+  if (!userStore.userId) {
+    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
+      goToLogin()
+    }
+    return
+  }
+  reportTarget.value = { type: targetType, id: targetId }
+  showReportModal.value = true
+}
+
+const closeReportModal = () => {
+  showReportModal.value = false
+  reportTarget.value = { type: '', id: null }
+}
 
 const loadScript = (src, id, forceReload = false) =>
   new Promise((resolve) => {

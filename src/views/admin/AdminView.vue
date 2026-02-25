@@ -55,6 +55,12 @@
         <p>사용자 조회 및 관리</p>
       </div>
 
+      <div class="nav-card" @click="goToReportManage">
+        <span class="nav-icon">⚠</span>
+        <h3>신고 관리</h3>
+        <p>신고 접수 및 처리</p>
+      </div>
+
       <div class="nav-card" @click="goHome">
         <span class="nav-icon">←</span>
         <h3>메인 페이지</h3>
@@ -103,6 +109,9 @@ const goToUserManage = () => {
 }
 const goToMainBoardManage = () => {
   router.push('/admin/main-boards')
+}
+const goToReportManage = () => {
+  router.push('/admin/reports')
 }
 const goHome = () => {
   router.push('/')
