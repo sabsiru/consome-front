@@ -3,6 +3,7 @@ import BoardManageView from '@/views/admin/BoardManageView.vue'
 import UserManageView from '@/views/admin/UserManageView.vue'
 import MainBoardManageView from '@/views/admin/MainBoardManageView.vue'
 import SectionManageView from '@/views/admin/SectionManageView.vue'
+import ReportManageView from '@/views/admin/ReportManageView.vue'
 
 export default [
   {
@@ -33,6 +34,12 @@ export default [
     path: '/admin/users/',
     name: 'userManage',
     component: UserManageView,
+    meta: { role: 'ADMIN' },
+  },
+  {
+    path: '/admin/reports',
+    name: 'reportManage',
+    component: ReportManageView,
     meta: { role: 'ADMIN' },
   }
 ]
