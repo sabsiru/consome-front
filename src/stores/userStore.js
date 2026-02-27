@@ -33,6 +33,7 @@ export const useUserStore = defineStore('user', {
       this.level = 1
       this.token = ''
       this.userId = ''
+      this.role = ''
       this.managedBoardIds = []
       localStorage.removeItem('userId')
       localStorage.removeItem('nickname');

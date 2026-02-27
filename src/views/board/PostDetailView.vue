@@ -117,7 +117,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const page = computed(() => Number(route.query.page ?? 0))
-const size = computed(() => Number(route.query.size ?? 20))
+const size = computed(() => Number(route.query.size ?? 50))
 const postId = computed(() => Number(route.params.postId))
 const keyword = computed(() => route.query.keyword ?? '')
 const searchType = computed(() => route.query.type ?? 'TITLE_CONTENT')

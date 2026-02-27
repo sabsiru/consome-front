@@ -39,7 +39,7 @@ const userStore = useUserStore()
 
 const boardId = computed(() => Number(route.params.boardId))
 const page = computed(() => Number(route.query.page ?? 0))
-const size = computed(() => Number(route.query.size ?? 20))
+const size = computed(() => Number(route.query.size ?? 50))
 const categoryId = computed(() => {
   const v = route.query.categoryId
   return v === undefined || v === null || v === '' ? null : Number(v)
