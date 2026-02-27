@@ -48,6 +48,11 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.page-board__actions {
+  display: flex;
+  gap: 8px;
+}
+
 .page-board__title-row {
   display: flex;
   align-items: center;
@@ -308,4 +313,56 @@
   .col-dislike {
     display: none;
   }
+}
+
+/* 고정 게시글 스타일 삭제됨 - BoardPostList.vue의 scoped style에서 관리 */
+
+.pinned-toggle-row {
+  background-color: #f9f9f9;
+}
+
+.pinned-toggle-row:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-toggle-pinned {
+  width: 100%;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 12px;
+}
+
+.btn-toggle-pinned:hover {
+  color: #333;
+}
+
+.col-pin {
+  width: 60px;
+  text-align: center;
+}
+
+.btn-pin {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-pin:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.1);
+}
+
+.btn-pin.is-pinned {
+  color: #ffa500;
+}
+
+.btn-pin:not(.is-pinned) {
+  color: #999;
 }
