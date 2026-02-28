@@ -139,7 +139,7 @@ import '@/assets/styles/admin/user-manage.css'
 const users = ref([])
 
 const page = ref(0)
-const size = ref(20)
+const size = ref(50)
 const totalElements = ref(0)
 const totalPages = ref(0)
 

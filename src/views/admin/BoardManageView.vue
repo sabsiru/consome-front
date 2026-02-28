@@ -241,7 +241,7 @@ const goToBoard = () => {
 // 보드 목록
 const boards = ref([])
 const page = ref(0)
-const size = ref(20)
+const size = ref(50)
 const totalElements = ref(0)
 const totalPages = ref(0)
 const searchKeyword = ref('')

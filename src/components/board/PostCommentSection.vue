@@ -215,7 +215,7 @@ const props = defineProps({
 
   comments: { type: Array, default: () => [] },
   page: { type: Number, default: 0 },
-  size: { type: Number, default: 20 },
+  size: { type: Number, default: 50 },
   totalPages: { type: Number, default: 0 },
   totalElements: { type: Number, default: 0 },
 
