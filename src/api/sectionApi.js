@@ -9,3 +9,7 @@ export const createSection = (name) => api.post('/admin/sections', { name })
 export const updateSection = (id, name) => api.put(`/admin/sections/${id}`, { name })
 export const deleteSection = (id) => api.delete(`/admin/sections/${id}`)
 export const reorderSections = (orders) => api.put('/admin/sections/reorder', { orders })
+export const getSectionBoards = (sectionId, { page = 0, size = 20, keyword = '' } = {}) =>
+  api.get(`/admin/sections/${sectionId}/boards`, {
+    params: { page, size, ...(keyword && { keyword }) }
+  })

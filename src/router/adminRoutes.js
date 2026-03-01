@@ -1,5 +1,4 @@
 import AdminView from '@/views/admin/AdminView.vue'
-import BoardManageView from '@/views/admin/BoardManageView.vue'
 import UserManageView from '@/views/admin/UserManageView.vue'
 import MainBoardManageView from '@/views/admin/MainBoardManageView.vue'
 import SectionManageView from '@/views/admin/SectionManageView.vue'
@@ -16,12 +15,6 @@ export default [
     path: '/admin/sections',
     name: 'sectionManage',
     component: SectionManageView,
-    meta: { role: 'ADMIN' },
-  },
-  {
-    path: '/admin/boards',
-    name: 'boardManage',
-    component: BoardManageView,
     meta: { role: 'ADMIN' },
   },
   {

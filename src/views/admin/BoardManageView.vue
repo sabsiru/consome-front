@@ -1,24 +1,18 @@
 <template>
   <div class="board-manage">
     <header class="page-header">
-      <h1>Board<span class="accent">.</span>Manager</h1>
-      <p class="subtitle">Board → Category</p>
+      <div class="header-top">
+        <div>
+          <h1>Board<span class="accent">.</span>Manager</h1>
+          <p class="subtitle">담당 게시판 관리 (MANAGER)</p>
+        </div>
+        <button class="btn btn-ghost" @click="$router.back()">← 뒤로가기</button>
+      </div>
     </header>
 
-    <div class="split-panel">
-      <!-- 좌측: 보드 리스트 -->
-      <div class="panel-left">
-        <div class="search-bar" :class="{ 'search-bar--hidden': isManagerMode }">
-          <input
-            v-model="searchKeyword"
-            class="search-input"
-            placeholder="Search boards..."
-            @keyup.enter="searchBoards"
-            :disabled="isManagerMode"
-          />
-          <button class="search-btn" @click="searchBoards" :disabled="isManagerMode">검색</button>
-        </div>
-
+    <div class="content-wrapper">
+      <!-- 좌측: 담당 게시판 목록 -->
+      <div class="board-list-section">
         <div class="board-list">
           <div
             v-for="board in boards"
@@ -27,75 +21,19 @@
             @click="selectBoard(board)"
           >
             <span class="board-name">{{ board.name }}</span>
-            <!--            <span class="category-count">{{ board.categoryCount || 0 }}</span>-->
           </div>
 
           <div v-if="!boards.length" class="empty-list">
             <span class="empty-icon">∅</span>
-            <p>No boards found</p>
+            <p>담당 게시판이 없습니다</p>
           </div>
         </div>
-
-        <!-- 페이지네이션 -->
-        <div v-if="totalPages > 1" class="pagination">
-          <button :disabled="page === 0" @click="changePage(page - 1)">‹</button>
-          <span>{{ page + 1 }} / {{ totalPages }}</span>
-          <button :disabled="page >= totalPages - 1" @click="changePage(page + 1)">›</button>
-        </div>
-
-        <button v-if="!isManagerMode" class="create-board-btn" @click="startCreateBoard">
-          <span class="btn-icon">+</span> 보드 생성
-        </button>
       </div>
 
       <!-- 우측: 상세/편집 패널 -->
-      <div class="panel-right">
-        <div class="action-bar">
-          <button class="back-btn" @click="$router.back()">뒤로가기</button>
-        </div>
-
-        <!-- 보드 생성 모드 -->
-        <div v-if="mode === 'create-board'" class="detail-panel create-mode">
-          <div class="panel-header">
-            <span class="panel-tag">CREATE</span>
-            <h2>New Board</h2>
-          </div>
-
-          <div class="form-group">
-            <label>Section <span class="required">*</span></label>
-            <select v-model="createForm.sectionId" class="form-select">
-              <option value="">섹션 선택</option>
-              <option v-for="section in sections" :key="section.id" :value="section.id">
-                {{ section.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Name</label>
-            <input v-model="createForm.name" class="form-input" placeholder="Enter name..." />
-          </div>
-
-          <div class="form-group">
-            <label>Description</label>
-            <textarea
-              v-model="createForm.description"
-              class="form-textarea"
-              placeholder="Enter description..."
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="panel-actions">
-            <button class="btn btn-ghost" @click="cancelCreate">Cancel</button>
-            <button class="btn btn-primary" @click="createBoard">
-              <span class="btn-icon">+</span> Create
-            </button>
-          </div>
-        </div>
-
+      <div class="detail-section">
         <!-- 카테고리 생성 모드 -->
-        <div v-else-if="mode === 'create-category'" class="detail-panel create-mode">
+        <div v-if="mode === 'create-category'" class="detail-panel create-mode">
           <div class="panel-header">
             <span class="panel-tag">CREATE</span>
             <h2>New Category</h2>
@@ -124,14 +62,9 @@
           <div class="panel-header">
             <span class="panel-tag">BOARD</span>
             <div class="panel-title-row">
-              <h2>{{ editForm.name || 'Untitled' }}</h2>
+              <h2>{{ selectedBoard.name }}</h2>
               <button class="btn btn-link" @click="goToBoard">게시판 이동 →</button>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label>Name</label>
-            <input v-model="editForm.name" class="form-input" :disabled="isManagerMode" />
           </div>
 
           <div class="form-group">
@@ -139,25 +72,8 @@
             <textarea v-model="editForm.description" class="form-textarea" rows="3"></textarea>
           </div>
 
-          <div class="meta-info">
-            <div class="meta-item">
-              <span class="meta-label">ID</span>
-              <span class="meta-value">{{ selectedBoard.id }}</span>
-            </div>
-            <div v-if="!isManagerMode" class="meta-item">
-              <span class="meta-label">주요 게시판</span>
-              <button
-                :class="['toggle-btn', { active: selectedBoard.isMain }]"
-                @click="toggleMainBoard"
-              >
-                {{ selectedBoard.isMain ? 'ON' : 'OFF' }}
-              </button>
-            </div>
-          </div>
-
           <div class="panel-actions">
-            <button v-if="!isManagerMode" class="btn btn-danger" @click="deleteBoard">Delete</button>
-            <button class="btn btn-primary" @click="saveBoard">Save Changes</button>
+            <button class="btn btn-primary" @click="saveBoard">저장</button>
           </div>
 
           <!-- 카테고리 섹션 -->
@@ -207,8 +123,7 @@
         <div v-else class="detail-panel empty-state">
           <div class="empty-content">
             <span class="empty-icon">◎</span>
-            <p>Select a board to edit</p>
-            <p class="empty-hint">or create a new one</p>
+            <p>게시판을 선택하세요</p>
           </div>
         </div>
       </div>
@@ -217,20 +132,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
-import { eventBus } from '@/utils/eventBus.js'
-import { getAdminSections } from '@/api/sectionApi.js'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
 
-const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const isManagerMode = computed(() => route.path.startsWith('/manager'))
 
 const goToBoard = () => {
   if (selectedBoard.value) {
@@ -238,27 +149,19 @@ const goToBoard = () => {
   }
 }
 
-// 보드 목록
+// 담당 게시판 목록
 const boards = ref([])
-const page = ref(0)
-const size = ref(50)
-const totalElements = ref(0)
-const totalPages = ref(0)
-const searchKeyword = ref('')
 
 // 선택/모드
 const mode = ref(null)
 const selectedBoard = ref(null)
 const categories = ref([])
 
-// 섹션 목록
-const sections = ref([])
-
 // 생성 폼
-const createForm = ref({ name: '', description: '', sectionId: '' })
+const createForm = ref({ name: '' })
 
 // 편집 폼
-const editForm = ref({ name: '', description: '' })
+const editForm = ref({ description: '' })
 
 // 카테고리 편집
 const editingCategoryId = ref(null)
@@ -266,92 +169,22 @@ const editingCategoryName = ref('')
 
 onMounted(async () => {
   await loadBoards()
-  await loadSections()
 })
 
-// 섹션 목록 조회
-const loadSections = async () => {
-  try {
-    const { data } = await getAdminSections()
-    sections.value = data
-  } catch (err) {
-    console.error('[BoardManage] 섹션 조회 실패', err)
-  }
-}
-
-// 보드 목록 조회
+// 담당 게시판 목록 조회
 const loadBoards = async () => {
   try {
-    if (isManagerMode.value) {
-      // MANAGER 모드: managedBoardIds로 필터링
-      const ids = userStore.managedBoardIds.map(id => Number(id))
-      if (ids.length === 0) {
-        boards.value = []
-        return
-      }
-      const res = await api.get('/admin/manage/boards', {
-        params: { page: 0, size: 100 },
-      })
-      boards.value = res.data.boards.filter(b => ids.includes(Number(b.id)))
-      totalPages.value = 1
-    } else {
-      const res = await api.get('/admin/manage/boards', {
-        params: {
-          page: page.value,
-          size: size.value,
-        },
-      })
-      const data = res.data
-      boards.value = data.boards
-      page.value = data.page
-      size.value = data.size
-      totalElements.value = data.totalElements
-      totalPages.value = data.totalPages
+    const ids = userStore.managedBoardIds.map(id => Number(id))
+    if (ids.length === 0) {
+      boards.value = []
+      return
     }
+    const res = await api.get('/admin/manage/boards', {
+      params: { page: 0, size: 100 },
+    })
+    boards.value = res.data.boards.filter(b => ids.includes(Number(b.id)))
   } catch (err) {
     console.error(err)
-  }
-}
-
-// 보드 검색
-const searchBoards = async () => {
-  if (!searchKeyword.value.trim()) {
-    page.value = 0
-    await loadBoards()
-    return
-  }
-  try {
-    const res = await api.get('/admin/manage/boards/search', {
-      params: { keyword: searchKeyword.value, page: 0, size: 100 },
-    })
-    let data = res.data
-    if (isManagerMode.value) {
-      const ids = userStore.managedBoardIds
-      boards.value = data.boards.filter(b => ids.includes(b.id))
-      totalPages.value = 1
-    } else {
-      boards.value = data.boards
-      page.value = data.page
-      size.value = data.size
-      totalElements.value = data.totalElements
-      totalPages.value = data.totalPages
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-// 페이지 변경
-const changePage = async (newPage) => {
-  page.value = newPage
-  if (searchKeyword.value.trim()) {
-    const res = await api.get('/admin/manage/boards/search', {
-      params: { keyword: searchKeyword.value, page: newPage, size: 20 },
-    })
-    boards.value = res.data.content
-    totalPages.value = res.data.totalPages
-  } else {
-    await loadBoards()
   }
 }
 
@@ -360,7 +193,6 @@ const selectBoard = async (board) => {
   mode.value = null
   selectedBoard.value = board
   editForm.value = {
-    name: board.name,
     description: board.description || '',
   }
   await loadCategories(board.id)
@@ -377,13 +209,6 @@ const loadCategories = async (boardId) => {
   }
 }
 
-// 보드 생성 시작
-const startCreateBoard = () => {
-  mode.value = 'create-board'
-  selectedBoard.value = null
-  createForm.value = { name: '', description: '', sectionId: '' }
-}
-
 // 카테고리 생성 시작
 const startCreateCategory = () => {
   mode.value = 'create-category'
@@ -393,86 +218,26 @@ const startCreateCategory = () => {
 // 생성 취소
 const cancelCreate = () => {
   mode.value = null
-  if (selectedBoard.value) {
-    // 보드가 선택되어 있으면 상세 화면으로 복귀
-  }
 }
 
-// 보드 생성
-const createBoard = async () => {
-  if (!createForm.value.sectionId) {
-    alert('섹션을 선택해주세요.')
-    return
-  }
-  try {
-    await api.post('/admin/boards', {
-      name: createForm.value.name,
-      description: createForm.value.description,
-      sectionId: createForm.value.sectionId,
-    })
-    mode.value = null
-    await loadBoards()
-  } catch (err) {
-    console.error(err)
-    alert(err.response?.data?.message || '보드 생성 실패')
-  }
-}
-
-// 보드 저장 (변경된 필드만 전송)
+// 보드 저장 (description만)
 const saveBoard = async () => {
-  const payload = {}
-  if (!isManagerMode.value && editForm.value.name !== selectedBoard.value.name) {
-    payload.name = editForm.value.name
-  }
-  if (editForm.value.description !== (selectedBoard.value.description || '')) {
-    payload.description = editForm.value.description
-  }
-
-  if (Object.keys(payload).length === 0) {
+  if (editForm.value.description === (selectedBoard.value.description || '')) {
     alert('변경된 내용이 없습니다.')
     return
   }
 
   try {
-    await api.patch(`/admin/boards/${selectedBoard.value.id}`, payload)
+    await api.patch(`/admin/boards/${selectedBoard.value.id}`, {
+      description: editForm.value.description
+    })
     await loadBoards()
     const updated = boards.value.find((b) => b.id === selectedBoard.value.id)
     if (updated) selectBoard(updated)
+    alert('수정이 완료되었습니다.')
   } catch (err) {
     console.error(err)
     alert('저장 실패')
-  }
-}
-
-// 주요 게시판 토글
-const toggleMainBoard = async () => {
-  try {
-    const res = await api.patch(`/admin/boards/${selectedBoard.value.id}/main`)
-    const isMain = res.data.isMain ?? res.data.main
-    selectedBoard.value = { ...selectedBoard.value, isMain }
-    // boards 목록도 업데이트
-    const idx = boards.value.findIndex(b => b.id === selectedBoard.value.id)
-    if (idx !== -1) {
-      boards.value[idx] = { ...boards.value[idx], isMain }
-    }
-    eventBus.emit('main-boards-updated')
-  } catch (err) {
-    console.error(err)
-    alert('주요 게시판 설정 실패')
-  }
-}
-
-// 보드 삭제
-const deleteBoard = async () => {
-  if (!confirm('정말 삭제하시겠습니까?')) return
-  try {
-    await api.delete(`/admin/boards/${selectedBoard.value.id}`)
-    selectedBoard.value = null
-    categories.value = []
-    await loadBoards()
-  } catch (err) {
-    console.error(err)
-    alert('삭제 실패')
   }
 }
 
@@ -550,11 +315,101 @@ const onCategoryDragEnd = async () => {
     await loadCategories(selectedBoard.value.id)
   }
 }
-
-watch(searchKeyword, (val) => {
-  if (!val.trim()) {
-    page.value = 0
-    loadBoards()
-  }
-})
 </script>
+
+<style scoped>
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.board-list-section {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.board-list {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 400px;
+}
+
+.board-item {
+  padding: 12px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.board-item:hover {
+  background: var(--bg-hover);
+}
+
+.board-item.selected {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.detail-section {
+  flex: 1;
+}
+
+.detail-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 28px;
+  min-height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-content {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-content .empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+</style>
