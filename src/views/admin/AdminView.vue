@@ -34,13 +34,7 @@
       <div class="nav-card" @click="goToSectionManage">
         <span class="nav-icon">▣</span>
         <h3>섹션 관리</h3>
-        <p>섹션 CRUD 및 순서 관리</p>
-      </div>
-
-      <div class="nav-card" @click="goToBoardManage">
-        <span class="nav-icon">◆</span>
-        <h3>게시판 관리</h3>
-        <p>Board, Category 관리</p>
+        <p>섹션 → 게시판 → 카테고리</p>
       </div>
 
       <div class="nav-card" @click="goToMainBoardManage">
@@ -100,9 +94,6 @@ onMounted(() => {
 
 const goToSectionManage = () => {
   router.push('/admin/sections')
-}
-const goToBoardManage = () => {
-  router.push('/admin/boards')
 }
 const goToUserManage = () => {
   router.push('/admin/users')
