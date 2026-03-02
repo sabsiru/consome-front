@@ -89,6 +89,7 @@
             <td class="col-category">{{ post.categoryName }}</td>
             <td class="col-title">
               <span v-html="highlightKeyword(post.title, props.keyword)"></span>
+              <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
               <span v-if="post.commentCount > 0" class="post-comment-count">
                 [{{ post.commentCount }}]
               </span>
@@ -122,6 +123,7 @@
             <td class="col-category">{{ post.categoryName }}</td>
             <td class="col-title">
               <span v-html="highlightKeyword(post.title, props.keyword)"></span>
+              <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
               <span v-if="post.commentCount > 0" class="post-comment-count">
                 [{{ post.commentCount }}]
               </span>
@@ -166,6 +168,7 @@
           <td class="col-category">{{ post.categoryName }}</td>
           <td class="col-title">
             <span v-html="highlightKeyword(post.title, props.keyword)"></span>
+            <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
             <span v-if="post.commentCount > 0" class="post-comment-count">
               [{{ post.commentCount }}]
             </span>
@@ -683,5 +686,12 @@ const cancelPinnedOrder = () => {
 
 .board-row.is-pinned-notice:hover {
   background-color: #2d2d42 !important;
+}
+
+/* 미디어 아이콘 */
+.post-media-icon {
+  margin-right: 4px;
+  font-size: 12px;
+  opacity: 0.8;
 }
 </style>
