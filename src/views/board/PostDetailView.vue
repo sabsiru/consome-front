@@ -105,6 +105,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
+import { useReadPosts } from '@/composables/useReadPosts.js'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
@@ -115,6 +116,7 @@ import ReportModal from '@/components/common/ReportModal.vue'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { markAsRead } = useReadPosts()
 
 const page = computed(() => Number(route.query.page ?? 0))
 const size = computed(() => Number(route.query.size ?? 50))
@@ -342,6 +344,7 @@ const loadPost = async () => {
   try {
     const { data } = await api.get(`/posts/${postId.value}`)
     post.value = data
+    markAsRead(postId.value)
     // 투표 상태 로드 (백엔드에서 반환 시)
     hasLiked.value = data.hasLiked ?? false
     hasDisliked.value = data.hasDisliked ?? false
@@ -489,8 +492,7 @@ watch(
     if (!next || next === prev) return
     loadPost()
     loadComments(0)
-    // 선택: 화면 맨 위로
-    // window.scrollTo({ top: 0, behavior: 'auto' })
+    window.scrollTo({ top: 0, behavior: 'auto' })
   },
 )
 

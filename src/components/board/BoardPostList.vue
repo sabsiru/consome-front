@@ -70,7 +70,8 @@
             :class="{
               'is-active': activePostId === post.postId,
               'is-pinned': true,
-              'is-pinned-notice': post.categoryName === '공지사항'
+              'is-pinned-notice': post.categoryName === '공지사항',
+              'is-read': isRead(post.postId)
             }"
             class="board-row"
             @click="emitPostClick(post.postId)"
@@ -115,7 +116,8 @@
             :class="{
               'is-active': activePostId === post.postId,
               'is-pinned': true,
-              'is-pinned-notice': post.categoryName === '공지사항'
+              'is-pinned-notice': post.categoryName === '공지사항',
+              'is-read': isRead(post.postId)
             }"
             class="board-row"
             @click="emitPostClick(post.postId)"
@@ -152,7 +154,7 @@
         <tr
           v-for="post in regularPosts"
           :key="post.postId"
-          :class="{ 'is-active': activePostId === post.postId }"
+          :class="{ 'is-active': activePostId === post.postId, 'is-read': isRead(post.postId) }"
           class="board-row"
           @click="emitPostClick(post.postId)"
         >
@@ -269,6 +271,7 @@ import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
 import { useUserStore } from '@/stores/userStore.js'
+import { useReadPosts } from '@/composables/useReadPosts.js'
 import '@/assets/styles/components.css'
 import '@/assets/styles/board/board.css'
 
@@ -293,6 +296,7 @@ const emit = defineEmits([
 ])
 
 const userStore = useUserStore()
+const { isRead } = useReadPosts()
 
 const posts = ref([])
 const totalElements = ref(0)
@@ -693,5 +697,10 @@ const cancelPinnedOrder = () => {
   margin-right: 4px;
   font-size: 12px;
   opacity: 0.8;
+}
+
+/* 읽은 게시글 */
+.board-row.is-read .col-title {
+  color: #888;
 }
 </style>
