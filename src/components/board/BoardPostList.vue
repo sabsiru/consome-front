@@ -694,7 +694,7 @@ const cancelPinnedOrder = () => {
 
 /* 미디어 아이콘 */
 .post-media-icon {
-  margin-right: 4px;
+  margin-left: 6px;
   font-size: 12px;
   opacity: 0.8;
 }

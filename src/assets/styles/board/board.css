@@ -192,6 +192,10 @@
   color: var(--accent);
 }
 
+.post-media-icon + .post-comment-count {
+  margin-left: 0;
+}
+
 /* 빈 상태 */
 .board-empty {
   text-align: center;
