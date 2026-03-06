@@ -1,5 +1,17 @@
 <template>
   <div class="board-post-write">
+    <!-- 이메일 미인증 안내 모달 -->
+    <div v-if="showEmailVerifyModal" class="modal-overlay" @click.self="showEmailVerifyModal = false">
+      <div class="modal-content">
+        <h3>이메일 인증 필요</h3>
+        <p>글쓰기 기능을 이용하려면 이메일 인증이 필요합니다.</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" @click="showEmailVerifyModal = false">닫기</button>
+          <button class="btn btn-primary" @click="resendVerificationEmail">인증 메일 재발송</button>
+        </div>
+      </div>
+    </div>
+
     <form @submit.prevent="submit">
       <!-- 🔹 카테고리: DB 조회 결과를 select로 표시 -->
       <div class="form-row">
@@ -192,6 +204,7 @@ const showImageDropZone = ref(false)
 const showVideoDropZone = ref(false)
 const isDragOver = ref(false)
 const videoConverting = ref(false)
+const showEmailVerifyModal = ref(false)
 
 const Video = Node.create({
   name: 'video',
@@ -724,9 +737,28 @@ onBeforeUnmount(() => {
   editor.value?.destroy()
 })
 
+const resendVerificationEmail = async () => {
+  try {
+    await api.post('/users/email/resend')
+    alert('인증 메일이 발송되었습니다. 메일함을 확인해주세요.')
+    showEmailVerifyModal.value = false
+  } catch (e) {
+    const code = e.response?.data?.code
+    if (code === 'EMAIL_COOLDOWN') {
+      alert('인증 메일은 1분에 한 번만 발송할 수 있습니다.')
+    } else {
+      alert('메일 발송에 실패했습니다.')
+    }
+  }
+}
+
 const submit = async () => {
   if (!userStore.userId) {
     error.value = '로그인이 필요합니다.'
+    return
+  }
+  if (!userStore.emailVerified) {
+    showEmailVerifyModal.value = true
     return
   }
   if (!title.value.trim()) {
@@ -786,3 +818,67 @@ const goBack = () => {
   router.push({ name: 'BoardPosts', params: { boardId: boardId.value } })
 }
 </script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-content h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-actions .btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modal-actions .btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.modal-actions .btn-primary {
+  background: var(--accent);
+  border: none;
+  color: var(--bg-primary);
+}
+</style>

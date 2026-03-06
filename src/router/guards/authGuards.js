@@ -26,6 +26,18 @@ export async function adminGuard(to, next) {
   }
 }
 
+export function requireEmailVerified(to, from, next) {
+  const store = useUserStore()
+  if (!store.token) {
+    return next('/login')
+  }
+  if (!store.emailVerified) {
+    alert('이메일 인증 후 글쓰기가 가능합니다.')
+    return next(false)
+  }
+  next()
+}
+
 export function redirectIfLoggedIn(to, next) {
   const store = useUserStore()
 
