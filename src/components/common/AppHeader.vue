@@ -56,6 +56,7 @@
 
           <!-- ✅ 로그인 한 상태 -->
           <template v-else>
+            <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
             <span class="user-info" @click="goMyProfile"><LevelBadge :level="level" :role="role" /> <span class="nickname-link">{{ nickname }}</span> <span class="sep">·</span> <span class="point">{{ point }}P</span></span>
             <button class="message-btn" @click="goMessages">
               <Mail :size="16" />
@@ -84,7 +85,7 @@ import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
 
 const store = useUserStore()
-const { nickname, point, level, role } = storeToRefs(store)
+const { nickname, point, level, role, emailVerified } = storeToRefs(store)
 
 const logout = (event) => {
   if (!event || event.type !== 'click') return
@@ -488,6 +489,16 @@ onUnmounted(() => {
   border-color: var(--accent) !important;
   color: var(--accent) !important;
   background: transparent !important;
+}
+
+.email-unverified-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--warning, #f59e0b);
+  border: 1px solid var(--warning, #f59e0b);
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: default;
 }
 
 .unread-badge {

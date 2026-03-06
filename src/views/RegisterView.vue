@@ -3,7 +3,22 @@
     <section class="register-container">
       <h2>회원가입</h2>
 
-      <form @submit.prevent="register">
+      <!-- 회원가입 성공 후 인증 안내 -->
+      <div v-if="registered" class="success-message">
+        <div class="success-icon">✉️</div>
+        <h3>회원가입 완료!</h3>
+        <p>
+          <strong>{{ registeredEmail }}</strong>으로 인증 메일을 발송했습니다.
+        </p>
+        <p class="sub-text">
+          메일함을 확인하고 인증 링크를 클릭해주세요.<br />
+          인증 완료 후 모든 기능을 이용할 수 있습니다.
+        </p>
+        <button class="login-btn" @click="goToLogin">로그인하러 가기</button>
+      </div>
+
+      <!-- 회원가입 폼 -->
+      <form v-else @submit.prevent="register">
         <div class="form-group">
           <label for="loginId">아이디</label>
           <input id="loginId" v-model="loginId" type="text" required />
@@ -15,11 +30,18 @@
         </div>
 
         <div class="form-group">
+          <label for="email">이메일</label>
+          <input id="email" v-model="email" type="email" placeholder="example@email.com" required />
+        </div>
+
+        <div class="form-group">
           <label for="password">비밀번호</label>
           <input id="password" v-model="password" type="password" required />
         </div>
 
-        <button type="submit">회원가입</button>
+        <button type="submit" :disabled="isLoading">
+          {{ isLoading ? '처리중...' : '회원가입' }}
+        </button>
       </form>
     </section>
   </div>
@@ -27,23 +49,35 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from '@/api/axios'
+
+const router = useRouter()
 
 const loginId = ref('')
 const nickname = ref('')
+const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
+const registered = ref(false)
+const registeredEmail = ref('')
 
 const register = async () => {
+  isLoading.value = true
   try {
-    const response = await axios.post('/users', {
+    const res = await axios.post('/users', {
       loginId: loginId.value,
       nickname: nickname.value,
+      email: email.value,
       password: password.value,
     })
 
-    console.log('회원가입 성공:', response.data)
-    alert('회원가입이 완료되었습니다.')
-    window.location.href = '/'
+    if (res.data.verifyToken) {
+      console.log('[DEV] 이메일 인증 URL:', `${window.location.origin}/email/verify?token=${res.data.verifyToken}`)
+    }
+
+    registeredEmail.value = email.value
+    registered.value = true
   } catch (error) {
     console.error('회원가입 실패:', error)
 
@@ -60,7 +94,13 @@ const register = async () => {
     } else {
       alert('서버와의 연결에 실패했습니다.')
     }
+  } finally {
+    isLoading.value = false
   }
+}
+
+const goToLogin = () => {
+  router.push('/')
 }
 </script>
 
@@ -141,6 +181,60 @@ const register = async () => {
 }
 
 .register-container button[type="submit"]:hover {
+  background: #00e6b8;
+}
+
+.register-container button[type="submit"]:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.success-message {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.success-message h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.success-message p {
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.success-message .sub-text {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.login-btn:hover {
   background: #00e6b8;
 }
 </style>

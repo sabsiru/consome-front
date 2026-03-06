@@ -74,6 +74,17 @@
   border-color: #ff5577;
 }
 
+/* warning (주의 액션) */
+.btn-warning {
+  background: transparent;
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.btn-warning:hover {
+  background: rgba(245, 158, 11, 0.1);
+}
+
 /* ghost (최소화된 버튼) */
 .btn-ghost {
   background: transparent;

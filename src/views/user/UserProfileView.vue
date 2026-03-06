@@ -22,6 +22,7 @@
           쪽지 보내기
         </button>
         <template v-if="isMyProfile">
+          <button v-if="!userStore.emailVerified" class="btn btn-warning" @click="resendVerificationEmail">이메일 인증하기</button>
           <button class="btn btn-secondary" @click="showNicknameModal = true">닉네임 변경</button>
           <button class="btn btn-secondary" @click="showPasswordModal = true">비밀번호 변경</button>
         </template>
@@ -253,6 +254,15 @@ const onCommentClick = (comment) => {
 
 const goSendMessage = () => {
   router.push({ name: 'MessageCompose', query: { to: userId.value } })
+}
+
+const resendVerificationEmail = async () => {
+  try {
+    await api.post('/users/email/resend')
+    alert('인증 메일을 발송했습니다. 서버 콘솔에서 인증 URL을 확인하세요.')
+  } catch (e) {
+    alert(e.response?.data?.message || '메일 발송에 실패했습니다.')
+  }
 }
 
 onMounted(() => {
