@@ -19,15 +19,27 @@
             <span class="section__count">({{ section.boards.length }})</span>
           </h2>
           <div class="section__boards">
-            <RouterLink
+            <div
               v-for="board in section.boards"
               :key="board.id"
-              :to="`/boards/${board.id}`"
               class="board-card"
+              @click="goToBoard(board.id)"
             >
-              <h3 class="board-card__name">{{ board.name }}</h3>
-              <p class="board-card__desc">{{ board.description }}</p>
-            </RouterLink>
+              <div class="board-card__content">
+                <h3 class="board-card__name">{{ board.name }}</h3>
+                <p class="board-card__desc">{{ board.description }}</p>
+              </div>
+              <button
+                v-if="userId"
+                class="board-card__fav-btn"
+                :class="{ 'board-card__fav-btn--active': favoriteStore.isFavorited(board.id) }"
+                :disabled="favoriteStore.isPending(board.id)"
+                @click.stop="favoriteStore.toggleFavorite(board.id)"
+                :title="favoriteStore.isFavorited(board.id) ? '즐겨찾기 해제' : '즐겨찾기 추가'"
+              >
+                {{ favoriteStore.isFavorited(board.id) ? '★' : '☆' }}
+              </button>
+            </div>
           </div>
           <div v-if="!section.boards.length" class="section__empty">
             등록된 게시판이 없습니다
@@ -40,10 +52,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { getSections } from '@/api/sectionApi.js'
+import { useUserStore } from '@/stores/userStore.js'
+import { useFavoriteStore } from '@/stores/favoriteStore.js'
 
+const router = useRouter()
 const sections = ref([])
 const loading = ref(true)
+
+const userStore = useUserStore()
+const { userId } = storeToRefs(userStore)
+const favoriteStore = useFavoriteStore()
 
 const fetchSections = async () => {
   try {
@@ -54,6 +75,10 @@ const fetchSections = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const goToBoard = (id) => {
+  router.push(`/boards/${id}`)
 }
 
 onMounted(fetchSections)
@@ -124,18 +149,26 @@ onMounted(fetchSections)
 }
 
 .board-card {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   padding: 20px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  text-decoration: none;
+  cursor: pointer;
   transition: all 0.2s ease;
+  gap: 8px;
 }
 
 .board-card:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
+}
+
+.board-card__content {
+  flex: 1;
+  min-width: 0;
 }
 
 .board-card__name {
@@ -155,6 +188,27 @@ onMounted(fetchSections)
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+.board-card__fav-btn {
+  font-size: 27px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.board-card__fav-btn:hover {
+  color: var(--accent);
+  transform: scale(1.2);
+}
+
+.board-card__fav-btn--active {
+  color: var(--accent);
 }
 
 /* Admin Only Section */
