@@ -23,21 +23,21 @@
         <!-- 전체 게시판 버튼 -->
         <RouterLink to="/boards" class="all-boards-btn">전체 게시판</RouterLink>
 
+        <!-- 즐겨찾기 버튼 (로그인 시) -->
+        <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★ 즐겨찾기</RouterLink>
+
         <!-- 주요 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger">
             주요 게시판 <span class="arrow">▾</span>
           </button>
           <ul v-if="showMainDropdown" class="main-boards-menu">
-            <!-- 관리자 지정 게시판 -->
             <li v-for="board in featuredBoards.pinnedBoards" :key="'pinned-' + board.boardId">
               <RouterLink :to="`/boards/${board.boardId}`" class="main-board-link pinned">
                 {{ board.boardName }}
               </RouterLink>
             </li>
-            <!-- 구분선 -->
             <li v-if="featuredBoards.pinnedBoards?.length && featuredBoards.popularBoards?.length" class="divider"></li>
-            <!-- 인기 게시판 -->
             <li v-for="board in featuredBoards.popularBoards" :key="'popular-' + board.boardId">
               <RouterLink :to="`/boards/${board.boardId}`" class="main-board-link">
                 {{ board.boardName }}
@@ -74,6 +74,7 @@
 
 <script setup>
 import { useUserStore } from '@/stores/userStore'
+import { useFavoriteStore } from '@/stores/favoriteStore.js'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
@@ -87,11 +88,14 @@ import { eventBus } from '@/utils/eventBus.js'
 const store = useUserStore()
 const { nickname, point, level, role, emailVerified } = storeToRefs(store)
 
+const favoriteStore = useFavoriteStore()
+
 const logout = (event) => {
   if (!event || event.type !== 'click') return
   event.preventDefault()
 
   if (confirm('로그아웃 하시겠습니까?')) {
+    favoriteStore.clear()
     store.clearUser()
     window.location.reload()
   }
@@ -151,28 +155,13 @@ const hideDropdown = () => {
   setTimeout(() => { showDropdown.value = false }, 150)
 }
 
-const goHome = () => {
-  router.push('/')
-}
+const goHome = () => router.push('/')
+const goAdmin = () => router.push('/admin')
+const goManagerBoard = () => router.push('/manager/boards')
+const goMyProfile = () => router.push(`/users/${store.userId}`)
 
-const goAdmin = () => {
-  router.push('/admin')
-}
-
-const goManagerBoard = () => {
-  router.push('/manager/boards')
-}
-
-const goMyProfile = () => {
-  router.push(`/users/${store.userId}`)
-}
-
-// 쪽지 관련
 const unreadCount = ref(0)
-
-const goMessages = () => {
-  router.push('/messages')
-}
+const goMessages = () => router.push('/messages')
 
 const fetchUnreadCount = async () => {
   if (!store.userId) return
@@ -184,22 +173,24 @@ const fetchUnreadCount = async () => {
   }
 }
 
-// 로그인 상태 변경 시 안읽은 쪽지 수 조회
 watch(() => store.userId, (newVal) => {
-  if (newVal) fetchUnreadCount()
-  else unreadCount.value = 0
+  if (newVal) {
+    fetchUnreadCount()
+    favoriteStore.fetchFavorites()
+  } else {
+    unreadCount.value = 0
+    favoriteStore.clear()
+  }
 }, { immediate: true })
 
-// 30초마다 폴링
 onMounted(() => {
   fetchFeaturedBoards()
   if (store.userId) {
     fetchUnreadCount()
+    favoriteStore.fetchFavorites()
   }
   setInterval(() => {
-    if (store.userId) {
-      fetchUnreadCount()
-    }
+    if (store.userId) fetchUnreadCount()
   }, 30000)
   eventBus.on('main-boards-updated', fetchFeaturedBoards)
 })
@@ -229,7 +220,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-/* 헤더 가운데 영역 전체 */
 .nav {
   display: flex;
   align-items: center;
@@ -237,7 +227,6 @@ onUnmounted(() => {
   margin-left: 20px;
 }
 
-/* 메인 게시판 드롭다운 */
 .main-boards-dropdown {
   position: relative;
   margin-left: 12px;
@@ -319,7 +308,6 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
-/* 게시판 검색 */
 .board-search {
   position: relative;
 }
@@ -376,7 +364,6 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
-/* 전체 게시판 버튼 */
 .all-boards-btn {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -394,7 +381,6 @@ onUnmounted(() => {
   border-color: var(--accent);
 }
 
-/* 로그인/유저 영역: 오른쪽으로 밀기 */
 .nav-auth {
   margin-left: auto;
   display: flex;
@@ -419,7 +405,6 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-/* 링크 스타일 */
 .link {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -437,7 +422,6 @@ onUnmounted(() => {
   text-decoration: none;
 }
 
-/* 버튼 스타일 */
 .nav-auth button {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -474,7 +458,6 @@ onUnmounted(() => {
   filter: brightness(1.1);
 }
 
-/* 쪽지 버튼 */
 .message-btn {
   position: relative;
   display: flex;
