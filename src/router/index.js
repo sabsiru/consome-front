@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import BoardsView from '../views/BoardsView.vue'
+import FavoriteBoardsView from '../views/board/FavoriteBoardsView.vue'
 import AdminRoutes from '@/router/adminRoutes.js'
 import BoardRoutes from '@/router/boardRoutes.js'
 import UserRoutes from '@/router/userRoutes.js'
@@ -16,6 +17,7 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: HomeView },
     { path: '/boards', name: 'boards', component: BoardsView },
+    { path: '/favorites', name: 'favorites', component: FavoriteBoardsView, meta: { requiresAuth: true } },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/login', name: 'login', component: LoginView },
     { path: '/manager/boards', name: 'manager-boards', component: BoardManageView },
@@ -47,7 +49,6 @@ router.beforeEach(async (to, from, next) => {
     redirectIfLoggedIn(to, next)
   }
 
-  // 쪽지 인증 가드
   if (to.meta.requiresAuth) {
     const store = useUserStore()
     if (!store.token) {
