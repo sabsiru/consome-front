@@ -40,6 +40,7 @@ const login = async () => {
     })
 
     localStorage.setItem('accessToken', data.accessToken)
+    localStorage.setItem('refreshToken', data.refreshToken)
 
     store.setUserData(data)
     if (route.query.redirect) {

@@ -90,14 +90,14 @@ const { nickname, point, level, role, emailVerified } = storeToRefs(store)
 
 const favoriteStore = useFavoriteStore()
 
-const logout = (event) => {
+const logout = async (event) => {
   if (!event || event.type !== 'click') return
   event.preventDefault()
 
   if (confirm('로그아웃 하시겠습니까?')) {
     favoriteStore.clear()
-    store.clearUser()
-    window.location.reload()
+    await store.logout()
+    window.location.href = '/'
   }
 }
 
