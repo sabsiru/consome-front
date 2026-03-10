@@ -228,6 +228,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import draggable from 'vuedraggable'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios'
 import {
   getAdminSections,
@@ -366,14 +367,14 @@ const createBoard = async (sectionId) => {
     await loadSections() // 섹션의 게시판 수 갱신
   } catch (err) {
     console.error(err)
-    alert(err.response?.data?.message || '게시판 생성 실패')
+    toast.error(err.response?.data?.message || '게시판 생성 실패')
   }
 }
 
 // 게시판 저장 (description만 수정 가능)
 const saveBoard = async () => {
   if (boardForm.value.description === (selectedBoard.value.description || '')) {
-    alert('변경된 내용이 없습니다.')
+    toast.info('변경된 내용이 없습니다.')
     return
   }
 
@@ -391,10 +392,10 @@ const saveBoard = async () => {
       selectedBoard.value = { ...selectedBoard.value, ...updated }
       boardForm.value = { name: updated.name, description: updated.description || '' }
     }
-    alert('수정이 완료되었습니다.')
+    toast.success('수정이 완료되었습니다.')
   } catch (err) {
     console.error(err)
-    alert('저장 실패')
+    toast.error('저장 실패')
   }
 }
 
@@ -408,7 +409,7 @@ const deleteBoard = async () => {
     await loadSections()
   } catch (err) {
     console.error(err)
-    alert('삭제 실패')
+    toast.error('삭제 실패')
   }
 }
 
@@ -420,7 +421,7 @@ const toggleMainBoard = async () => {
     eventBus.emit('main-boards-updated')
   } catch (err) {
     console.error(err)
-    alert('주요 게시판 설정 실패')
+    toast.error('주요 게시판 설정 실패')
   }
 }
 
@@ -444,7 +445,7 @@ const createCategory = async () => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 생성 실패')
+    toast.error('카테고리 생성 실패')
   }
 }
 
@@ -468,7 +469,7 @@ const saveCategory = async (categoryId) => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 수정 실패')
+    toast.error('카테고리 수정 실패')
   }
 }
 
@@ -479,7 +480,7 @@ const deleteCategory = async (categoryId) => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 삭제 실패')
+    toast.error('카테고리 삭제 실패')
   }
 }
 
@@ -493,7 +494,7 @@ const onCategoryDragEnd = async () => {
     await api.put('/admin/categories/reorder', { orders })
   } catch (err) {
     console.error(err)
-    alert('순서 변경 실패')
+    toast.error('순서 변경 실패')
     await loadCategories(selectedBoard.value.id)
   }
 }
@@ -513,10 +514,10 @@ const saveOrder = async () => {
   try {
     await reorderSections(orders)
     originalOrder.value = sections.value.map(s => s.id)
-    alert('순서가 저장되었습니다.')
+    toast.success('순서가 저장되었습니다.')
   } catch (err) {
     console.error(err)
-    alert('순서 저장 실패')
+    toast.error('순서 저장 실패')
   }
 }
 
@@ -542,7 +543,7 @@ const closeModal = () => {
 
 const submitModal = async () => {
   if (!modalName.value.trim()) {
-    alert('섹션 이름을 입력하세요.')
+    toast.warning('섹션 이름을 입력하세요.')
     return
   }
   try {
@@ -555,13 +556,13 @@ const submitModal = async () => {
     await loadSections()
   } catch (err) {
     console.error(err)
-    alert(err.response?.data?.message || '요청 실패')
+    toast.error(err.response?.data?.message || '요청 실패')
   }
 }
 
 const deleteSection = async (section) => {
   if (section.boards?.length > 0) {
-    alert('소속 게시판이 있어 삭제할 수 없습니다.')
+    toast.warning('소속 게시판이 있어 삭제할 수 없습니다.')
     return
   }
   if (!confirm(`'${section.name}' 섹션을 삭제하시겠습니까?`)) return
@@ -570,7 +571,7 @@ const deleteSection = async (section) => {
     await loadSections()
   } catch (err) {
     console.error(err)
-    alert(err.response?.data?.message || '삭제 실패')
+    toast.error(err.response?.data?.message || '삭제 실패')
   }
 }
 </script>

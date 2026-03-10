@@ -2,6 +2,8 @@
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, watch } from 'vue'
 import AppHeader from './components/common/AppHeader.vue'
+import { Toaster } from 'vue-sonner'
+import 'vue-sonner/style.css'
 import { getOnlineCount, getVisitedBoards } from '@/api/statisticsApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 import './assets/styles/layout.css'
@@ -131,6 +133,8 @@ watch(visitedBoards, () => {
       <RouterView />
     </main>
   </div>
+
+  <Toaster position="top-center" :duration="3000" theme="dark" rich-colors close-button />
 
   <footer class="app-footer">
     <div class="app-footer__inner">

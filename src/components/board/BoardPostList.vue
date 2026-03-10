@@ -267,6 +267,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import draggable from 'vuedraggable'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
@@ -534,7 +535,7 @@ const togglePin = async (post) => {
       syncDraggablePinnedPosts()
     }
   } catch (error) {
-    alert('고정 상태를 변경할 수 없습니다.')
+    toast.error('고정 상태를 변경할 수 없습니다.')
   }
 }
 
@@ -574,12 +575,12 @@ const savePinnedOrder = async () => {
       orders
     })
 
-    alert('순서가 저장되었습니다.')
+    toast.success('순서가 저장되었습니다.')
     hasOrderChanged.value = false
     await loadPosts()
     syncDraggablePinnedPosts()
   } catch (error) {
-    alert('순서 저장에 실패했습니다.')
+    toast.error('순서 저장에 실패했습니다.')
   }
 }
 

@@ -194,6 +194,7 @@
 import { onMounted, ref } from 'vue'
 import { getGroupedReports, getReportersByTarget, resolveReport, rejectReport } from '@/api/reportApi.js'
 import { suspendUser } from '@/api/adminApi.js'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 
 const userStore = useUserStore()
@@ -235,7 +236,7 @@ const loadReports = async (p = 0) => {
     page.value = data.number || 0
     totalPages.value = data.totalPages || 0
   } catch (e) {
-    alert('신고 목록을 불러오지 못했습니다.')
+    toast.error('신고 목록을 불러오지 못했습니다.')
   }
 }
 
@@ -255,7 +256,7 @@ const openReportersModal = async (r) => {
     reporters.value = data
     showReportersModal.value = true
   } catch (e) {
-    alert('신고자 목록을 불러오지 못했습니다.')
+    toast.error('신고자 목록을 불러오지 못했습니다.')
   }
 }
 
@@ -305,9 +306,9 @@ const confirmResolve = async () => {
 
     closeSuspendModal()
     loadReports(page.value)
-    alert('처리되었습니다.')
+    toast.success('처리되었습니다.')
   } catch (e) {
-    alert(e.response?.data?.message || '처리에 실패했습니다.')
+    toast.error(e.response?.data?.message || '처리에 실패했습니다.')
   }
 }
 
@@ -323,9 +324,9 @@ const rejectAll = async (r) => {
       }
     }
     loadReports(page.value)
-    alert('반려되었습니다.')
+    toast.success('반려되었습니다.')
   } catch (e) {
-    alert(e.response?.data?.message || '반려에 실패했습니다.')
+    toast.error(e.response?.data?.message || '반려에 실패했습니다.')
   }
 }
 

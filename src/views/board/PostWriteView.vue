@@ -174,6 +174,7 @@ import { Node, mergeAttributes } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Youtube from '@tiptap/extension-youtube'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
 
@@ -494,10 +495,10 @@ const onFileDrop = async (event) => {
   }
 
   if (oversizedImages.length > 0) {
-    alert(`이미지 용량 초과 (5MB 제한): ${oversizedImages.join(', ')}`)
+    toast.warning(`이미지 용량 초과 (5MB 제한): ${oversizedImages.join(', ')}`)
   }
   if (oversizedVideos.length > 0) {
-    alert(`영상 용량 초과 (30MB 제한): ${oversizedVideos.join(', ')}`)
+    toast.warning(`영상 용량 초과 (30MB 제한): ${oversizedVideos.join(', ')}`)
   }
 
   if (images.length > 0) {
@@ -515,7 +516,7 @@ const onFileDrop = async (event) => {
       }
     } catch (e) {
       console.error('이미지 업로드 실패', e)
-      alert('이미지 업로드에 실패했습니다.')
+      toast.error('이미지 업로드에 실패했습니다.')
     }
   }
 
@@ -531,7 +532,7 @@ const onFileDrop = async (event) => {
       editor.value?.chain().focus().setVideo({ src: uploadedUrl }).run()
     } catch (e) {
       console.error('영상 업로드 실패', e)
-      alert('영상 업로드에 실패했습니다.')
+      toast.error('영상 업로드에 실패했습니다.')
     } finally {
       videoConverting.value = false
     }
@@ -558,7 +559,7 @@ const onImageDropZone = async (event) => {
   const images = allImages.filter((f) => f.size <= MAX_IMAGE_SIZE)
 
   if (oversized.length > 0) {
-    alert(`이미지 용량 초과 (5MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
+    toast.warning(`이미지 용량 초과 (5MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
   }
   if (images.length === 0) return
 
@@ -576,7 +577,7 @@ const onImageDropZone = async (event) => {
     }
   } catch (e) {
     console.error('이미지 업로드 실패', e)
-    alert('이미지 업로드에 실패했습니다.')
+    toast.error('이미지 업로드에 실패했습니다.')
   }
 }
 
@@ -591,7 +592,7 @@ const onVideoDropZone = async (event) => {
   const videos = allVideos.filter((f) => f.size <= MAX_VIDEO_SIZE)
 
   if (oversized.length > 0) {
-    alert(`영상 용량 초과 (30MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
+    toast.warning(`영상 용량 초과 (30MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
   }
   if (videos.length === 0) return
 
@@ -607,7 +608,7 @@ const onVideoDropZone = async (event) => {
       editor.value?.chain().focus().setVideo({ src: uploadedUrl }).run()
     } catch (e) {
       console.error('영상 업로드 실패', e)
-      alert('영상 업로드에 실패했습니다.')
+      toast.error('영상 업로드에 실패했습니다.')
     } finally {
       videoConverting.value = false
     }
@@ -630,7 +631,7 @@ const onImageSelected = async (event) => {
   const validFiles = allFiles.filter((f) => f.size <= MAX_IMAGE_SIZE)
 
   if (oversized.length > 0) {
-    alert(`이미지 용량 초과 (5MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
+    toast.warning(`이미지 용량 초과 (5MB 제한): ${oversized.map((f) => f.name).join(', ')}`)
   }
   if (validFiles.length === 0) {
     event.target.value = ''
@@ -652,7 +653,7 @@ const onImageSelected = async (event) => {
     }
   } catch (e) {
     console.error('이미지 업로드 실패', e)
-    alert('이미지 업로드에 실패했습니다.')
+    toast.error('이미지 업로드에 실패했습니다.')
   }
 
   event.target.value = ''
@@ -669,7 +670,7 @@ const onVideoSelected = async (event) => {
   if (!file) return
 
   if (file.size > MAX_VIDEO_SIZE) {
-    alert(`영상 용량 초과 (30MB 제한): ${file.name}`)
+    toast.warning(`영상 용량 초과 (30MB 제한): ${file.name}`)
     event.target.value = ''
     return
   }
@@ -686,7 +687,7 @@ const onVideoSelected = async (event) => {
     editor.value.chain().focus().setVideo({ src: uploadedUrl }).run()
   } catch (e) {
     console.error('영상 업로드 실패', e)
-    alert('영상 업로드에 실패했습니다.')
+    toast.error('영상 업로드에 실패했습니다.')
   } finally {
     videoConverting.value = false
   }
@@ -740,14 +741,14 @@ onBeforeUnmount(() => {
 const resendVerificationEmail = async () => {
   try {
     await api.post('/users/email/resend')
-    alert('인증 메일이 발송되었습니다. 메일함을 확인해주세요.')
+    toast.success('인증 메일이 발송되었습니다. 메일함을 확인해주세요.')
     showEmailVerifyModal.value = false
   } catch (e) {
     const code = e.response?.data?.code
     if (code === 'EMAIL_COOLDOWN') {
-      alert('인증 메일은 1분에 한 번만 발송할 수 있습니다.')
+      toast.warning('인증 메일은 1분에 한 번만 발송할 수 있습니다.')
     } else {
-      alert('메일 발송에 실패했습니다.')
+      toast.error('메일 발송에 실패했습니다.')
     }
   }
 }

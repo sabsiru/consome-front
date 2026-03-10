@@ -34,6 +34,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import axios from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
 
@@ -86,20 +87,20 @@ const goToHome = () => {
 
 const resendEmail = async () => {
   if (!userStore.token) {
-    alert('로그인 후 인증 메일을 재발송할 수 있습니다.')
+    toast.info('로그인 후 인증 메일을 재발송할 수 있습니다.')
     router.push('/')
     return
   }
 
   try {
     await axios.post('/users/email/resend')
-    alert('인증 메일이 재발송되었습니다. 메일함을 확인해주세요.')
+    toast.success('인증 메일이 재발송되었습니다. 메일함을 확인해주세요.')
   } catch (error) {
     const code = error.response?.data?.code
     if (code === 'EMAIL_COOLDOWN') {
-      alert('인증 메일은 1분에 한 번만 발송할 수 있습니다.')
+      toast.warning('인증 메일은 1분에 한 번만 발송할 수 있습니다.')
     } else {
-      alert('메일 발송에 실패했습니다.')
+      toast.error('메일 발송에 실패했습니다.')
     }
   }
 }

@@ -103,6 +103,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
 import { useReadPosts } from '@/composables/useReadPosts.js'
@@ -170,7 +171,7 @@ const loadComments = async (p = 0) => {
 // 댓글 작성
 const createComment = async (payload, done, fail) => {
   if (!isLoggedIn.value) {
-    alert('로그인 후 이용 가능합니다.')
+    toast.info('로그인 후 이용 가능합니다.')
     fail?.()
     return
   }
@@ -190,7 +191,7 @@ const createComment = async (payload, done, fail) => {
     // 화면의 댓글 수 즉시 반영
     if (post.value) post.value.commentCount = (post.value.commentCount ?? 0) + 1
   } catch (e) {
-    alert(e?.response?.data?.message || '댓글 등록에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '댓글 등록에 실패했습니다.')
     fail?.()
   }
 }
@@ -198,7 +199,7 @@ const createComment = async (payload, done, fail) => {
 // 댓글 수정
 const editComment = async (payload, done, fail) => {
   if (!isLoggedIn.value) {
-    alert('로그인 후 이용 가능합니다.')
+    toast.info('로그인 후 이용 가능합니다.')
     fail?.()
     return
   }
@@ -214,7 +215,7 @@ const editComment = async (payload, done, fail) => {
     // 수정 반영
     await loadComments(commentPage.value)
   } catch (e) {
-    alert(e?.response?.data?.message || '댓글 수정에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '댓글 수정에 실패했습니다.')
     fail?.()
   }
 }
@@ -228,7 +229,7 @@ const isAuthor = computed(() => {
 // 댓글 삭제
 const deleteComment = async (commentId, done, fail) => {
   if (!isLoggedIn.value) {
-    alert('로그인 후 이용 가능합니다.')
+    toast.info('로그인 후 이용 가능합니다.')
     fail?.()
     return
   }
@@ -251,7 +252,7 @@ const deleteComment = async (commentId, done, fail) => {
     // 화면의 댓글 수 즉시 반영(단순 감소)
     if (post.value) post.value.commentCount = Math.max(0, (post.value.commentCount ?? 0) - 1)
   } catch (e) {
-    alert(e?.response?.data?.message || '댓글 삭제에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '댓글 삭제에 실패했습니다.')
     fail?.()
   }
 }
@@ -299,7 +300,7 @@ const likeComment = async (commentId) => {
     // 실패 시 원복
     comment.hasLiked = prevHasLiked
     comment.likeCount = prevLikeCount
-    alert(e?.response?.data?.message || '추천에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '추천에 실패했습니다.')
   }
 }
 
@@ -333,7 +334,7 @@ const dislikeComment = async (commentId) => {
     // 실패 시 원복
     comment.hasDisliked = prevHasDisliked
     comment.dislikeCount = prevDislikeCount
-    alert(e?.response?.data?.message || '비추천에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '비추천에 실패했습니다.')
   }
 }
 
@@ -391,7 +392,7 @@ const onDelete = async () => {
       params: { boardId: post.value.boardId },
     })
   } catch (e) {
-    alert(e?.response?.data?.message || '삭제에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '삭제에 실패했습니다.')
   }
 }
 
@@ -427,7 +428,7 @@ const onLike = async () => {
   } catch (e) {
     // 실패 시 원복
     hasLiked.value = prevLiked
-    alert(e?.response?.data?.message || '추천에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '추천에 실패했습니다.')
   }
 }
 
@@ -462,7 +463,7 @@ const onDislike = async () => {
   } catch (e) {
     // 실패 시 원복
     hasDisliked.value = prevDisliked
-    alert(e?.response?.data?.message || '비추천에 실패했습니다.')
+    toast.error(e?.response?.data?.message || '비추천에 실패했습니다.')
   }
 }
 
