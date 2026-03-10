@@ -16,6 +16,10 @@
     </form>
 
     <p v-if="error" class="error">{{ error }}</p>
+
+    <div class="forgot-link">
+      <RouterLink to="/password/reset-request">비밀번호를 잊으셨나요?</RouterLink>
+    </div>
   </div>
 </template>
 
@@ -138,5 +142,22 @@ const login = async () => {
   border: 1px solid var(--danger);
   border-radius: 6px;
   text-align: center;
+}
+
+.forgot-link {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.forgot-link a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-link a:hover {
+  color: var(--accent);
 }
 </style>
