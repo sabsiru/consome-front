@@ -78,6 +78,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import axios from '@/api/axios'
 
 const router = useRouter()
@@ -142,14 +143,14 @@ const register = async () => {
       const { code, message } = error.response.data
 
       if (code && message) {
-        alert(`${message}`)
+        toast.error(message)
       } else if (message) {
-        alert(message)
+        toast.error(message)
       } else {
-        alert('회원가입 중 알 수 없는 오류가 발생했습니다.')
+        toast.error('회원가입 중 알 수 없는 오류가 발생했습니다.')
       }
     } else {
-      alert('서버와의 연결에 실패했습니다.')
+      toast.error('서버와의 연결에 실패했습니다.')
     }
   } finally {
     isLoading.value = false

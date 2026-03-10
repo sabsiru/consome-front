@@ -59,6 +59,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Flag, X } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { createReport } from '@/api/reportApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 
@@ -107,12 +108,12 @@ const submit = async () => {
       reason.value,
       description.value
     )
-    alert('신고가 접수되었습니다.')
+    toast.success('신고가 접수되었습니다.')
     emit('success')
     close()
   } catch (e) {
     const msg = e.response?.data?.message || '신고 접수에 실패했습니다.'
-    alert(msg)
+    toast.error(msg)
   } finally {
     submitting.value = false
   }

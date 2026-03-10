@@ -35,6 +35,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeft, Gift } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 import { readMessage, deleteMessage } from '@/api/messageApi.js'
 
@@ -55,7 +56,7 @@ const fetchMessage = async () => {
     message.value = data
   } catch (e) {
     console.error(e)
-    alert('쪽지를 불러올 수 없습니다.')
+    toast.error('쪽지를 불러올 수 없습니다.')
     router.back()
   } finally {
     loading.value = false
@@ -77,7 +78,7 @@ const deleteMsg = async () => {
     await deleteMessage(messageId.value, userStore.userId)
     router.push({ name: 'MessageList' })
   } catch (e) {
-    alert('삭제에 실패했습니다.')
+    toast.error('삭제에 실패했습니다.')
   }
 }
 

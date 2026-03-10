@@ -66,6 +66,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import draggable from 'vuedraggable'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios'
 import { eventBus } from '@/utils/eventBus.js'
 import '@/assets/styles/admin/admin.css'
@@ -106,10 +107,10 @@ const saveOrder = async () => {
     await api.put('/admin/boards/main/reorder', { orders })
     originalOrder.value = mainBoards.value.map(b => b.boardId)
     eventBus.emit('main-boards-updated')
-    alert('순서가 저장되었습니다.')
+    toast.success('순서가 저장되었습니다.')
   } catch (err) {
     console.error(err)
-    alert('순서 저장 실패')
+    toast.error('순서 저장 실패')
   }
 }
 
@@ -121,7 +122,7 @@ const removeFromMain = async (board) => {
     eventBus.emit('main-boards-updated')
   } catch (err) {
     console.error(err)
-    alert('제거 실패')
+    toast.error('제거 실패')
   }
 }
 
@@ -131,7 +132,7 @@ const toggleWrite = async (board) => {
     board.writeEnabled = res.data.writeEnabled
   } catch (err) {
     console.error(err)
-    alert('글쓰기 설정 변경 실패')
+    toast.error('글쓰기 설정 변경 실패')
   }
 }
 
@@ -141,7 +142,7 @@ const toggleComment = async (board) => {
     board.commentEnabled = res.data.commentEnabled
   } catch (err) {
     console.error(err)
-    alert('댓글 설정 변경 실패')
+    toast.error('댓글 설정 변경 실패')
   }
 }
 </script>

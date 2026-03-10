@@ -63,6 +63,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeft, Gift } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 import { sendMessage } from '@/api/messageApi.js'
 import api from '@/api/axios.js'
@@ -93,7 +94,7 @@ const goBack = () => {
 
 const send = async () => {
   if (!content.value.trim()) {
-    alert('내용을 입력해주세요.')
+    toast.warning('내용을 입력해주세요.')
     return
   }
 
@@ -103,17 +104,17 @@ const send = async () => {
     let receiverId = initialReceiverId.value
     if (!receiverId) {
       // 닉네임으로 사용자 조회 API 필요 - 임시로 에러 처리
-      alert('받는 사람을 선택해주세요.')
+      toast.warning('받는 사람을 선택해주세요.')
       sending.value = false
       return
     }
 
     await sendMessage(userStore.userId, receiverId, content.value, point.value || 0)
-    alert('쪽지를 보냈습니다.')
+    toast.success('쪽지를 보냈습니다.')
     router.push({ name: 'MessageList' })
   } catch (e) {
     const msg = e.response?.data?.message || '쪽지 전송에 실패했습니다.'
-    alert(msg)
+    toast.error(msg)
   } finally {
     sending.value = false
   }

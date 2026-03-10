@@ -130,6 +130,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios'
 import { suspendUser, unsuspendUser } from '@/api/adminApi.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
@@ -308,11 +309,11 @@ const confirmSuspend = async () => {
 
   try {
     await suspendUser(suspendTarget.value.userId, selectedSuspensionType.value, suspendReason.value)
-    alert('제재가 적용되었습니다.')
+    toast.success('제재가 적용되었습니다.')
     await loadUsers()
     closeSuspendModal()
   } catch (e) {
-    alert(e.response?.data?.message || '제재 적용에 실패했습니다.')
+    toast.error(e.response?.data?.message || '제재 적용에 실패했습니다.')
   }
 }
 
@@ -321,11 +322,11 @@ const confirmUnsuspend = async () => {
 
   try {
     await unsuspendUser(suspendTarget.value.userId)
-    alert('제재가 해제되었습니다.')
+    toast.success('제재가 해제되었습니다.')
     await loadUsers()
     closeSuspendModal()
   } catch (e) {
-    alert(e.response?.data?.message || '제재 해제에 실패했습니다.')
+    toast.error(e.response?.data?.message || '제재 해제에 실패했습니다.')
   }
 }
 

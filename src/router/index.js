@@ -11,6 +11,7 @@ import MessageRoutes from '@/router/messageRoutes.js'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
 import { adminGuard, redirectIfLoggedIn } from '@/router/guards/authGuards.js'
 import { useUserStore } from '@/stores/userStore.js'
+import { toast } from 'vue-sonner'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,11 +37,11 @@ router.beforeEach(async (to, from, next) => {
   if (to.path.startsWith('/manager')) {
     const store = useUserStore()
     if (!store.token) {
-      alert('로그인이 필요합니다.')
+      toast.info('로그인이 필요합니다.')
       return next('/login')
     }
     if (store.role !== 'MANAGER' && store.role !== 'ADMIN') {
-      alert('매니저 권한이 필요합니다.')
+      toast.error('매니저 권한이 필요합니다.')
       return next('/')
     }
   }
@@ -52,7 +53,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     const store = useUserStore()
     if (!store.token) {
-      alert('로그인이 필요합니다.')
+      toast.info('로그인이 필요합니다.')
       return next('/login')
     }
   }

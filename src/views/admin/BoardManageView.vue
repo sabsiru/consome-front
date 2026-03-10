@@ -135,6 +135,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
+import { toast } from 'vue-sonner'
 import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
 import '@/assets/styles/admin/admin.css'
@@ -223,7 +224,7 @@ const cancelCreate = () => {
 // 보드 저장 (description만)
 const saveBoard = async () => {
   if (editForm.value.description === (selectedBoard.value.description || '')) {
-    alert('변경된 내용이 없습니다.')
+    toast.info('변경된 내용이 없습니다.')
     return
   }
 
@@ -234,10 +235,10 @@ const saveBoard = async () => {
     await loadBoards()
     const updated = boards.value.find((b) => b.id === selectedBoard.value.id)
     if (updated) selectBoard(updated)
-    alert('수정이 완료되었습니다.')
+    toast.success('수정이 완료되었습니다.')
   } catch (err) {
     console.error(err)
-    alert('저장 실패')
+    toast.error('저장 실패')
   }
 }
 
@@ -257,7 +258,7 @@ const createCategory = async () => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 생성 실패')
+    toast.error('카테고리 생성 실패')
   }
 }
 
@@ -284,7 +285,7 @@ const saveCategory = async (categoryId) => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 수정 실패')
+    toast.error('카테고리 수정 실패')
   }
 }
 
@@ -296,7 +297,7 @@ const deleteCategory = async (categoryId) => {
     await loadCategories(selectedBoard.value.id)
   } catch (err) {
     console.error(err)
-    alert('카테고리 삭제 실패')
+    toast.error('카테고리 삭제 실패')
   }
 }
 
@@ -311,7 +312,7 @@ const onCategoryDragEnd = async () => {
     await api.put('/admin/categories/reorder', { orders })
   } catch (err) {
     console.error(err)
-    alert('순서 변경 실패')
+    toast.error('순서 변경 실패')
     await loadCategories(selectedBoard.value.id)
   }
 }
