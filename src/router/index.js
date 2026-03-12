@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import BoardsView from '../views/BoardsView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 import FavoriteBoardsView from '../views/board/FavoriteBoardsView.vue'
 import AdminRoutes from '@/router/adminRoutes.js'
 import BoardRoutes from '@/router/boardRoutes.js'
@@ -26,6 +27,7 @@ const router = createRouter({
     ...UserRoutes,
     ...MessageRoutes,
     ...AdminRoutes,
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView },
   ],
 })
 

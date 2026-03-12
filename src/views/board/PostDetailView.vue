@@ -265,17 +265,15 @@ const goToLogin = () => {
 
 // 로그인 필요 시 처리
 const onLoginRequired = () => {
-  if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-    goToLogin()
-  }
+  toast.info('로그인이 필요합니다.')
+  goToLogin()
 }
 
 // 댓글 추천
 const likeComment = async (commentId) => {
   if (!userStore.userId) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      goToLogin()
-    }
+    toast.info('로그인이 필요합니다.')
+    goToLogin()
     return
   }
 
@@ -307,9 +305,8 @@ const likeComment = async (commentId) => {
 // 댓글 비추천
 const dislikeComment = async (commentId) => {
   if (!userStore.userId) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      goToLogin()
-    }
+    toast.info('로그인이 필요합니다.')
+    goToLogin()
     return
   }
 
@@ -399,9 +396,8 @@ const onDelete = async () => {
 const onLike = async () => {
   if (!post.value) return
   if (!userStore.userId) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      goToLogin()
-    }
+    toast.info('로그인이 필요합니다.')
+    goToLogin()
     return
   }
 
@@ -435,9 +431,8 @@ const onLike = async () => {
 const onDislike = async () => {
   if (!post.value) return
   if (!userStore.userId) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      goToLogin()
-    }
+    toast.info('로그인이 필요합니다.')
+    goToLogin()
     return
   }
 
@@ -537,9 +532,8 @@ const isLoggedIn = computed(() => !!userStore.userId)
 // 게시글 신고
 const openReportModal = (targetType, targetId) => {
   if (!userStore.userId) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      goToLogin()
-    }
+    toast.info('로그인이 필요합니다.')
+    goToLogin()
     return
   }
   reportTarget.value = { type: targetType, id: targetId }

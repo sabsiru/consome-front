@@ -32,6 +32,7 @@ import { useRoute, useRouter } from 'vue-router'
 import BoardPostList from '@/components/board/BoardPostList.vue'
 import ReportModal from '@/components/common/ReportModal.vue'
 import { useUserStore } from '@/stores/userStore.js'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,9 +56,8 @@ const reportTarget = ref({ type: '', id: null })
 
 const onReport = ({ targetType, targetId }) => {
   if (!userStore.token) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      router.push({ name: 'login', query: { redirect: route.fullPath } })
-    }
+    toast.info('로그인이 필요합니다.')
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
     return
   }
   reportTarget.value = { type: targetType, id: targetId }
@@ -125,9 +125,8 @@ const onCategoryChange = (nextCategoryId) => {
 
 const onWriteClick = () => {
   if (!userStore.token) {
-    if (confirm('로그인이 필요합니다. 로그인 하시겠습니까?')) {
-      router.push({ name: 'login', query: { redirect: route.fullPath } })
-    }
+    toast.info('로그인이 필요합니다.')
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
     return
   }
   router.push({ name: 'PostWrite', params: { boardId: boardId.value } })
