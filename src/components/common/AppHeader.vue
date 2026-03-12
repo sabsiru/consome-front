@@ -82,6 +82,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import { Mail } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
 
@@ -94,11 +95,10 @@ const logout = async (event) => {
   if (!event || event.type !== 'click') return
   event.preventDefault()
 
-  if (confirm('로그아웃 하시겠습니까?')) {
-    favoriteStore.clear()
-    await store.logout()
-    window.location.href = '/'
-  }
+  favoriteStore.clear()
+  await store.logout()
+  toast.success('로그아웃 되었습니다.')
+  router.push('/')
 }
 
 const featuredBoards = ref({ pinnedBoards: [], popularBoards: [] })
