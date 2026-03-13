@@ -360,4 +360,20 @@ const goToLogin = () => {
 .login-btn:hover {
   background: #00e6b8;
 }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 24px 20px;
+  }
+
+  .register-container h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .pw-validation {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
