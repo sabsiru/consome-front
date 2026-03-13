@@ -367,3 +367,78 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* ==========================================
+   Responsive - Admin
+   ========================================== */
+@media (max-width: 768px) {
+  .admin-header h1 {
+    font-size: 22px;
+  }
+
+  .admin-panel {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .admin-panel-header {
+    margin-bottom: 20px;
+  }
+
+  .admin-panel-header h2 {
+    font-size: 18px;
+  }
+
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .admin-meta-info {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .admin-panel-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-search-bar {
+    flex-direction: column;
+  }
+
+  .admin-search-bar input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-header {
+    margin-bottom: 20px;
+  }
+
+  .admin-btn {
+    padding: 10px 14px;
+    font-size: 11px;
+  }
+
+  .admin-panel-actions {
+    gap: 8px;
+  }
+
+  .admin-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+}
