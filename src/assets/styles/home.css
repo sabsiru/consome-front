@@ -210,6 +210,10 @@
 }
 
 @media (max-width: 480px) {
+  .home {
+    padding: 20px var(--app-padding-x, 12px);
+  }
+
   .home__boards-area {
     grid-template-columns: 1fr;
   }
@@ -221,6 +225,25 @@
 
   .home__posts-table .col-board {
     width: 60px;
+  }
+
+  .home__posts-table .col-views {
+    display: none;
+  }
+
+  .home__posts-table th,
+  .home__posts-table td {
+    padding: 8px 8px;
+    font-size: 12px;
+  }
+
+  .home__title {
+    font-size: 22px;
+  }
+
+  .home__subtitle {
+    font-size: 11px;
+    letter-spacing: 1px;
   }
 }
 
@@ -426,5 +449,24 @@
 
 [data-theme="glass"] .home__section--board:nth-child(3) {
   transform: translateX(-10px);
+}
+
+/* Glass theme mobile fix */
+@media (max-width: 768px) {
+  [data-theme="glass"] .home__content {
+    grid-template-columns: 1fr;
+  }
+
+  [data-theme="glass"] .home__section--board:nth-child(2),
+  [data-theme="glass"] .home__section--board:nth-child(3) {
+    transform: none;
+  }
+}
+
+/* Discord theme mobile fix */
+@media (max-width: 768px) {
+  [data-theme="discord"] .home__content {
+    grid-template-columns: 1fr;
+  }
 }
 
