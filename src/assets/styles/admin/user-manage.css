@@ -468,3 +468,23 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-user-view {
+    padding: 16px;
+  }
+
+  .admin-user-view h1 {
+    font-size: 20px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .search-bar input {
+    min-width: 0;
+    width: 100%;
+  }
+}

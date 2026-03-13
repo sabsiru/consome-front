@@ -239,4 +239,33 @@ onMounted(fetchMessage)
   font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-detail-view {
+    padding: 16px;
+  }
+
+  .message-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .actions {
+    gap: 4px;
+  }
+
+  .reply-btn,
+  .delete-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
 </style>

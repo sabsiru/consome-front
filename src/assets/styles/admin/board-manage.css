@@ -741,3 +741,23 @@
   color: var(--text-muted);
   font-size: 13px;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .board-manage {
+    padding: 16px;
+  }
+
+  .split-panel {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .panel-left {
+    max-width: none;
+  }
+
+  .action-bar {
+    flex-wrap: wrap;
+  }
+}

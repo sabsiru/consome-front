@@ -130,3 +130,36 @@
   color: var(--text-secondary);
   margin: 0;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-view {
+    padding: 16px;
+  }
+
+  .admin-view .page-header {
+    margin-bottom: 28px;
+  }
+
+  .admin-view .page-header h1 {
+    font-size: 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .nav-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .nav-card {
+    padding: 20px;
+  }
+}

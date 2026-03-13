@@ -149,4 +149,20 @@ onMounted(async () => {
 .board-card__fav-btn--active {
   color: var(--accent);
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .favorites-page__inner {
+    padding: 24px var(--app-padding-x);
+  }
+
+  .favorites-page__title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

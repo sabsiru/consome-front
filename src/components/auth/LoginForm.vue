@@ -160,4 +160,16 @@ const login = async () => {
 .forgot-link a:hover {
   color: var(--accent);
 }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 24px 20px;
+  }
+
+  .login-container h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+}
 </style>

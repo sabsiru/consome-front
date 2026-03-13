@@ -298,4 +298,47 @@ onMounted(fetchMessages)
   font-size: 13px;
   color: var(--text-muted);
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-list-view {
+    padding: 16px;
+  }
+
+  .message-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .compose-btn {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-header h2 {
+    font-size: 18px;
+  }
+
+  .tab-buttons {
+    width: 100%;
+  }
+
+  .tab-buttons button {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .message-item {
+    padding: 12px;
+  }
+
+  .message-preview {
+    font-size: 13px;
+  }
+}
 </style>

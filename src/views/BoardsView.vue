@@ -232,4 +232,42 @@ onMounted(fetchSections)
   margin-right: 8px;
   vertical-align: middle;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .boards-page__inner {
+    padding: 24px var(--app-padding-x);
+  }
+
+  .boards-page__title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .sections {
+    gap: 28px;
+  }
+
+  .section__boards {
+    grid-template-columns: 1fr;
+  }
+
+  .section--admin-only {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .board-card {
+    padding: 14px;
+  }
+
+  .board-card__name {
+    font-size: 14px;
+  }
+
+  .board-card__desc {
+    font-size: 12px;
+  }
+}
 </style>

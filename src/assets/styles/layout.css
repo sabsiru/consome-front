@@ -60,6 +60,14 @@
   color: var(--text-muted);
 }
 
+/* 모바일 */
+@media (max-width: 480px) {
+  :root {
+    --app-padding-x: 12px;
+    --app-padding-y: 16px;
+  }
+}
+
 /* PC에서 좌우 여백/폭만 조정 */
 @media (min-width: 1024px) {
   :root {
