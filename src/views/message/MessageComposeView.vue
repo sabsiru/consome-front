@@ -286,4 +286,33 @@ onMounted(fetchReceiverNickname)
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-compose-view {
+    padding: 16px;
+  }
+
+  .compose-form {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .compose-header h2 {
+    font-size: 18px;
+  }
+
+  .form-group textarea {
+    min-height: 160px;
+  }
+
+  .send-btn {
+    width: 100%;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+}
 </style>
