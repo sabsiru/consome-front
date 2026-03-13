@@ -351,3 +351,45 @@
   color: var(--accent);
   margin-right: 6px;
 }
+
+/* Responsive - Comment */
+@media (max-width: 768px) {
+  .comment-item__meta {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .comment-item__actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .comment-item {
+    padding: 10px 12px;
+  }
+
+  .comment__write-actions {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comment-item__meta {
+    font-size: 11px;
+  }
+
+  .comment-item__content {
+    font-size: 12px;
+  }
+
+  .comment-item__edit-btn,
+  .comment-item__delete-btn,
+  .comment-item__report-btn,
+  .comment-item__reply-btn {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+}
