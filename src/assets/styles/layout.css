@@ -9,7 +9,7 @@
 .app-shell {
   max-width: var(--app-max-width);
   margin: 0 auto;
-  padding: var(--app-padding-y) var(--app-padding-x);
+  padding: 12px var(--app-padding-x) var(--app-padding-y);
   background: var(--bg-primary);
 }
 
@@ -20,9 +20,8 @@
   background: var(--bg-primary);
 }
 
-/* 헤더가 fixed면 콘텐츠를 아래로 밀어줌 */
+/* 메인 콘텐츠 영역 */
 .app-content {
-  padding-top: var(--app-header-height);
   min-height: calc(100vh - var(--app-header-height));
   background: var(--bg-primary);
 }

@@ -1,7 +1,7 @@
 /* Developer Console Theme - Comment Styles */
 .comment {
-  margin-top: 18px;
-  padding-top: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -29,9 +29,9 @@
 }
 
 .comment-item {
-  padding: 12px 14px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  overflow: hidden;
   background: var(--bg-secondary);
   transition: border-color 0.2s ease;
 }
@@ -45,10 +45,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  padding: 8px 14px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .comment-item__meta-left {
@@ -104,6 +106,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  padding: 10px 14px;
 
   font-size: 13px;
   line-height: 1.6;
@@ -364,8 +367,12 @@
     pointer-events: auto;
   }
 
-  .comment-item {
-    padding: 10px 12px;
+  .comment-item__meta {
+    padding: 6px 12px;
+  }
+
+  .comment-item__content {
+    padding: 8px 12px;
   }
 
   .comment__write-actions {
