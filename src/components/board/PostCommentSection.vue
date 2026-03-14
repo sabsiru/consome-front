@@ -15,7 +15,7 @@
       >
         <div class="comment-item__meta">
           <div class="comment-item__meta-left">
-            <span class="comment-item__author">{{ c.userNickname }} <LevelBadge :level="c.userLevel" :role="c.userRole" /></span>
+            <span class="comment-item__author"><LevelBadge :level="c.userLevel" :role="c.userRole" size="xs" /> {{ c.userNickname }}</span>
             <span
               v-if="props.postAuthorId != null && c.userId === props.postAuthorId"
               class="comment-badge comment-badge--author"
