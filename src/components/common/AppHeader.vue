@@ -64,7 +64,7 @@
           </template>
           <template v-else>
             <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
-            <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" /> <span class="nickname-link">{{ nickname }}</span></span>
+            <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" size="xs" /> <span class="nickname-link">{{ nickname }}</span></span>
             <button class="message-btn" @click="goMessages()">
               <Mail :size="16" />
               <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
