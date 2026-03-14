@@ -8,6 +8,12 @@
 
 /* 보드 헤더 */
 .board-header {
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  margin-left: calc(-1 * var(--app-padding-x));
+  margin-right: calc(-1 * var(--app-padding-x));
+  padding-left: var(--app-padding-x);
+  padding-right: var(--app-padding-x);
   border-bottom: 1px solid var(--border-color);
 }
 

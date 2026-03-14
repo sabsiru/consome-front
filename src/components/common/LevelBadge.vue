@@ -4,7 +4,7 @@ import { computed } from 'vue'
 const props = defineProps({
   level: { type: Number, required: true },
   role: { type: String, default: null },
-  size: { type: String, default: 'md' } // 'sm' | 'md'
+  size: { type: String, default: 'md' } // 'xs' | 'sm' | 'md'
 })
 
 const displayText = computed(() => {

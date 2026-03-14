@@ -1,13 +1,19 @@
 <template>
   <div class="page-post">
     <div class="post-layout">
-      <!-- MAIN -->
-      <article class="post-main">
-        <header class="post-header" v-if="post">
+      <div v-if="loading" class="post-status">불러오는 중...</div>
+      <div v-else-if="error" class="post-status post-status--error">{{ error }}</div>
+
+      <!-- 게시글 카드 -->
+      <article class="post-main" v-if="post">
+        <header class="post-header">
           <h1 class="post-title">{{ post.title }}</h1>
 
-          <div class="post-meta" v-if="post">
-            <span class="post-meta__author">{{ post.authorNickname }} <LevelBadge :level="post.authorLevel" :role="post.authorRole" /></span>
+          <div class="post-meta">
+            <span class="post-meta__author" @click="openUserModal($event, post)">
+              <LevelBadge :level="post.authorLevel" :role="post.authorRole" size="xs" />
+              {{ post.authorNickname }}
+            </span>
             <span class="post-meta__sep"></span>
             추천<span class="post-meta__stat post-meta__stat--like"> {{ post.likeCount }} </span>
             <span class="post-meta__sep">|</span>
@@ -25,70 +31,83 @@
           </div>
         </header>
 
-        <section class="post-body" v-if="post">
+        <section class="post-body">
           <div class="post-content">
             <div v-html="post.content"></div>
           </div>
-        </section>
 
-        <section class="post-actions" v-if="post">
-          <div class="post-actions__center">
-            <button type="button" class="btn" :class="{ 'btn--voted': hasLiked }" :disabled="hasLiked" @click="onLike">추천</button>
-            <button type="button" class="btn" :class="{ 'btn--voted-dislike': hasDisliked }" :disabled="hasDisliked" @click="onDislike">비추천</button>
+          <div class="post-actions">
+            <div class="post-actions__center">
+              <button type="button" class="btn" :class="{ 'btn--voted': hasLiked }" :disabled="hasLiked" @click="onLike">추천</button>
+              <button type="button" class="btn" :class="{ 'btn--voted-dislike': hasDisliked }" :disabled="hasDisliked" @click="onDislike">비추천</button>
+            </div>
+
+            <div class="post-actions__right">
+              <template v-if="isAuthor">
+                <button type="button" class="btn" @click="goEdit">수정</button>
+                <button type="button" class="btn btn-danger" @click="onDelete">삭제</button>
+              </template>
+              <button v-else-if="isLoggedIn" type="button" class="btn btn-report" @click="openReportModal('POST', postId)">신고</button>
+            </div>
           </div>
-
-          <div class="post-actions__right">
-            <template v-if="isAuthor">
-              <button type="button" class="btn" @click="goEdit">수정</button>
-              <button type="button" class="btn btn-danger" @click="onDelete">삭제</button>
-            </template>
-            <button v-else-if="isLoggedIn" type="button" class="btn btn-report" @click="openReportModal('POST', postId)">신고</button>
-          </div>
         </section>
-
-        <section class="post-comments" v-if="post && post.commentEnabled">
-          <PostCommentSection
-            :post-id="postId"
-            :comments="comments"
-            :page="commentPage"
-            :size="commentSize"
-            :total-pages="commentTotalPages"
-            :total-elements="commentTotalElements"
-            :can-write="isLoggedIn"
-            :current-user-id="userStore.userId || null"
-            :post-author-id="post.authorId"
-            @page-change="loadComments"
-            @create-comment="createComment"
-            @edit-comment="editComment"
-            @delete-comment="deleteComment"
-            @like-comment="likeComment"
-            @dislike-comment="dislikeComment"
-            @login-required="onLoginRequired"
-            @report-comment="(commentId) => openReportModal('COMMENT', commentId)"
-          />
-        </section>
-        <section class="post-comments post-comments--disabled" v-else-if="post && !post.commentEnabled">
-          <p class="comment-disabled-notice">이 게시판에서는 댓글이 허용되지 않습니다.</p>
-        </section>
-        <section class="post-related-list" v-if="post">
-          <BoardPostList
-            :board-id="post.boardId"
-            :page="page"
-            :size="size"
-            :active-post-id="post.postId"
-            :keyword="keyword"
-            :search-type="searchType"
-            @page-change="onPageChange"
-            @post-click="goPostDetailFromList"
-            @write-click="onWriteClick"
-            @search="onSearch"
-            @report="({ targetType, targetId }) => openReportModal(targetType, targetId)"
-          />
-        </section>
-        <div v-if="loading" class="post-status">불러오는 중...</div>
-        <div v-else-if="error" class="post-status post-status--error">{{ error }}</div>
       </article>
+
+      <!-- 댓글 -->
+      <section class="post-comments" v-if="post && post.commentEnabled">
+        <PostCommentSection
+          :post-id="postId"
+          :comments="comments"
+          :page="commentPage"
+          :size="commentSize"
+          :total-pages="commentTotalPages"
+          :total-elements="commentTotalElements"
+          :can-write="isLoggedIn"
+          :current-user-id="userStore.userId || null"
+          :post-author-id="post.authorId"
+          @page-change="loadComments"
+          @create-comment="createComment"
+          @edit-comment="editComment"
+          @delete-comment="deleteComment"
+          @like-comment="likeComment"
+          @dislike-comment="dislikeComment"
+          @login-required="onLoginRequired"
+          @report-comment="(commentId) => openReportModal('COMMENT', commentId)"
+        />
+      </section>
+      <section class="post-comments post-comments--disabled" v-else-if="post && !post.commentEnabled">
+        <p class="comment-disabled-notice">이 게시판에서는 댓글이 허용되지 않습니다.</p>
+      </section>
+
+      <!-- 게시글 목록 -->
+      <section class="post-related-list" v-if="post">
+        <BoardPostList
+          :board-id="post.boardId"
+          :page="page"
+          :size="size"
+          :active-post-id="post.postId"
+          :keyword="keyword"
+          :search-type="searchType"
+          @page-change="onPageChange"
+          @post-click="goPostDetailFromList"
+          @write-click="onWriteClick"
+          @search="onSearch"
+          @report="({ targetType, targetId }) => openReportModal(targetType, targetId)"
+        />
+      </section>
     </div>
+
+    <!-- 유저 액션 모달 -->
+    <UserActionModal
+      :visible="userModal.visible"
+      :user-id="userModal.userId"
+      :nickname="userModal.nickname"
+      :level="userModal.level"
+      :role="userModal.role"
+      :position="userModal.position"
+      @close="closeUserModal"
+      @report="onUserReport"
+    />
 
     <ReportModal
       :visible="showReportModal"
@@ -113,6 +132,7 @@ import BoardPostList from '@/components/board/BoardPostList.vue'
 import PostCommentSection from '@/components/board/PostCommentSection.vue'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import ReportModal from '@/components/common/ReportModal.vue'
+import UserActionModal from '@/components/common/UserActionModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -543,6 +563,36 @@ const openReportModal = (targetType, targetId) => {
 const closeReportModal = () => {
   showReportModal.value = false
   reportTarget.value = { type: '', id: null }
+}
+
+// 유저 액션 모달
+const userModal = ref({
+  visible: false,
+  userId: 0,
+  nickname: '',
+  level: 0,
+  role: '',
+  position: { x: 0, y: 0 }
+})
+
+const openUserModal = (event, post) => {
+  userModal.value = {
+    visible: true,
+    userId: post.authorId,
+    nickname: post.authorNickname,
+    level: post.authorLevel,
+    role: post.authorRole,
+    position: { x: event.clientX, y: event.clientY }
+  }
+}
+
+const closeUserModal = () => {
+  userModal.value.visible = false
+}
+
+const onUserReport = (payload) => {
+  closeUserModal()
+  openReportModal(payload.targetType, payload.targetId)
 }
 
 const loadScript = (src, id, forceReload = false) =>

@@ -99,21 +99,29 @@ a:hover {
   box-shadow: none !important;
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - 스크롤 시에만 표시 */
+html {
+  overflow-y: overlay;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: transparent;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+html.is-scrolling ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+html.is-scrolling ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
