@@ -97,7 +97,7 @@ const router = useRouter()
 
 // Theme Switcher
 const themes = [
-  { id: 'default', name: 'Default', color: '#00d4aa', glow: '#00d4aa50' },
+  { id: 'default', name: 'Default', color: '#64b5f6', glow: '#64b5f650' },
   { id: 'discord', name: 'Discord', color: '#5865f2', glow: '#5865f250' },
   { id: 'glass', name: 'Glass', color: '#ffffff', glow: '#ffffff30' },
 ]

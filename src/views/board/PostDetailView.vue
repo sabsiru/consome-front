@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
@@ -362,6 +362,7 @@ const loadPost = async () => {
   try {
     const { data } = await api.get(`/posts/${postId.value}`)
     post.value = data
+    document.title = data.title
     markAsRead(postId.value)
     // 투표 상태 로드 (백엔드에서 반환 시)
     hasLiked.value = data.hasLiked ?? false
@@ -500,6 +501,10 @@ onMounted(() => {
   }
   loadPost()
   loadComments(0)
+})
+
+onUnmounted(() => {
+  document.title = '콘소메'
 })
 
 watch(
