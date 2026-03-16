@@ -1,5 +1,9 @@
 import api from '@/api/axios.js'
 
+// 사용자 검색
+export const searchUsers = (nickname) =>
+  api.get('/users/search', { params: { nickname } })
+
 // 쪽지
 export const sendMessage = (userId, receiverId, content, point = 0) =>
   api.post('/messages', { receiverId, content, point }, { params: { userId } })
