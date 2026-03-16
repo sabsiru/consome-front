@@ -65,6 +65,7 @@
           <template v-else>
             <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
             <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" size="xs" /> <span class="nickname-link">{{ nickname }}</span></span>
+            <NotificationBell />
             <button class="message-btn" @click="goMessages()">
               <Mail :size="16" />
               <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
@@ -96,6 +97,8 @@ import { Mail } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
+import NotificationBell from '@/components/common/NotificationBell.vue'
+import { useNotification } from '@/composables/useNotification.js'
 
 const store = useUserStore()
 const { nickname, level, role, emailVerified } = storeToRefs(store)
@@ -109,6 +112,9 @@ watch(() => currentRoute.path, () => {
 })
 
 const favoriteStore = useFavoriteStore()
+
+// SSE 알림 연결 초기화
+useNotification()
 
 const logout = async (event) => {
   if (!event || event.type !== 'click') return
@@ -208,14 +214,13 @@ onMounted(() => {
     fetchUnreadCount()
     favoriteStore.fetchFavorites()
   }
-  setInterval(() => {
-    if (store.userId) fetchUnreadCount()
-  }, 30000)
   eventBus.on('main-boards-updated', fetchFeaturedBoards)
+  eventBus.on('message-received', fetchUnreadCount)
 })
 
 onUnmounted(() => {
   eventBus.off('main-boards-updated', fetchFeaturedBoards)
+  eventBus.off('message-received', fetchUnreadCount)
 })
 </script>
 
