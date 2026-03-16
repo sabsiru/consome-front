@@ -9,15 +9,37 @@
     </div>
 
     <form @submit.prevent="send" class="compose-form">
-      <div class="form-group">
+      <div class="form-group receiver-group">
         <label>받는 사람</label>
-        <input
-          v-model="receiverNickname"
-          type="text"
-          placeholder="닉네임 입력"
-          :disabled="!!initialReceiverId"
-          required
-        />
+        <div class="receiver-input-wrap">
+          <input
+            v-model="receiverNickname"
+            type="text"
+            placeholder="닉네임 입력 (2글자 이상)"
+            :disabled="!!selectedReceiverId"
+            @input="onNicknameInput"
+            required
+          />
+          <button
+            v-if="selectedReceiverId && !initialReceiverId"
+            type="button"
+            class="clear-receiver-btn"
+            @click="clearReceiver"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+        <ul v-if="searchResults.length > 0" class="search-dropdown">
+          <li
+            v-for="user in searchResults"
+            :key="user.userId"
+            @click="selectReceiver(user)"
+          >
+            {{ user.nickname }}
+          </li>
+        </ul>
+        <span v-if="searching" class="search-status">검색 중...</span>
+        <span v-else-if="searchDone && searchResults.length === 0" class="search-status">검색 결과가 없습니다</span>
       </div>
 
       <div class="form-group">
@@ -60,12 +82,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ChevronLeft, Gift } from 'lucide-vue-next'
+import { ChevronLeft, Gift, X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
-import { sendMessage } from '@/api/messageApi.js'
+import { sendMessage, searchUsers } from '@/api/messageApi.js'
 import api from '@/api/axios.js'
 
 const route = useRoute()
@@ -73,10 +95,15 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const initialReceiverId = ref(route.query.to ? Number(route.query.to) : null)
+const selectedReceiverId = ref(initialReceiverId.value)
 const receiverNickname = ref('')
 const content = ref('')
 const point = ref(0)
 const sending = ref(false)
+const searchResults = ref([])
+const searching = ref(false)
+const searchDone = ref(false)
+let searchTimer = null
 
 const fetchReceiverNickname = async () => {
   if (!initialReceiverId.value) return
@@ -86,6 +113,40 @@ const fetchReceiverNickname = async () => {
   } catch (e) {
     console.error(e)
   }
+}
+
+const onNicknameInput = () => {
+  clearTimeout(searchTimer)
+  searchResults.value = []
+  searchDone.value = false
+
+  const query = receiverNickname.value.trim()
+  if (query.length < 2) return
+
+  searchTimer = setTimeout(async () => {
+    searching.value = true
+    try {
+      const { data } = await searchUsers(query)
+      searchResults.value = data
+      searchDone.value = true
+    } catch (e) {
+      console.error(e)
+    } finally {
+      searching.value = false
+    }
+  }, 300)
+}
+
+const selectReceiver = (user) => {
+  selectedReceiverId.value = user.userId
+  receiverNickname.value = user.nickname
+  searchResults.value = []
+}
+
+const clearReceiver = () => {
+  selectedReceiverId.value = null
+  receiverNickname.value = ''
+  searchResults.value = []
 }
 
 const goBack = () => {
@@ -98,18 +159,14 @@ const send = async () => {
     return
   }
 
+  if (!selectedReceiverId.value) {
+    toast.warning('받는 사람을 선택해주세요.')
+    return
+  }
+
   sending.value = true
   try {
-    // receiverId 조회 (닉네임으로)
-    let receiverId = initialReceiverId.value
-    if (!receiverId) {
-      // 닉네임으로 사용자 조회 API 필요 - 임시로 에러 처리
-      toast.warning('받는 사람을 선택해주세요.')
-      sending.value = false
-      return
-    }
-
-    await sendMessage(userStore.userId, receiverId, content.value, point.value || 0)
+    await sendMessage(userStore.userId, selectedReceiverId.value, content.value, point.value || 0)
     toast.success('쪽지를 보냈습니다.')
     router.push({ name: 'MessageList' })
   } catch (e) {
@@ -121,6 +178,7 @@ const send = async () => {
 }
 
 onMounted(fetchReceiverNickname)
+onUnmounted(() => clearTimeout(searchTimer))
 </script>
 
 <style scoped>
@@ -219,6 +277,76 @@ onMounted(fetchReceiverNickname)
 .form-group input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.receiver-group {
+  position: relative;
+}
+
+.receiver-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.receiver-input-wrap input {
+  flex: 1;
+}
+
+.clear-receiver-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.clear-receiver-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-dropdown li {
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.search-dropdown li:hover {
+  background: var(--bg-tertiary);
+}
+
+.search-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .form-group textarea {
