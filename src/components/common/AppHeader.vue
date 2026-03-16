@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="header__inner">
-      <h1 @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></h1>
+      <div @click="goHome" class="title"><img src="@/assets/consome-logo.svg" class="logo" /></div>
 
       <div class="nav">
         <!-- 게시판 검색 -->
@@ -216,11 +216,13 @@ onMounted(() => {
   }
   eventBus.on('main-boards-updated', fetchFeaturedBoards)
   eventBus.on('message-received', fetchUnreadCount)
+  eventBus.on('message-read', fetchUnreadCount)
 })
 
 onUnmounted(() => {
   eventBus.off('main-boards-updated', fetchFeaturedBoards)
   eventBus.off('message-received', fetchUnreadCount)
+  eventBus.off('message-read', fetchUnreadCount)
 })
 </script>
 
@@ -243,6 +245,12 @@ onUnmounted(() => {
 .title {
   cursor: pointer;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .nav {
@@ -250,6 +258,7 @@ onUnmounted(() => {
   align-items: center;
   flex: 1;
   margin-left: 20px;
+  overflow: hidden;
 }
 
 /* 모바일 축약 라벨 (PC에선 숨김) */
