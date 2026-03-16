@@ -105,7 +105,7 @@ const formatDate = (dateStr) => {
   const now = new Date()
   const isToday = date.toDateString() === now.toDateString()
   if (isToday) {
-    return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })
   }
   return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
 }

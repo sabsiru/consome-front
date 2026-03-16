@@ -38,6 +38,7 @@ import { ChevronLeft, Gift } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 import { readMessage, deleteMessage } from '@/api/messageApi.js'
+import { eventBus } from '@/utils/eventBus.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -54,6 +55,7 @@ const fetchMessage = async () => {
   try {
     const { data } = await readMessage(messageId.value, userStore.userId)
     message.value = data
+    eventBus.emit('message-read')
   } catch (e) {
     console.error(e)
     toast.error('쪽지를 불러올 수 없습니다.')
@@ -88,7 +90,8 @@ const formatDate = (dateStr) => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: false
   })
 }
 
