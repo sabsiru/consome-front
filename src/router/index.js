@@ -9,6 +9,7 @@ import AdminRoutes from '@/router/adminRoutes.js'
 import BoardRoutes from '@/router/boardRoutes.js'
 import UserRoutes from '@/router/userRoutes.js'
 import MessageRoutes from '@/router/messageRoutes.js'
+import NotificationRoutes from '@/router/notificationRoutes.js'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
 import { adminGuard, redirectIfLoggedIn } from '@/router/guards/authGuards.js'
 import { useUserStore } from '@/stores/userStore.js'
@@ -26,6 +27,7 @@ const router = createRouter({
     ...BoardRoutes,
     ...UserRoutes,
     ...MessageRoutes,
+    ...NotificationRoutes,
     ...AdminRoutes,
     { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView },
   ],
