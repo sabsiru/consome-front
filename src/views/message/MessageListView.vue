@@ -60,6 +60,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Mail } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 import { getReceivedMessages, getSentMessages } from '@/api/messageApi.js'
 
@@ -81,7 +82,7 @@ const fetchMessages = async () => {
     messages.value = data.content
     totalPages.value = data.totalPages
   } catch (e) {
-    console.error(e)
+    toast.error('쪽지를 불러오지 못했습니다.')
   } finally {
     loading.value = false
   }
