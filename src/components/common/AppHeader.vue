@@ -24,13 +24,10 @@
         <!-- 전체 게시판 버튼 -->
         <RouterLink to="/boards" class="all-boards-btn">전체</RouterLink>
 
-        <!-- 즐겨찾기 버튼 (로그인 시) -->
-        <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★</RouterLink>
-
         <!-- 주요 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger" @click="showMainDropdown = !showMainDropdown">
-            인기
+            주요
             <span class="arrow">▾</span>
           </button>
           <ul v-if="showMainDropdown" class="main-boards-menu">
@@ -45,6 +42,9 @@
           </ul>
         </div>
 
+        <!-- 즐겨찾기 버튼 (로그인 시) -->
+        <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★</RouterLink>
+
         <!-- 모바일 햄버거 버튼 -->
         <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
           <span class="hamburger" :class="{ 'is-open': mobileMenuOpen }">
@@ -57,33 +57,15 @@
           <template v-if="!nickname || nickname.length === 0">
             <RouterLink to="/login" class="link">로그인</RouterLink>
             <RouterLink to="/register" class="link">회원가입</RouterLink>
-            <button
-              class="mode-toggle"
-              :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
-              @click="toggleColorMode"
-            >
-              <Sun v-if="colorMode === 'dark'" :size="15" />
-              <Moon v-else :size="15" />
-            </button>
           </template>
           <template v-else>
             <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
-            <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" size="xs" /> <span class="nickname-link">{{ nickname }}</span></span>
             <NotificationBell />
             <button class="message-btn" @click="goMessages()">
               <Mail :size="16" />
               <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
             </button>
-            <button v-if="role === 'ADMIN'" @click="goAdmin()">관리자페이지</button>
-            <button v-if="role === 'MANAGER'" @click="goManagerBoard()">게시판관리</button>
-            <button
-              class="mode-toggle"
-              :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
-              @click="toggleColorMode"
-            >
-              <Sun v-if="colorMode === 'dark'" :size="15" />
-              <Moon v-else :size="15" />
-            </button>
+            <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" size="xs" /> <span class="nickname-link">{{ nickname }}</span></span>
             <button class="logout-btn" @click="logout">로그아웃</button>
           </template>
         </div>
@@ -93,6 +75,25 @@
     <!-- 모바일 메뉴 배경 오버레이 -->
     <div v-if="mobileMenuOpen" class="mobile-overlay" @click="mobileMenuOpen = false"></div>
   </header>
+
+  <!-- 모드토글 플로팅 오브 (드래그 가능) -->
+  <div ref="modeDockRef" class="mode-dock" :style="modeDockStyle">
+    <button
+      class="mode-orb"
+      :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
+      :style="{
+        '--orb-color': colorMode === 'dark' ? '#fbbf24' : '#94a3b8',
+        '--orb-glow': colorMode === 'dark' ? '#fbbf2450' : '#94a3b850'
+      }"
+      @click="!wasDragged && toggleColorMode()"
+    >
+      <span class="mode-orb__ring"></span>
+      <span class="mode-orb__core">
+        <Sun v-if="colorMode === 'dark'" :size="12" />
+        <Moon v-else :size="12" />
+      </span>
+    </button>
+  </div>
 </template>
 
 <script setup>
@@ -111,12 +112,16 @@ import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
 import NotificationBell from '@/components/common/NotificationBell.vue'
 import { useNotification } from '@/composables/useNotification.js'
+import { useDraggable } from '@/composables/useDraggable.js'
 
 const store = useUserStore()
 const { nickname, level, role, emailVerified } = storeToRefs(store)
 const currentRoute = useRoute()
 
 const mobileMenuOpen = ref(false)
+
+// 모드토글 드래그
+const { elRef: modeDockRef, posStyle: modeDockStyle, wasDragged } = useDraggable('mode-dock-pos', { top: 80, right: 20 })
 
 // Color Mode
 const colorMode = ref(localStorage.getItem('colorMode') || 'dark')
@@ -207,8 +212,6 @@ const hideDropdown = () => {
 }
 
 const goHome = () => router.push('/')
-const goAdmin = () => router.push('/admin')
-const goManagerBoard = () => router.push('/manager/boards')
 const goMyProfile = () => router.push(`/users/${store.userId}`)
 
 const unreadCount = ref(0)
@@ -284,12 +287,12 @@ onUnmounted(() => {
   align-items: center;
   flex: 1;
   margin-left: 20px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .main-boards-dropdown {
   position: relative;
-  margin-left: 12px;
+  margin-left: 8px;
 }
 
 .main-boards-trigger {
@@ -299,7 +302,8 @@ onUnmounted(() => {
   background: transparent;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 8px 12px;
+  height: 32px;
+  padding: 0 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -375,7 +379,8 @@ onUnmounted(() => {
 .search-input {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
-  padding: 8px 14px;
+  height: 32px;
+  padding: 0 14px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   background: var(--bg-tertiary);
@@ -429,7 +434,10 @@ onUnmounted(() => {
   font-size: 12px;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   margin-left: 8px;
@@ -561,28 +569,81 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-/* 다크/라이트 모드 토글 */
-.mode-toggle {
-  display: flex !important;
+/* 모드토글 플로팅 독 — theme-dock과 동일한 디자인 */
+.mode-dock {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
   align-items: center;
   justify-content: center;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px;
-  padding: 0 !important;
-  background: transparent !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 6px !important;
-  color: var(--text-secondary) !important;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  padding: 10px;
+  background: var(--mode-dock-bg, rgba(10, 10, 15, 0.85));
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--mode-dock-border, rgba(255, 255, 255, 0.08));
+  border-radius: 24px;
+  box-shadow: var(--mode-dock-shadow,
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05));
 }
 
-.mode-toggle:hover {
-  color: var(--accent) !important;
-  border-color: var(--accent) !important;
-  background: var(--accent-dim) !important;
+.mode-orb {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: block;
+  line-height: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mode-orb:hover {
+  transform: scale(1.15);
+}
+
+.mode-orb__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--orb-color);
+  opacity: 0.4;
+  transition: opacity 0.2s, transform 0.3s;
+  animation: orb-pulse-mode 2s ease-in-out infinite;
+}
+
+.mode-orb__core {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--orb-color);
+  box-shadow: 0 0 16px var(--orb-glow), 0 0 32px var(--orb-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mode-orb-icon, rgba(0, 0, 0, 0.7));
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.mode-orb:hover .mode-orb__ring {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.mode-orb:hover .mode-orb__core {
+  box-shadow: 0 0 20px var(--orb-glow), 0 0 40px var(--orb-glow);
+}
+
+@keyframes orb-pulse-mode {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.6; }
 }
 
 /* 모바일 햄버거 버튼 */
@@ -718,6 +779,20 @@ onUnmounted(() => {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 99;
+  }
+
+  .mode-dock {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .mode-orb {
+    width: 28px;
+    height: 28px;
+  }
+
+  .mode-orb__core {
+    inset: 5px;
   }
 }
 </style>
