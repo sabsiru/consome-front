@@ -1,7 +1,7 @@
 <template>
   <main class="home">
-    <!-- Theme Switcher -->
-    <div class="theme-dock">
+    <!-- Theme Switcher (어드민 전용) -->
+    <div v-if="isAdmin" class="theme-dock">
       <button
         v-for="theme in themes"
         :key="theme.id"
@@ -89,13 +89,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getPopularPosts, getPopularBoards } from '@/api/navigationApi.js'
+import { useUserStore } from '@/stores/userStore.js'
 
 const router = useRouter()
+const store = useUserStore()
 
-// Theme Switcher
+const isAdmin = computed(() => store.role === 'ADMIN')
+
+// Theme Switcher (어드민 전용 색상 테마)
 const themes = [
   { id: 'default', name: 'Default', color: '#64b5f6', glow: '#64b5f650' },
   { id: 'discord', name: 'Discord', color: '#5865f2', glow: '#5865f250' },
@@ -106,8 +110,18 @@ const currentTheme = ref(localStorage.getItem('theme') || 'default')
 
 const setTheme = (themeId) => {
   currentTheme.value = themeId
-  document.documentElement.dataset.theme = themeId === 'default' ? '' : themeId
   localStorage.setItem('theme', themeId)
+  applyTheme()
+}
+
+const applyTheme = () => {
+  const mode = localStorage.getItem('colorMode') || 'dark'
+  if (mode === 'light') {
+    document.documentElement.dataset.theme = 'light'
+  } else {
+    const theme = currentTheme.value
+    document.documentElement.dataset.theme = theme === 'default' ? '' : theme
+  }
 }
 
 const popularPosts = ref([])
@@ -146,10 +160,6 @@ const goToBoard = (boardId) => {
 }
 
 onMounted(() => {
-  // Initialize theme
-  if (currentTheme.value && currentTheme.value !== 'default') {
-    document.documentElement.dataset.theme = currentTheme.value
-  }
   fetchPopularPosts()
   fetchPopularBoards()
 })
