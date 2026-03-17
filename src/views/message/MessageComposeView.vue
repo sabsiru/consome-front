@@ -15,7 +15,7 @@
           <input
             v-model="receiverNickname"
             type="text"
-            placeholder="닉네임 입력 (2글자 이상)"
+            placeholder="닉네임 입력"
             :disabled="!!selectedReceiverId"
             @input="onNicknameInput"
             required
@@ -29,11 +29,11 @@
             <X :size="16" />
           </button>
         </div>
-        <ul v-if="searchResults.length > 0" class="search-dropdown">
+        <ul v-if="searchResults.length > 0 && !selectedReceiverId" class="search-dropdown">
           <li
             v-for="user in searchResults"
             :key="user.userId"
-            @click="selectReceiver(user)"
+            @mousedown.prevent="selectReceiver(user)"
           >
             {{ user.nickname }}
           </li>
@@ -116,17 +116,22 @@ const fetchReceiverNickname = async () => {
 }
 
 const onNicknameInput = () => {
+  if (selectedReceiverId.value) return
   clearTimeout(searchTimer)
-  searchResults.value = []
   searchDone.value = false
 
   const query = receiverNickname.value.trim()
-  if (query.length < 2) return
+  if (query.length < 1) {
+    searchResults.value = []
+    return
+  }
 
   searchTimer = setTimeout(async () => {
+    if (selectedReceiverId.value) return
     searching.value = true
     try {
       const { data } = await searchUsers(query)
+      if (selectedReceiverId.value) return
       searchResults.value = data
       searchDone.value = true
     } catch (e) {
@@ -138,6 +143,7 @@ const onNicknameInput = () => {
 }
 
 const selectReceiver = (user) => {
+  clearTimeout(searchTimer)
   selectedReceiverId.value = user.userId
   receiverNickname.value = user.nickname
   searchResults.value = []
