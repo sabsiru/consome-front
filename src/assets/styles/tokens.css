@@ -54,6 +54,28 @@
   --section-gap: 160px;
 }
 
+/* ========== THEME: Light ========== */
+[data-theme="light"] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f0f1f3;
+  --bg-hover: #e8e9eb;
+  --border-color: #d8dbe0;
+  --text-primary: #1a1c1e;
+  --text-secondary: #5f6368;
+  --text-muted: #9aa0a6;
+  --accent: #1a73e8;
+  --accent-dim: #1a73e820;
+  --danger: #d93025;
+  --color-background: var(--bg-primary);
+  --color-background-soft: var(--bg-secondary);
+  --color-background-mute: var(--bg-tertiary);
+  --color-border: var(--border-color);
+  --color-border-hover: var(--bg-hover);
+  --color-heading: var(--text-primary);
+  --color-text: var(--text-primary);
+}
+
 /* ========== THEME: Discord ========== */
 [data-theme="discord"] {
   --bg-primary: #1e1f22;
