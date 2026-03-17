@@ -445,7 +445,7 @@ onUnmounted(() => {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .user-info {
@@ -480,10 +480,11 @@ onUnmounted(() => {
 .nav-auth button {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
+  height: 32px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 6px 14px;
+  border-radius: 6px;
+  padding: 0 12px;
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -518,9 +519,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px;
+  padding: 0 !important;
   background: transparent !important;
   border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
 }
 
 .message-btn:hover {
@@ -561,13 +566,13 @@ onUnmounted(() => {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px;
   padding: 0 !important;
-  background: var(--bg-tertiary) !important;
+  background: transparent !important;
   border: 1px solid var(--border-color) !important;
-  border-radius: 8px;
+  border-radius: 6px !important;
   color: var(--text-secondary) !important;
   cursor: pointer;
   transition: all 0.2s ease;

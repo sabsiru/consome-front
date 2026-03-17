@@ -125,10 +125,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
   background: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
