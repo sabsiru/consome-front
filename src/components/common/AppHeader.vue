@@ -22,10 +22,7 @@
         </div>
 
         <!-- 전체 게시판 버튼 -->
-        <RouterLink to="/boards" class="all-boards-btn">
-          <span class="label-full">전체 게시판</span>
-          <span class="label-short">전체</span>
-        </RouterLink>
+        <RouterLink to="/boards" class="all-boards-btn">전체</RouterLink>
 
         <!-- 즐겨찾기 버튼 (로그인 시) -->
         <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★</RouterLink>
@@ -33,8 +30,7 @@
         <!-- 주요 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger" @click="showMainDropdown = !showMainDropdown">
-            <span class="label-full">주요 게시판</span>
-            <span class="label-short">주요</span>
+            인기
             <span class="arrow">▾</span>
           </button>
           <ul v-if="showMainDropdown" class="main-boards-menu">
@@ -48,6 +44,16 @@
             <li v-if="!featuredBoards.pinnedBoards?.length && !featuredBoards.popularBoards?.length" class="empty">등록된 주요 게시판이 없습니다</li>
           </ul>
         </div>
+
+        <!-- 다크/라이트 모드 토글 -->
+        <button
+          class="mode-toggle"
+          :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
+          @click="toggleColorMode"
+        >
+          <Sun v-if="colorMode === 'dark'" :size="15" />
+          <Moon v-else :size="15" />
+        </button>
 
         <!-- 모바일 햄버거 버튼 -->
         <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
@@ -93,7 +99,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
-import { Mail } from 'lucide-vue-next'
+import { Mail, Sun, Moon } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
@@ -105,6 +111,20 @@ const { nickname, level, role, emailVerified } = storeToRefs(store)
 const currentRoute = useRoute()
 
 const mobileMenuOpen = ref(false)
+
+// Color Mode
+const colorMode = ref(localStorage.getItem('colorMode') || 'dark')
+
+const toggleColorMode = () => {
+  colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
+  localStorage.setItem('colorMode', colorMode.value)
+  if (colorMode.value === 'light') {
+    document.documentElement.dataset.theme = 'light'
+  } else {
+    const theme = localStorage.getItem('theme') || 'default'
+    document.documentElement.dataset.theme = theme === 'default' ? '' : theme
+  }
+}
 
 // 라우트 변경 시 모바일 메뉴 닫기
 watch(() => currentRoute.path, () => {
@@ -259,11 +279,6 @@ onUnmounted(() => {
   flex: 1;
   margin-left: 20px;
   overflow: hidden;
-}
-
-/* 모바일 축약 라벨 (PC에선 숨김) */
-.label-short {
-  display: none;
 }
 
 .main-boards-dropdown {
@@ -535,6 +550,30 @@ onUnmounted(() => {
   justify-content: center;
 }
 
+/* 다크/라이트 모드 토글 */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: auto;
+  margin-right: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.mode-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
 /* 모바일 햄버거 버튼 */
 .mobile-menu-btn {
   display: none;
@@ -583,15 +622,6 @@ onUnmounted(() => {
   .nav {
     margin-left: 8px;
     gap: 4px;
-  }
-
-  /* 텍스트 축약 */
-  .label-full {
-    display: none;
-  }
-
-  .label-short {
-    display: inline;
   }
 
   /* 검색 입력 축소 */
