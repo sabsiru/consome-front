@@ -12,6 +12,8 @@ const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
 
+const toasterTheme = ref(localStorage.getItem('colorMode') === 'light' ? 'light' : 'dark')
+
 const onlineCount = ref(0)
 const visitedBoards = ref([])
 
@@ -74,6 +76,21 @@ let onlineTimer = null
 let visitedTimer = null
 
 onMounted(() => {
+  // Initialize theme
+  const colorMode = localStorage.getItem('colorMode') || 'dark'
+  if (colorMode === 'light') {
+    document.documentElement.dataset.theme = 'light'
+  } else {
+    const theme = localStorage.getItem('theme') || 'default'
+    document.documentElement.dataset.theme = theme === 'default' ? '' : theme
+  }
+
+  // data-theme 변경 감지 → toaster 테마 동기화
+  const observer = new MutationObserver(() => {
+    toasterTheme.value = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
+  })
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+
   fetchOnlineCount()
   fetchVisitedBoards()
   onlineTimer = setInterval(fetchOnlineCount, 30000)
@@ -142,7 +159,7 @@ watch(visitedBoards, () => {
     </main>
   </div>
 
-  <Toaster position="top-center" :duration="3000" theme="dark" rich-colors close-button />
+  <Toaster position="top-center" :duration="3000" :theme="toasterTheme" rich-colors close-button />
 
   <footer class="app-footer">
     <div class="app-footer__inner">
