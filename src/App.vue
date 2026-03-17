@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter, useRoute } from 'vue-router'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import AppHeader from './components/common/AppHeader.vue'
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
@@ -70,11 +70,19 @@ watch(() => route.path, () => {
   }
 })
 
+let onlineTimer = null
+let visitedTimer = null
+
 onMounted(() => {
   fetchOnlineCount()
   fetchVisitedBoards()
-  setInterval(fetchOnlineCount, 30000)
-  setInterval(fetchVisitedBoards, 30000)
+  onlineTimer = setInterval(fetchOnlineCount, 30000)
+  visitedTimer = setInterval(fetchVisitedBoards, 30000)
+})
+
+onUnmounted(() => {
+  clearInterval(onlineTimer)
+  clearInterval(visitedTimer)
 })
 
 // visitedBoards 변경 시 스크롤 체크
