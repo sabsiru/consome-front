@@ -45,16 +45,6 @@
           </ul>
         </div>
 
-        <!-- 다크/라이트 모드 토글 -->
-        <button
-          class="mode-toggle"
-          :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
-          @click="toggleColorMode"
-        >
-          <Sun v-if="colorMode === 'dark'" :size="15" />
-          <Moon v-else :size="15" />
-        </button>
-
         <!-- 모바일 햄버거 버튼 -->
         <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
           <span class="hamburger" :class="{ 'is-open': mobileMenuOpen }">
@@ -67,6 +57,14 @@
           <template v-if="!nickname || nickname.length === 0">
             <RouterLink to="/login" class="link">로그인</RouterLink>
             <RouterLink to="/register" class="link">회원가입</RouterLink>
+            <button
+              class="mode-toggle"
+              :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
+              @click="toggleColorMode"
+            >
+              <Sun v-if="colorMode === 'dark'" :size="15" />
+              <Moon v-else :size="15" />
+            </button>
           </template>
           <template v-else>
             <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
@@ -78,6 +76,14 @@
             </button>
             <button v-if="role === 'ADMIN'" @click="goAdmin()">관리자페이지</button>
             <button v-if="role === 'MANAGER'" @click="goManagerBoard()">게시판관리</button>
+            <button
+              class="mode-toggle"
+              :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
+              @click="toggleColorMode"
+            >
+              <Sun v-if="colorMode === 'dark'" :size="15" />
+              <Moon v-else :size="15" />
+            </button>
             <button class="logout-btn" @click="logout">로그아웃</button>
           </template>
         </div>
@@ -552,26 +558,26 @@ onUnmounted(() => {
 
 /* 다크/라이트 모드 토글 */
 .mode-toggle {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  margin-left: auto;
-  margin-right: 8px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px;
+  padding: 0 !important;
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 8px;
-  color: var(--text-secondary);
+  color: var(--text-secondary) !important;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .mode-toggle:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-dim);
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: var(--accent-dim) !important;
 }
 
 /* 모바일 햄버거 버튼 */
