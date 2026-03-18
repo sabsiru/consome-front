@@ -82,8 +82,9 @@
       class="mode-orb"
       :title="colorMode === 'dark' ? '라이트 모드' : '다크 모드'"
       :style="{
-        '--orb-color': colorMode === 'dark' ? '#fbbf24' : '#94a3b8',
-        '--orb-glow': colorMode === 'dark' ? '#fbbf2450' : '#94a3b850'
+        '--orb-color': colorMode === 'dark' ? '#ffffff' : '#000000',
+        '--orb-glow': colorMode === 'dark' ? '#ffffff50' : '#00000050',
+        '--mode-orb-icon': colorMode === 'dark' ? '#000000' : '#ffffff'
       }"
       @click="!wasDragged && toggleColorMode()"
     >
