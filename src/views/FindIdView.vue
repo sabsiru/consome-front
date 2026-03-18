@@ -1,40 +1,33 @@
 <template>
-  <div class="reset-view">
-    <section class="reset-container">
-      <h2>비밀번호 재설정</h2>
+  <div class="find-id-view">
+    <section class="find-id-container">
+      <h2>아이디 찾기</h2>
 
-      <!-- 요청 성공 -->
-      <div v-if="sent" class="success-message">
-        <div class="success-icon">✉️</div>
-        <h3>메일 발송 완료</h3>
-        <p>
-          <strong>{{ sentEmail }}</strong>으로 비밀번호 재설정 링크를 발송했습니다.
-        </p>
-        <p class="sub-text">
-          메일함을 확인하고 재설정 링크를 클릭해주세요.<br />
-          링크는 1시간 동안 유효합니다.
-        </p>
-        <button class="login-btn" @click="router.push('/login')">로그인으로 돌아가기</button>
+      <!-- 결과 -->
+      <div v-if="result" class="result-message">
+        <div class="result-icon">🔍</div>
+        <h3>아이디 찾기 완료</h3>
+        <p>입력하신 이메일로 가입된 아이디입니다.</p>
+        <div class="masked-id">{{ result }}</div>
+        <div class="action-buttons">
+          <button class="login-btn" @click="router.push('/login')">로그인</button>
+          <button class="reset-btn" @click="router.push('/password/reset-request')">비밀번호 재설정</button>
+        </div>
       </div>
 
-      <!-- 입력 폼 -->
-      <form v-else @submit.prevent="requestReset">
+      <!-- 이메일 입력 폼 -->
+      <form v-else @submit.prevent="findId">
         <p class="description">
-          가입 시 등록한 아이디와 이메일을 입력하면<br />비밀번호 재설정 링크를 보내드립니다.
+          가입 시 등록한 이메일을 입력하면<br />아이디를 알려드립니다.
         </p>
-
-        <div class="form-group">
-          <label for="loginId">아이디</label>
-          <input id="loginId" v-model="loginId" type="text" placeholder="아이디를 입력해주세요" required />
-        </div>
 
         <div class="form-group">
           <label for="email">이메일</label>
           <input id="email" v-model="email" type="email" placeholder="example@email.com" required />
         </div>
 
-        <button type="submit" :disabled="isLoading || !email || !loginId">
-          {{ isLoading ? '발송 중...' : '재설정 링크 발송' }}
+        <button type="submit" :disabled="isLoading || !email">
+          {{ isLoading ? '조회 중...' : '아이디 찾기' }}
         </button>
 
         <p v-if="error" class="error">{{ error }}</p>
@@ -53,27 +46,19 @@ import { useRouter } from 'vue-router'
 import axios from '@/api/axios'
 
 const router = useRouter()
-const loginId = ref('')
 const email = ref('')
 const isLoading = ref(false)
 const error = ref('')
-const sent = ref(false)
-const sentEmail = ref('')
+const result = ref('')
 
-const requestReset = async () => {
+const findId = async () => {
   isLoading.value = true
   error.value = ''
   try {
-    const { data } = await axios.post('/users/password/reset-request', {
-      loginId: loginId.value,
-      email: email.value,
-    })
-
-    sentEmail.value = email.value
-    sent.value = true
+    const { data } = await axios.post('/users/find-id', { email: email.value })
+    result.value = data.maskedLoginId
   } catch (err) {
-    const message = err.response?.data?.message
-    error.value = message || '요청 처리 중 오류가 발생했습니다.'
+    error.value = err.response?.data?.message || '조회 중 오류가 발생했습니다.'
   } finally {
     isLoading.value = false
   }
@@ -81,7 +66,7 @@ const requestReset = async () => {
 </script>
 
 <style scoped>
-.reset-view {
+.find-id-view {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,7 +75,7 @@ const requestReset = async () => {
   padding: 20px;
 }
 
-.reset-container {
+.find-id-container {
   width: 100%;
   max-width: 400px;
   padding: 40px;
@@ -99,7 +84,7 @@ const requestReset = async () => {
   border-radius: 12px;
 }
 
-.reset-container h2 {
+.find-id-container h2 {
   font-family: 'Outfit', sans-serif;
   font-size: 24px;
   font-weight: 600;
@@ -149,7 +134,7 @@ const requestReset = async () => {
   box-shadow: 0 0 0 2px var(--accent-dim);
 }
 
-.reset-container button[type="submit"] {
+.find-id-container button[type="submit"] {
   width: 100%;
   padding: 14px;
   background: var(--accent);
@@ -164,11 +149,11 @@ const requestReset = async () => {
   margin-top: 8px;
 }
 
-.reset-container button[type="submit"]:hover {
+.find-id-container button[type="submit"]:hover {
   background: #00e6b8;
 }
 
-.reset-container button[type="submit"]:disabled {
+.find-id-container button[type="submit"]:disabled {
   background: var(--text-muted);
   cursor: not-allowed;
 }
@@ -202,52 +187,78 @@ const requestReset = async () => {
   color: var(--accent);
 }
 
-.success-message {
+.result-message {
   text-align: center;
   padding: 20px 0;
 }
 
-.success-icon {
+.result-icon {
   font-size: 48px;
   margin-bottom: 16px;
 }
 
-.success-message h3 {
+.result-message h3 {
   font-family: 'Outfit', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.result-message p {
+  color: var(--text-secondary);
+  font-size: 14px;
   margin-bottom: 16px;
 }
 
-.success-message p {
+.masked-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 8px;
-}
-
-.success-message .sub-text {
-  color: var(--text-secondary);
-  font-size: 13px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
   margin-bottom: 24px;
+  letter-spacing: 2px;
 }
 
-.login-btn {
-  width: 100%;
-  padding: 14px;
-  background: var(--accent);
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.login-btn,
+.reset-btn {
+  flex: 1;
+  padding: 12px;
   border: none;
   border-radius: 6px;
-  color: var(--bg-primary);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
+.login-btn {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
 .login-btn:hover {
   background: #00e6b8;
+}
+
+.reset-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.reset-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
 }
 </style>
