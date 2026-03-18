@@ -130,10 +130,6 @@ const register = async () => {
       password: password.value,
     })
 
-    if (res.data.verifyToken) {
-      console.log('[DEV] 이메일 인증 URL:', `${window.location.origin}/email/verify?token=${res.data.verifyToken}`)
-    }
-
     registeredEmail.value = email.value
     registered.value = true
   } catch (error) {
