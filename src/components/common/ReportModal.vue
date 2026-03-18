@@ -65,8 +65,8 @@ import { useUserStore } from '@/stores/userStore.js'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
-  targetType: { type: String, required: true }, // POST, COMMENT, USER
-  targetId: { type: Number, required: true }
+  targetType: { type: String, default: '' }, // POST, COMMENT, USER
+  targetId: { type: Number, default: null }
 })
 
 const emit = defineEmits(['close', 'success'])

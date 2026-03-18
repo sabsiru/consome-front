@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  level: { type: Number, required: true },
+  level: { type: Number, default: 1 },
   role: { type: String, default: null },
   size: { type: String, default: 'md' } // 'xs' | 'sm' | 'md'
 })
