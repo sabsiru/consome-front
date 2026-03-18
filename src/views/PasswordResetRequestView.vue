@@ -62,10 +62,6 @@ const requestReset = async () => {
       email: email.value,
     })
 
-    if (data.token) {
-      const resetUrl = `${window.location.origin}/password/reset?token=${data.token}`
-      console.log('[DEV] 비밀번호 재설정 URL:', resetUrl)
-    }
 
     sentEmail.value = email.value
     sent.value = true
