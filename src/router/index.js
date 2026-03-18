@@ -11,6 +11,9 @@ import UserRoutes from '@/router/userRoutes.js'
 import MessageRoutes from '@/router/messageRoutes.js'
 import NotificationRoutes from '@/router/notificationRoutes.js'
 import BoardManageView from '@/views/admin/BoardManageView.vue'
+import FindIdView from '@/views/FindIdView.vue'
+import PasswordResetRequestView from '@/views/PasswordResetRequestView.vue'
+import PasswordResetView from '@/views/PasswordResetView.vue'
 import { adminGuard, redirectIfLoggedIn } from '@/router/guards/authGuards.js'
 import { useUserStore } from '@/stores/userStore.js'
 import { toast } from 'vue-sonner'
@@ -23,6 +26,9 @@ const router = createRouter({
     { path: '/favorites', name: 'favorites', component: FavoriteBoardsView, meta: { requiresAuth: true } },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/login', name: 'login', component: LoginView },
+    { path: '/find-id', name: 'find-id', component: FindIdView },
+    { path: '/password/reset-request', name: 'password-reset-request', component: PasswordResetRequestView },
+    { path: '/password/reset', name: 'password-reset', component: PasswordResetView },
     { path: '/manager/boards', name: 'manager-boards', component: BoardManageView },
     ...BoardRoutes,
     ...UserRoutes,
