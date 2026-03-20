@@ -11,3 +11,9 @@ export const markAsRead = (notificationId, userId) =>
 
 export const markAllAsRead = (userId) =>
   api.patch('/notifications/read-all', null, { params: { userId } })
+
+export const deleteNotification = (notificationId, userId) =>
+  api.delete(`/notifications/${notificationId}`, { params: { userId } })
+
+export const deleteAllNotifications = (userId) =>
+  api.delete('/notifications', { params: { userId } })

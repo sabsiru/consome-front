@@ -61,11 +61,11 @@
           <template v-else>
             <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
             <NotificationBell />
-            <button class="message-btn" @click="goMessages()">
-              <Mail :size="16" />
-              <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
-            </button>
-            <span class="user-info" @click="goMyProfile()"><LevelBadge :level="level" :role="role" size="xs" /> <span class="nickname-link">{{ nickname }}</span></span>
+            <span class="user-info" @click="goMyProfile()">
+              <LevelBadge :level="level" :role="role" size="xs" />
+              <span class="nickname-link">{{ nickname }}</span>
+              <User :size="16" class="user-icon-mobile" />
+            </span>
             <button class="logout-btn" @click="logout">로그아웃</button>
           </template>
         </div>
@@ -107,9 +107,8 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
-import { Mail, Sun, Moon } from 'lucide-vue-next'
+import { Sun, Moon, User } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
-import { getUnreadCount } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
 import NotificationBell from '@/components/common/NotificationBell.vue'
 import { useNotification } from '@/composables/useNotification.js'
@@ -215,25 +214,10 @@ const hideDropdown = () => {
 const goHome = () => router.push('/')
 const goMyProfile = () => router.push(`/users/${store.userId}`)
 
-const unreadCount = ref(0)
-const goMessages = () => router.push('/messages')
-
-const fetchUnreadCount = async () => {
-  if (!store.userId) return
-  try {
-    const { data } = await getUnreadCount(store.userId)
-    unreadCount.value = data.count
-  } catch (e) {
-    console.error('[AppHeader] 안읽은 쪽지 조회 실패', e)
-  }
-}
-
 watch(() => store.userId, (newVal) => {
   if (newVal) {
-    fetchUnreadCount()
     favoriteStore.fetchFavorites()
   } else {
-    unreadCount.value = 0
     favoriteStore.clear()
   }
 }, { immediate: true })
@@ -241,18 +225,13 @@ watch(() => store.userId, (newVal) => {
 onMounted(() => {
   fetchFeaturedBoards()
   if (store.userId) {
-    fetchUnreadCount()
     favoriteStore.fetchFavorites()
   }
   eventBus.on('main-boards-updated', fetchFeaturedBoards)
-  eventBus.on('message-received', fetchUnreadCount)
-  eventBus.on('message-read', fetchUnreadCount)
 })
 
 onUnmounted(() => {
   eventBus.off('main-boards-updated', fetchFeaturedBoards)
-  eventBus.off('message-received', fetchUnreadCount)
-  eventBus.off('message-read', fetchUnreadCount)
 })
 </script>
 
@@ -462,11 +441,18 @@ onUnmounted(() => {
   font-size: 12px;
   color: var(--text-primary);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .nickname-link:hover {
   color: var(--accent);
   text-decoration: underline;
+}
+
+.user-icon-mobile {
+  display: none;
 }
 
 .link {
@@ -523,26 +509,6 @@ onUnmounted(() => {
   filter: brightness(1.1);
 }
 
-.message-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px;
-  padding: 0 !important;
-  background: transparent !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 6px !important;
-}
-
-.message-btn:hover {
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
-  background: transparent !important;
-}
-
 .email-unverified-badge {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -551,23 +517,6 @@ onUnmounted(() => {
   border-radius: 4px;
   padding: 3px 8px;
   cursor: default;
-}
-
-.unread-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  background: var(--danger, #ef4444);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* 모드토글 플로팅 독 — theme-dock과 동일한 디자인 */
@@ -764,9 +713,18 @@ onUnmounted(() => {
     text-align: center;
   }
 
-  .message-btn {
-    width: 100% !important;
-    justify-content: center;
+  /* 인라인(헤더)에서는 닉네임 숨기고 아이콘 표시, 드로어에서는 닉네임 유지 */
+  .nav-auth:not(.is-open) .nickname-link {
+    display: none;
+  }
+
+  .nav-auth:not(.is-open) .user-icon-mobile {
+    display: inline-block;
+  }
+
+  /* 드로어 열렸을 때는 아이콘 숨기고 닉네임 표시 */
+  .nav-auth.is-open .user-icon-mobile {
+    display: none;
   }
 
   .email-unverified-badge {

@@ -6,6 +6,16 @@
           <LevelBadge :level="profile.level" :role="profile.role" />
           <span class="user-profile__nickname">{{ profile.nickname }}</span>
         </div>
+        <div v-if="levelInfo" class="user-profile__exp">
+          <span class="user-profile__exp-text">
+            {{ levelInfo.levelName }}
+            <template v-if="isMaxLevel">(MAX)</template>
+            <template v-else>({{ currentExp.toLocaleString() }} / {{ segmentTotal.toLocaleString() }})</template>
+          </span>
+          <div class="user-profile__exp-bar">
+            <div class="user-profile__exp-fill" :style="{ width: expPercent + '%' }"></div>
+          </div>
+        </div>
         <div class="user-profile__stats">
           <span>{{ profile.point?.toLocaleString() }}P</span>
           <span class="user-profile__sep">·</span>
@@ -17,11 +27,20 @@
       </div>
 
       <div class="user-profile__actions">
+        <button v-if="isMyProfile" class="btn btn-primary" @click="goMessages">
+          <Mail :size="16" />
+          쪽지함
+          <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+        </button>
         <button v-if="canSendMessage" class="btn btn-primary" @click="goSendMessage">
           <Mail :size="16" />
           쪽지 보내기
         </button>
         <template v-if="isMyProfile">
+          <button v-if="isAdminOrManager" class="btn btn-secondary" @click="goManageBoard">
+            <Shield :size="16" />
+            관리 게시판
+          </button>
           <button v-if="!userStore.emailVerified" class="btn btn-warning" @click="resendVerificationEmail">이메일 인증하기</button>
           <button class="btn btn-secondary" @click="showNicknameModal = true">닉네임 변경</button>
           <button class="btn btn-secondary" @click="showPasswordModal = true">비밀번호 변경</button>
@@ -145,9 +164,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Mail } from 'lucide-vue-next'
+import { Mail, Shield } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
+import { getUnreadCount } from '@/api/messageApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserPostList from '@/components/user/UserPostList.vue'
@@ -160,9 +180,28 @@ const userStore = useUserStore()
 const userId = computed(() => Number(route.params.userId))
 const isMyProfile = computed(() => userStore.userId === userId.value)
 const canSendMessage = computed(() => userStore.userId && !isMyProfile.value)
+const isAdminOrManager = computed(() => ['ADMIN', 'MANAGER'].includes(profile.value.role))
 
 const profile = ref({})
+const levelInfo = ref(null)
+const unreadCount = ref(0)
 const activeTab = ref('posts')
+
+// 경험치 계산
+const isMaxLevel = computed(() => levelInfo.value && levelInfo.value.nextLevelExp === null)
+const currentExp = computed(() => {
+  if (!levelInfo.value || isMaxLevel.value) return 0
+  return levelInfo.value.totalExp - levelInfo.value.requiredExp
+})
+const segmentTotal = computed(() => {
+  if (!levelInfo.value || isMaxLevel.value) return 1
+  return levelInfo.value.nextLevelExp - levelInfo.value.requiredExp
+})
+const expPercent = computed(() => {
+  if (isMaxLevel.value) return 100
+  if (!segmentTotal.value) return 0
+  return Math.min(100, Math.round((currentExp.value / segmentTotal.value) * 100))
+})
 
 // 모달 상태
 const showNicknameModal = ref(false)
@@ -205,6 +244,25 @@ const pwStrength = computed(() => {
 const loadProfile = async () => {
   const res = await api.get(`/users/${userId.value}`)
   profile.value = res.data
+}
+
+const loadLevelInfo = async () => {
+  try {
+    const res = await api.get(`/users/${userId.value}/level`)
+    levelInfo.value = res.data
+  } catch (e) {
+    console.error('[UserProfile] 레벨 정보 조회 실패', e)
+  }
+}
+
+const fetchUnreadCount = async () => {
+  if (!isMyProfile.value || !userStore.userId) return
+  try {
+    const { data } = await getUnreadCount(userStore.userId)
+    unreadCount.value = data.count
+  } catch (e) {
+    console.error('[UserProfile] 안읽은 쪽지 조회 실패', e)
+  }
 }
 
 const changeNickname = async () => {
@@ -257,6 +315,18 @@ const goSendMessage = () => {
   router.push({ name: 'MessageCompose', query: { to: userId.value } })
 }
 
+const goMessages = () => {
+  router.push('/messages')
+}
+
+const goManageBoard = () => {
+  if (profile.value.role === 'ADMIN') {
+    router.push({ name: 'admin' })
+  } else {
+    router.push({ name: 'manager-boards' })
+  }
+}
+
 const resendVerificationEmail = async () => {
   try {
     await api.post('/users/email/resend')
@@ -268,10 +338,14 @@ const resendVerificationEmail = async () => {
 
 onMounted(() => {
   loadProfile()
+  loadLevelInfo()
+  fetchUnreadCount()
 })
 
 watch(userId, () => {
   loadProfile()
+  loadLevelInfo()
+  fetchUnreadCount()
 })
 </script>
 
@@ -315,6 +389,33 @@ watch(userId, () => {
   letter-spacing: -0.5px;
 }
 
+/* Experience Bar */
+.user-profile__exp {
+  margin-bottom: 12px;
+}
+
+.user-profile__exp-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.user-profile__exp-bar {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.user-profile__exp-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
 .user-profile__stats {
   display: flex;
   align-items: center;
@@ -348,10 +449,27 @@ watch(userId, () => {
   flex-shrink: 0;
 }
 
-.user-profile__actions .btn-primary {
+.user-profile__actions .btn-primary,
+.user-profile__actions .btn-secondary {
   display: flex;
   align-items: center;
   gap: 6px;
+  position: relative;
+}
+
+.user-profile__actions .unread-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--danger, #ef4444);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
 }
 
 /* ==========================================

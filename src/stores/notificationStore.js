@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getNotifications, getUnreadNotificationCount, markAsRead, markAllAsRead } from '@/api/notificationApi.js'
+import { getNotifications, getUnreadNotificationCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications } from '@/api/notificationApi.js'
 
 export const useNotificationStore = defineStore('notification', {
   state: () => ({
@@ -51,6 +51,29 @@ export const useNotificationStore = defineStore('notification', {
         this.unreadCount = 0
       } catch (e) {
         console.error('[NotificationStore] 전체 읽음 처리 실패', e)
+      }
+    },
+
+    async deleteOne(notificationId, userId) {
+      try {
+        const target = this.notifications.find(n => n.id === notificationId)
+        await deleteNotification(notificationId, userId)
+        this.notifications = this.notifications.filter(n => n.id !== notificationId)
+        if (target && !target.isRead) {
+          this.unreadCount = Math.max(0, this.unreadCount - 1)
+        }
+      } catch (e) {
+        console.error('[NotificationStore] 알림 삭제 실패', e)
+      }
+    },
+
+    async deleteAll(userId) {
+      try {
+        await deleteAllNotifications(userId)
+        this.notifications = []
+        this.unreadCount = 0
+      } catch (e) {
+        console.error('[NotificationStore] 전체 삭제 실패', e)
       }
     },
 
