@@ -2,7 +2,10 @@
   <div class="notification-page">
     <div class="page-header">
       <h2 class="page-title">알림</h2>
-      <button v-if="unreadCount > 0" class="read-all-btn" @click="handleMarkAllAsRead">전체 읽음 처리</button>
+      <div class="page-actions">
+        <button v-if="unreadCount > 0" class="read-all-btn" @click="handleMarkAllAsRead">전체 읽음</button>
+        <button v-if="notifications.length > 0" class="delete-all-btn" @click="handleDeleteAll">전체 삭제</button>
+      </div>
     </div>
 
     <div v-if="notifications.length === 0" class="empty-state">
@@ -19,7 +22,10 @@
       >
         <div class="item-top">
           <span class="notification-type" :class="n.type.toLowerCase()">{{ typeLabel(n.type) }}</span>
-          <span class="notification-time">{{ formatDate(n.createdAt) }}</span>
+          <div class="item-top-right">
+            <span class="notification-time">{{ formatDate(n.createdAt) }}</span>
+            <button class="item-delete-btn" @click.stop="handleDelete(n.id)" title="삭제">✕</button>
+          </div>
         </div>
         <p class="notification-message">{{ n.message }}</p>
         <p v-if="n.actorNickname" class="notification-actor">by {{ n.actorNickname }}</p>
@@ -64,6 +70,14 @@ const handleClick = (notification) => {
   } else {
     router.push(`/boards/${notification.referenceId}/posts/${notification.targetId}`)
   }
+}
+
+const handleDelete = (notificationId) => {
+  notificationStore.deleteOne(notificationId, userStore.userId)
+}
+
+const handleDeleteAll = () => {
+  notificationStore.deleteAll(userStore.userId)
 }
 
 const handleMarkAllAsRead = () => {
@@ -112,21 +126,41 @@ const formatDate = (dateStr) => {
   color: var(--text-primary);
 }
 
-.read-all-btn {
+.page-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.read-all-btn,
+.delete-all-btn {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
-  color: var(--accent);
   background: transparent;
-  border: 1px solid var(--accent);
+  border: 1px solid;
   border-radius: 4px;
   padding: 6px 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
+.read-all-btn {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .read-all-btn:hover {
   background: var(--accent);
   color: var(--bg-primary);
+}
+
+.delete-all-btn {
+  color: var(--danger, #ef4444);
+  border-color: var(--danger, #ef4444);
+}
+
+.delete-all-btn:hover {
+  background: var(--danger, #ef4444);
+  color: white;
 }
 
 .empty-state {
@@ -168,6 +202,33 @@ const formatDate = (dateStr) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.item-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-delete-btn {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.notification-item:hover .item-delete-btn {
+  opacity: 1;
+}
+
+.item-delete-btn:hover {
+  color: var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .notification-type {

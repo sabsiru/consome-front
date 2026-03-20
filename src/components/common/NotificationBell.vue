@@ -23,6 +23,9 @@
           :class="{ unread: !n.isRead }"
           @click="handleClick(n)"
         >
+          <button class="delete-btn" @click.stop="handleDelete(n.id)" title="삭제">
+            <X :size="12" />
+          </button>
           <span class="notification-type" :class="n.type.toLowerCase()">{{ typeLabel(n.type) }}</span>
           <span class="notification-message">{{ n.message }}</span>
           <span class="notification-time">{{ timeAgo(n.createdAt) }}</span>
@@ -43,7 +46,7 @@ import { useRouter, RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/userStore.js'
 import { useNotificationStore } from '@/stores/notificationStore.js'
 import { storeToRefs } from 'pinia'
-import { Bell } from 'lucide-vue-next'
+import { Bell, X } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -73,6 +76,10 @@ const handleClick = (notification) => {
     // COMMENT, REPLY → 게시글로 이동 (referenceId = boardId)
     router.push(`/boards/${notification.referenceId}/posts/${notification.targetId}`)
   }
+}
+
+const handleDelete = (notificationId) => {
+  notificationStore.deleteOne(notificationId, userStore.userId)
 }
 
 const handleMarkAllAsRead = () => {
@@ -224,13 +231,43 @@ onUnmounted(() => {
 }
 
 .notification-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 12px 16px;
+  padding-right: 32px;
   cursor: pointer;
   transition: background 0.15s ease;
   border-bottom: 1px solid var(--border-color);
+}
+
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.notification-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .notification-item:last-child {
