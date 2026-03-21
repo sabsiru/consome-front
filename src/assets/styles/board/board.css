@@ -325,7 +325,7 @@
   }
 
   .page-board__actions {
-    width: 100%;
+    align-self: flex-end;
   }
 
   .page-board__tabs {
