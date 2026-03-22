@@ -45,7 +45,13 @@
         <!-- 즐겨찾기 버튼 (로그인 시) -->
         <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★</RouterLink>
 
-        <!-- 모바일 햄버거 버튼 -->
+        <!-- 모바일: 알림 + 프로필 아이콘 + 햄버거 -->
+        <div v-if="nickname" class="mobile-icons">
+          <NotificationBell class="mobile-notification" />
+          <button class="mobile-profile-btn" @click="goMyProfile()">
+            <User :size="16" />
+          </button>
+        </div>
         <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
           <span class="hamburger" :class="{ 'is-open': mobileMenuOpen }">
             <span></span><span></span><span></span>
@@ -64,8 +70,8 @@
             <span class="user-info" @click="goMyProfile()">
               <LevelBadge :level="level" :role="role" size="xs" />
               <span class="nickname-link">{{ nickname }}</span>
-              <User :size="16" class="user-icon-mobile" />
             </span>
+            <span class="mobile-point">{{ point.toLocaleString() }}P</span>
             <button class="logout-btn" @click="logout">로그아웃</button>
           </template>
         </div>
@@ -115,7 +121,7 @@ import { useNotification } from '@/composables/useNotification.js'
 import { useDraggable } from '@/composables/useDraggable.js'
 
 const store = useUserStore()
-const { nickname, level, role, emailVerified } = storeToRefs(store)
+const { nickname, level, role, emailVerified, point } = storeToRefs(store)
 const currentRoute = useRoute()
 
 const mobileMenuOpen = ref(false)
@@ -451,7 +457,9 @@ onUnmounted(() => {
   text-decoration: underline;
 }
 
-.user-icon-mobile {
+.mobile-profile-btn,
+.mobile-point,
+.mobile-icons {
   display: none;
 }
 
@@ -673,10 +681,15 @@ onUnmounted(() => {
     height: 24px;
   }
 
-  /* 햄버거 표시 - 우측 정렬 */
+  /* 햄버거 표시 */
   .mobile-menu-btn {
     display: flex;
     margin-left: auto;
+  }
+
+  /* mobile-icons가 있으면 그쪽에서 auto 처리 */
+  .mobile-icons + .mobile-menu-btn {
+    margin-left: 4px;
   }
 
   /* 인증 영역: PC에선 인라인, 모바일에선 드로어 */
@@ -713,18 +726,47 @@ onUnmounted(() => {
     text-align: center;
   }
 
-  /* 인라인(헤더)에서는 닉네임 숨기고 아이콘 표시, 드로어에서는 닉네임 유지 */
-  .nav-auth:not(.is-open) .nickname-link {
+  .mobile-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .mobile-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-profile-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 드로어 안의 NotificationBell 숨기기 */
+  .nav-auth :deep(.notification-bell) {
     display: none;
   }
 
-  .nav-auth:not(.is-open) .user-icon-mobile {
-    display: inline-block;
-  }
-
-  /* 드로어 열렸을 때는 아이콘 숨기고 닉네임 표시 */
-  .nav-auth.is-open .user-icon-mobile {
-    display: none;
+  .mobile-point {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .email-unverified-badge {
