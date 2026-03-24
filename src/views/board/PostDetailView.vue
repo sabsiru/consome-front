@@ -363,7 +363,11 @@ const loadPost = async () => {
     const { data } = await api.get(`/posts/${postId.value}`)
     post.value = data
     document.title = data.title
-    markAsRead(postId.value)
+    markAsRead(postId.value, {
+      title: data.title,
+      boardId: data.boardId,
+      boardName: data.boardName,
+    })
     // 투표 상태 로드 (백엔드에서 반환 시)
     hasLiked.value = data.hasLiked ?? false
     hasDisliked.value = data.hasDisliked ?? false

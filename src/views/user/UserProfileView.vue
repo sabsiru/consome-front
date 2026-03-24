@@ -27,11 +27,6 @@
       </div>
 
       <div class="user-profile__actions">
-        <button v-if="isMyProfile" class="btn btn-primary" @click="goMessages">
-          <Mail :size="16" />
-          쪽지함
-          <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
-        </button>
         <button v-if="canSendMessage" class="btn btn-primary" @click="goSendMessage">
           <Mail :size="16" />
           쪽지 보내기
@@ -167,7 +162,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { Mail, Shield } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
-import { getUnreadCount } from '@/api/messageApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserPostList from '@/components/user/UserPostList.vue'
@@ -184,7 +178,6 @@ const isAdminOrManager = computed(() => ['ADMIN', 'MANAGER'].includes(profile.va
 
 const profile = ref({})
 const levelInfo = ref(null)
-const unreadCount = ref(0)
 const activeTab = ref('posts')
 
 // 경험치 계산
@@ -255,16 +248,6 @@ const loadLevelInfo = async () => {
   }
 }
 
-const fetchUnreadCount = async () => {
-  if (!isMyProfile.value || !userStore.userId) return
-  try {
-    const { data } = await getUnreadCount(userStore.userId)
-    unreadCount.value = data.count
-  } catch (e) {
-    console.error('[UserProfile] 안읽은 쪽지 조회 실패', e)
-  }
-}
-
 const changeNickname = async () => {
   try {
     const res = await api.put('/users/me/nickname', { nickname: newNickname.value })
@@ -315,10 +298,6 @@ const goSendMessage = () => {
   router.push({ name: 'MessageCompose', query: { to: userId.value } })
 }
 
-const goMessages = () => {
-  router.push('/messages')
-}
-
 const goManageBoard = () => {
   if (profile.value.role === 'ADMIN') {
     router.push({ name: 'admin' })
@@ -339,13 +318,11 @@ const resendVerificationEmail = async () => {
 onMounted(() => {
   loadProfile()
   loadLevelInfo()
-  fetchUnreadCount()
 })
 
 watch(userId, () => {
   loadProfile()
   loadLevelInfo()
-  fetchUnreadCount()
 })
 </script>
 
