@@ -4,6 +4,10 @@ import api from '@/api/axios.js'
 export const createReport = (userId, targetType, targetId, reason, description = '') =>
   api.post('/reports', { targetType, targetId, reason, description }, { params: { userId } })
 
+// 내 신고 목록
+export const getMyReports = (userId, page = 0, size = 5) =>
+  api.get('/reports/mine', { params: { userId, page, size } })
+
 // 관리자 신고 관리 - 그룹화된 목록
 export const getGroupedReports = (status = null, page = 0, size = 20) =>
   api.get('/admin/reports', { params: { status, page, size } })

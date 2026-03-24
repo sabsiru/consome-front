@@ -45,41 +45,19 @@
         <!-- 즐겨찾기 버튼 (로그인 시) -->
         <RouterLink v-if="nickname" to="/favorites" class="all-boards-btn">★</RouterLink>
 
-        <!-- 모바일: 알림 + 프로필 아이콘 + 햄버거 -->
-        <div v-if="nickname" class="mobile-icons">
-          <NotificationBell class="mobile-notification" />
-          <button class="mobile-profile-btn" @click="goMyProfile()">
-            <User :size="16" />
-          </button>
-        </div>
-        <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
-          <span class="hamburger" :class="{ 'is-open': mobileMenuOpen }">
-            <span></span><span></span><span></span>
-          </span>
-        </button>
-
-        <!-- 인증 영역 (PC: 인라인 / 모바일: 햄버거) -->
-        <div class="nav-auth" :class="{ 'is-open': mobileMenuOpen }">
+        <!-- 인증 영역 -->
+        <div class="nav-auth">
           <template v-if="!nickname || nickname.length === 0">
             <RouterLink to="/login" class="link">로그인</RouterLink>
             <RouterLink to="/register" class="link">회원가입</RouterLink>
           </template>
           <template v-else>
-            <span v-if="!emailVerified" class="email-unverified-badge">이메일 미인증</span>
             <NotificationBell />
-            <span class="user-info" @click="goMyProfile()">
-              <LevelBadge :level="level" :role="role" size="xs" />
-              <span class="nickname-link">{{ nickname }}</span>
-            </span>
-            <span class="mobile-point">{{ point.toLocaleString() }}P</span>
-            <button class="logout-btn" @click="logout">로그아웃</button>
+            <UserDropdown />
           </template>
         </div>
       </div>
     </div>
-
-    <!-- 모바일 메뉴 배경 오버레이 -->
-    <div v-if="mobileMenuOpen" class="mobile-overlay" @click="mobileMenuOpen = false"></div>
   </header>
 
   <!-- 모드토글 플로팅 오브 (드래그 가능) -->
@@ -110,21 +88,16 @@ import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import router from '@/router/index.js'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import api from '@/api/axios.js'
-import LevelBadge from '@/components/common/LevelBadge.vue'
-import { Sun, Moon, User } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+import { Sun, Moon } from 'lucide-vue-next'
 import { eventBus } from '@/utils/eventBus.js'
 import NotificationBell from '@/components/common/NotificationBell.vue'
+import UserDropdown from '@/components/common/UserDropdown.vue'
 import { useNotification } from '@/composables/useNotification.js'
 import { useDraggable } from '@/composables/useDraggable.js'
 
 const store = useUserStore()
-const { nickname, level, role, emailVerified, point } = storeToRefs(store)
-const currentRoute = useRoute()
-
-const mobileMenuOpen = ref(false)
+const { nickname } = storeToRefs(store)
 
 // 모드토글 드래그
 const { elRef: modeDockRef, posStyle: modeDockStyle, wasDragged } = useDraggable('mode-dock-pos', { top: 80, right: 20 })
@@ -143,25 +116,10 @@ const toggleColorMode = () => {
   }
 }
 
-// 라우트 변경 시 모바일 메뉴 닫기
-watch(() => currentRoute.path, () => {
-  mobileMenuOpen.value = false
-})
-
 const favoriteStore = useFavoriteStore()
 
 // SSE 알림 연결 초기화
 useNotification()
-
-const logout = async (event) => {
-  if (!event || event.type !== 'click') return
-  event.preventDefault()
-
-  favoriteStore.clear()
-  await store.logout()
-  toast.success('로그아웃 되었습니다.')
-  router.push('/')
-}
 
 const featuredBoards = ref({ pinnedBoards: [], popularBoards: [] })
 const showMainDropdown = ref(false)
@@ -218,7 +176,6 @@ const hideDropdown = () => {
 }
 
 const goHome = () => router.push('/')
-const goMyProfile = () => router.push(`/users/${store.userId}`)
 
 watch(() => store.userId, (newVal) => {
   if (newVal) {
@@ -442,27 +399,6 @@ onUnmounted(() => {
   gap: 8px;
 }
 
-.user-info {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-primary);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.nickname-link:hover {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-.mobile-profile-btn,
-.mobile-point,
-.mobile-icons {
-  display: none;
-}
-
 .link {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -480,51 +416,10 @@ onUnmounted(() => {
   text-decoration: none;
 }
 
-.nav-auth button {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  height: 32px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 0 12px;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.nav-auth button:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg-primary);
-}
-
-.logout-btn {
-  background: transparent !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-muted) !important;
-}
-
-.logout-btn:hover {
-  background: transparent !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
-}
-
 .logo {
   height: 32px;
   width: auto;
   filter: brightness(1.1);
-}
-
-.email-unverified-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--warning, #f59e0b);
-  border: 1px solid var(--warning, #f59e0b);
-  border-radius: 4px;
-  padding: 3px 8px;
-  cursor: default;
 }
 
 /* 모드토글 플로팅 독 — theme-dock과 동일한 디자인 */
@@ -604,47 +499,6 @@ onUnmounted(() => {
   50% { transform: scale(1.2); opacity: 0.6; }
 }
 
-/* 모바일 햄버거 버튼 */
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  margin-left: auto;
-}
-
-.hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  width: 22px;
-}
-
-.hamburger span {
-  display: block;
-  height: 2px;
-  background: var(--text-primary);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.hamburger.is-open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.hamburger.is-open span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.is-open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.mobile-overlay {
-  display: none;
-}
-
 /* ==========================================
    Responsive - Tablet & Mobile
    ========================================== */
@@ -679,107 +533,6 @@ onUnmounted(() => {
 
   .logo {
     height: 24px;
-  }
-
-  /* 햄버거 표시 */
-  .mobile-menu-btn {
-    display: flex;
-    margin-left: auto;
-  }
-
-  /* mobile-icons가 있으면 그쪽에서 auto 처리 */
-  .mobile-icons + .mobile-menu-btn {
-    margin-left: 4px;
-  }
-
-  /* 인증 영역: PC에선 인라인, 모바일에선 드로어 */
-  .nav-auth {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 260px;
-    height: 100vh;
-    flex-direction: column;
-    gap: 8px;
-    margin-left: 0;
-    padding: 60px 16px 16px;
-    background: var(--bg-secondary);
-    border-left: 1px solid var(--border-color);
-    z-index: 100;
-    overflow-y: auto;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
-  }
-
-  .nav-auth.is-open {
-    display: flex;
-  }
-
-  .nav-auth button,
-  .nav-auth .link {
-    width: 100%;
-    text-align: center;
-    display: block;
-  }
-
-  .user-info {
-    text-align: center;
-  }
-
-  .mobile-icons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  .mobile-profile-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .mobile-profile-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* 드로어 안의 NotificationBell 숨기기 */
-  .nav-auth :deep(.notification-bell) {
-    display: none;
-  }
-
-  .mobile-point {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--accent);
-    text-align: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .email-unverified-badge {
-    text-align: center;
-    display: block;
-  }
-
-  .mobile-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 99;
   }
 
   .mode-dock {
