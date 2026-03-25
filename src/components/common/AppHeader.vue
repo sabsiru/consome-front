@@ -24,6 +24,9 @@
         <!-- 전체 게시판 버튼 -->
         <RouterLink to="/boards" class="all-boards-btn">전체</RouterLink>
 
+        <!-- 인기 게시글 버튼 -->
+        <RouterLink to="/popular" class="all-boards-btn">인기</RouterLink>
+
         <!-- 주요 게시판 드롭다운 -->
         <div class="main-boards-dropdown" @mouseenter="openMainDropdown" @mouseleave="closeMainDropdown">
           <button class="main-boards-trigger" @click="showMainDropdown = !showMainDropdown">
