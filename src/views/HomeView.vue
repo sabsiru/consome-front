@@ -53,6 +53,9 @@
             </tr>
           </tbody>
         </table>
+        <div v-if="popularPosts.length" class="home__more">
+          <router-link to="/popular?page=1" class="home__more-link">인기 게시글 더보기 →</router-link>
+        </div>
       </section>
 
       <!-- 인기 게시판 -->
@@ -91,7 +94,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPopularPosts, getPopularBoards } from '@/api/navigationApi.js'
+import { getPopularPostsPaged, getPopularBoards } from '@/api/navigationApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 
 const router = useRouter()
@@ -131,8 +134,8 @@ const boardsLoading = ref(true)
 
 const fetchPopularPosts = async () => {
   try {
-    const { data } = await getPopularPosts()
-    popularPosts.value = data
+    const { data } = await getPopularPostsPaged(0, 50)
+    popularPosts.value = data.content || []
   } catch (e) {
     console.error('인기 게시글 로드 실패:', e)
   } finally {
@@ -142,7 +145,7 @@ const fetchPopularPosts = async () => {
 
 const fetchPopularBoards = async () => {
   try {
-    const { data } = await getPopularBoards()
+    const { data } = await getPopularBoards(10, 10)
     popularBoards.value = data
   } catch (e) {
     console.error('인기 게시판 로드 실패:', e)
