@@ -108,6 +108,27 @@
   font-weight: 600;
 }
 
+.page-board__tab--popular.is-active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #000;
+}
+
+/* 인기 게시글 뱃지 */
+.post-badge--popular {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-right: 4px;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  vertical-align: middle;
+}
+
 /* 테이블(게시글 리스트) */
 .board-table {
   width: 100%;
