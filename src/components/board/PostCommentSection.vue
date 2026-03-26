@@ -5,23 +5,74 @@
       <h3 class="comment__title">댓글 {{ totalElements }}개</h3>
     </div>
 
+    <!-- 인기 댓글 섹션 -->
+    <div v-if="popularComments.length > 0" class="comment__popular">
+      <div class="comment__popular-label">인기 댓글</div>
+      <article
+        v-for="c in popularComments"
+        :key="'popular-' + c.commentId"
+        class="comment-item comment-item--popular"
+      >
+        <div class="comment-item__meta">
+          <div class="comment-item__meta-left">
+            <span class="comment-badge comment-badge--popular">인기</span>
+            <span class="comment-item__author" :class="{ 'comment-item__author--op': props.postAuthorId != null && c.userId === props.postAuthorId }"><LevelBadge :level="c.userLevel" :role="c.userRole" size="xs" /> {{ c.userNickname }}</span>
+          </div>
+          <div class="comment-item__meta-right">
+            <button
+              type="button"
+              class="comment-item__vote-btn comment-item__goto-btn"
+              @click="scrollToComment(c.commentId)"
+              aria-label="댓글로 이동"
+            >
+              <CornerDownRight :size="13" />
+            </button>
+            <button
+              type="button"
+              class="comment-item__vote-btn comment-item__vote-btn--like"
+              :class="{ 'comment-item__vote-btn--voted': c.hasLiked }"
+              :disabled="c.hasLiked"
+              @click="onLikeComment(c.commentId)"
+              aria-label="댓글 추천"
+            >
+              <ThumbsUp :size="13" />
+              <span v-if="c.likeCount != null" class="comment-item__vote-count">{{ c.likeCount }}</span>
+            </button>
+            <button
+              type="button"
+              class="comment-item__vote-btn comment-item__vote-btn--dislike"
+              :class="{ 'comment-item__vote-btn--voted-dislike': c.hasDisliked }"
+              :disabled="c.hasDisliked"
+              @click="onDislikeComment(c.commentId)"
+              aria-label="댓글 비추천"
+            >
+              <ThumbsDown :size="13" />
+              <span v-if="c.dislikeCount != null" class="comment-item__vote-count">{{ c.dislikeCount }}</span>
+            </button>
+            <span class="comment-item__date">{{ formatDate(c.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="comment-item__content">
+          <div class="comment-item__content-text">
+            <span class="comment-item__content-body">{{ c.content }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
     <!-- 댓글 목록 -->
     <div class="comment__list">
       <article
         v-for="c in comments"
         :key="c.commentId"
+        :id="'comment-' + c.commentId"
         class="comment-item"
+        :class="{ 'comment-item--popular-highlight': popularCommentIds.has(c.commentId) }"
         :style="{ marginLeft: `${(c.depth ?? 0) * INDENT_PX}px` }"
       >
         <div class="comment-item__meta">
           <div class="comment-item__meta-left">
-            <span class="comment-item__author"><LevelBadge :level="c.userLevel" :role="c.userRole" size="xs" /> {{ c.userNickname }}</span>
-            <span
-              v-if="props.postAuthorId != null && c.userId === props.postAuthorId"
-              class="comment-badge comment-badge--author"
-            >
-              작성자
-            </span>
+            <span class="comment-item__author" :class="{ 'comment-item__author--op': props.postAuthorId != null && c.userId === props.postAuthorId }"><LevelBadge :level="c.userLevel" :role="c.userRole" size="xs" /> {{ c.userNickname }}</span>
           </div>
 
           <div class="comment-item__meta-right">
@@ -202,7 +253,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ThumbsUp, ThumbsDown } from 'lucide-vue-next'
+import { ThumbsUp, ThumbsDown, CornerDownRight } from 'lucide-vue-next'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/board/comment.css'
 
@@ -210,9 +261,23 @@ const router = useRouter()
 const route = useRoute()
 const INDENT_PX = 20
 
+const popularCommentIds = computed(() =>
+  new Set(props.popularComments.map(c => c.commentId))
+)
+
+const scrollToComment = (commentId) => {
+  const el = document.getElementById('comment-' + commentId)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    el.classList.add('comment-item--flash')
+    setTimeout(() => el.classList.remove('comment-item--flash'), 1500)
+  }
+}
+
 const props = defineProps({
   postId: { type: Number, required: true },
 
+  popularComments: { type: Array, default: () => [] },
   comments: { type: Array, default: () => [] },
   page: { type: Number, default: 0 },
   size: { type: Number, default: 50 },

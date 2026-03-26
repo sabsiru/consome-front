@@ -58,6 +58,7 @@
         <PostCommentSection
           :post-id="postId"
           :comments="comments"
+          :popular-comments="popularComments"
           :page="commentPage"
           :size="commentSize"
           :total-pages="commentTotalPages"
@@ -159,6 +160,7 @@ const reportTarget = ref({ type: '', id: null })
 
 // 댓글 상태
 const comments = ref([])
+const popularComments = ref([])
 const commentPage = ref(0)
 const commentSize = ref(20)
 const commentTotalPages = ref(0)
@@ -176,12 +178,14 @@ const loadComments = async (p = 0) => {
     })
 
     comments.value = Array.isArray(data?.comments) ? data.comments : []
+    popularComments.value = Array.isArray(data?.popularComments) ? data.popularComments : []
     commentPage.value = Number.isFinite(data?.currentPage) ? data.currentPage : p
     commentTotalPages.value = Number.isFinite(data?.totalPages) ? data.totalPages : 0
     commentTotalElements.value = typeof data?.totalElements === 'number' ? data.totalElements : 0
   } catch (e) {
     console.error(e)
     comments.value = []
+    popularComments.value = []
     commentPage.value = p
     commentTotalPages.value = 0
     commentTotalElements.value = 0
@@ -297,27 +301,35 @@ const likeComment = async (commentId) => {
     return
   }
 
-  // 해당 댓글 찾기
-  const comment = comments.value.find((c) => c.commentId === commentId)
-  if (!comment) return
+  // 해당 댓글 찾기 (일반 + 인기 댓글 모두)
+  const targets = [
+    comments.value.find((c) => c.commentId === commentId),
+    popularComments.value.find((c) => c.commentId === commentId),
+  ].filter(Boolean)
+  if (targets.length === 0) return
 
   // Optimistic UI: 즉시 상태 토글
-  const prevHasLiked = comment.hasLiked
-  const prevLikeCount = comment.likeCount
-  comment.hasLiked = !comment.hasLiked
-  comment.likeCount = comment.hasLiked ? (comment.likeCount ?? 0) + 1 : Math.max(0, (comment.likeCount ?? 0) - 1)
+  const prev = targets.map(c => ({ hasLiked: c.hasLiked, likeCount: c.likeCount }))
+  targets.forEach(c => {
+    c.hasLiked = !c.hasLiked
+    c.likeCount = c.hasLiked ? (c.likeCount ?? 0) + 1 : Math.max(0, (c.likeCount ?? 0) - 1)
+  })
 
   try {
     const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/like`, null, {
       params: { userId: userStore.userId },
     })
     // 백엔드 응답이 있으면 반영
-    if (data?.likeCount !== undefined) comment.likeCount = data.likeCount
-    if (data?.hasLiked !== undefined) comment.hasLiked = data.hasLiked
+    targets.forEach(c => {
+      if (data?.likeCount !== undefined) c.likeCount = data.likeCount
+      if (data?.hasLiked !== undefined) c.hasLiked = data.hasLiked
+    })
   } catch (e) {
     // 실패 시 원복
-    comment.hasLiked = prevHasLiked
-    comment.likeCount = prevLikeCount
+    targets.forEach((c, i) => {
+      c.hasLiked = prev[i].hasLiked
+      c.likeCount = prev[i].likeCount
+    })
     toast.error(e?.response?.data?.message || '추천에 실패했습니다.')
   }
 }
@@ -330,27 +342,33 @@ const dislikeComment = async (commentId) => {
     return
   }
 
-  // 해당 댓글 찾기
-  const comment = comments.value.find((c) => c.commentId === commentId)
-  if (!comment) return
+  // 해당 댓글 찾기 (일반 + 인기 댓글 모두)
+  const targets = [
+    comments.value.find((c) => c.commentId === commentId),
+    popularComments.value.find((c) => c.commentId === commentId),
+  ].filter(Boolean)
+  if (targets.length === 0) return
 
   // Optimistic UI: 즉시 상태 토글
-  const prevHasDisliked = comment.hasDisliked
-  const prevDislikeCount = comment.dislikeCount
-  comment.hasDisliked = !comment.hasDisliked
-  comment.dislikeCount = comment.hasDisliked ? (comment.dislikeCount ?? 0) + 1 : Math.max(0, (comment.dislikeCount ?? 0) - 1)
+  const prev = targets.map(c => ({ hasDisliked: c.hasDisliked, dislikeCount: c.dislikeCount }))
+  targets.forEach(c => {
+    c.hasDisliked = !c.hasDisliked
+    c.dislikeCount = c.hasDisliked ? (c.dislikeCount ?? 0) + 1 : Math.max(0, (c.dislikeCount ?? 0) - 1)
+  })
 
   try {
     const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`, null, {
       params: { userId: userStore.userId },
     })
-    // 백엔드 응답이 있으면 반영
-    if (data?.dislikeCount !== undefined) comment.dislikeCount = data.dislikeCount
-    if (data?.hasDisliked !== undefined) comment.hasDisliked = data.hasDisliked
+    targets.forEach(c => {
+      if (data?.dislikeCount !== undefined) c.dislikeCount = data.dislikeCount
+      if (data?.hasDisliked !== undefined) c.hasDisliked = data.hasDisliked
+    })
   } catch (e) {
-    // 실패 시 원복
-    comment.hasDisliked = prevHasDisliked
-    comment.dislikeCount = prevDislikeCount
+    targets.forEach((c, i) => {
+      c.hasDisliked = prev[i].hasDisliked
+      c.dislikeCount = prev[i].dislikeCount
+    })
     toast.error(e?.response?.data?.message || '비추천에 실패했습니다.')
   }
 }

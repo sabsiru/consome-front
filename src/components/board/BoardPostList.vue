@@ -24,7 +24,7 @@
     <div class="page-board__tabs">
       <div
         class="page-board__tab"
-        :class="{ 'is-active': selectedCategoryId === null }"
+        :class="{ 'is-active': !isPopularMode && selectedCategoryId === null }"
         @click="selectCategory(null)"
       >
         전체
@@ -34,10 +34,18 @@
         v-for="c in categories"
         :key="c.id"
         class="page-board__tab"
-        :class="{ 'is-active': selectedCategoryId === c.id }"
+        :class="{ 'is-active': !isPopularMode && selectedCategoryId === c.id }"
         @click="selectCategory(c.id)"
       >
         {{ c.name }}
+      </div>
+
+      <div
+        class="page-board__tab page-board__tab--popular"
+        :class="{ 'is-active': isPopularMode }"
+        @click="togglePopularMode"
+      >
+        인기
       </div>
     </div>
 
@@ -169,6 +177,7 @@
           </td>
           <td class="col-category">{{ post.categoryName }}</td>
           <td class="col-title">
+            <span v-if="isPopularPost(post)" class="post-badge--popular">인기</span>
             <span v-html="highlightKeyword(post.title, props.keyword)"></span>
             <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
             <span v-if="post.commentCount > 0" class="post-comment-count">
@@ -307,6 +316,10 @@ const categories = ref([])
 const writeEnabled = ref(true)
 const isPinnedExpanded = ref(false)
 const isManageMode = ref(false)
+const isPopularMode = ref(false)
+
+const POPULAR_POST_MIN_LIKES = 10
+const isPopularPost = (post) => post.likeCount >= POPULAR_POST_MIN_LIKES
 
 // 드래그앤드롭용 상태
 const draggablePinnedPosts = ref([])
@@ -381,8 +394,11 @@ const loadPosts = async () => {
     page: props.page,
     size: props.size,
   }
-  if (selectedCategoryId.value !== null) {
+  if (selectedCategoryId.value !== null && !isPopularMode.value) {
     params.categoryId = selectedCategoryId.value
+  }
+  if (isPopularMode.value) {
+    params.popular = true
   }
 
   let res
@@ -443,8 +459,15 @@ const movePage = (targetPage) => {
 }
 
 const selectCategory = (categoryId) => {
+  isPopularMode.value = false
   selectedCategoryId.value = categoryId
   emit('category-change', categoryId) // 부모가 page=0으로 리셋 + URL 갱신
+}
+
+const togglePopularMode = () => {
+  isPopularMode.value = !isPopularMode.value
+  selectedCategoryId.value = null
+  loadPosts()
 }
 
 const emitPostClick = (postId) => emit('post-click', postId)
