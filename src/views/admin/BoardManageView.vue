@@ -68,12 +68,29 @@
           </div>
 
           <div class="form-group">
+            <label>Name</label>
+            <div class="name-check-row">
+              <input v-model="editForm.name" class="form-input" @input="onNameInput" />
+              <button
+                class="btn btn-secondary btn-sm"
+                :disabled="!isNameChanged || nameCheckLoading"
+                @click="checkNameDuplicate"
+              >
+                {{ nameCheckLoading ? '확인 중...' : '중복 검사' }}
+              </button>
+            </div>
+            <span v-if="nameCheckResult !== null" :class="['check-msg', nameCheckResult.available ? 'success' : 'error']">
+              {{ nameCheckResult.available ? '사용 가능한 이름입니다.' : nameCheckResult.reason }}
+            </span>
+          </div>
+
+          <div class="form-group">
             <label>Description</label>
             <textarea v-model="editForm.description" class="form-textarea" rows="3"></textarea>
           </div>
 
           <div class="panel-actions">
-            <button class="btn btn-primary" @click="saveBoard">저장</button>
+            <button class="btn btn-primary" :disabled="isNameChanged && !nameCheckPassed" @click="saveBoard">저장</button>
           </div>
 
           <!-- 카테고리 섹션 -->
@@ -132,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable'
 import { toast } from 'vue-sonner'
@@ -162,7 +179,16 @@ const categories = ref([])
 const createForm = ref({ name: '' })
 
 // 편집 폼
-const editForm = ref({ description: '' })
+const editForm = ref({ name: '', description: '' })
+
+// 이름 중복 검사 상태
+const nameCheckResult = ref(null)
+const nameCheckLoading = ref(false)
+const nameCheckPassed = ref(false)
+
+const isNameChanged = computed(() => {
+  return selectedBoard.value && editForm.value.name !== selectedBoard.value.name
+})
 
 // 카테고리 편집
 const editingCategoryId = ref(null)
@@ -194,8 +220,11 @@ const selectBoard = async (board) => {
   mode.value = null
   selectedBoard.value = board
   editForm.value = {
+    name: board.name || '',
     description: board.description || '',
   }
+  nameCheckResult.value = null
+  nameCheckPassed.value = false
   await loadCategories(board.id)
 }
 
@@ -221,17 +250,55 @@ const cancelCreate = () => {
   mode.value = null
 }
 
-// 보드 저장 (description만)
+// 이름 입력 시 검사 상태 초기화
+const onNameInput = () => {
+  nameCheckResult.value = null
+  nameCheckPassed.value = false
+}
+
+// 이름 중복 검사
+const checkNameDuplicate = async () => {
+  const name = editForm.value.name.trim()
+  if (!name) {
+    nameCheckResult.value = { available: false, reason: '이름을 입력해주세요.' }
+    return
+  }
+  nameCheckLoading.value = true
+  try {
+    const res = await api.get('/admin/boards/check-name', {
+      params: { name, excludeId: selectedBoard.value.id }
+    })
+    nameCheckResult.value = res.data
+    nameCheckPassed.value = res.data.available
+  } catch {
+    nameCheckResult.value = { available: false, reason: '검사 실패' }
+    nameCheckPassed.value = false
+  } finally {
+    nameCheckLoading.value = false
+  }
+}
+
+// 보드 저장
 const saveBoard = async () => {
-  if (editForm.value.description === (selectedBoard.value.description || '')) {
+  const nameChanged = editForm.value.name !== (selectedBoard.value.name || '')
+  const descChanged = editForm.value.description !== (selectedBoard.value.description || '')
+
+  if (!nameChanged && !descChanged) {
     toast.info('변경된 내용이 없습니다.')
     return
   }
 
+  if (nameChanged && !nameCheckPassed) {
+    toast.error('이름 중복 검사를 먼저 진행해주세요.')
+    return
+  }
+
   try {
-    await api.patch(`/admin/boards/${selectedBoard.value.id}`, {
-      description: editForm.value.description
-    })
+    const payload = {}
+    if (nameChanged) payload.name = editForm.value.name
+    if (descChanged) payload.description = editForm.value.description
+
+    await api.patch(`/admin/boards/${selectedBoard.value.id}`, payload)
     await loadBoards()
     const updated = boards.value.find((b) => b.id === selectedBoard.value.id)
     if (updated) selectBoard(updated)
@@ -412,5 +479,29 @@ const onCategoryDragEnd = async () => {
   font-size: 48px;
   display: block;
   margin-bottom: 16px;
+}
+
+.name-check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.name-check-row .form-input {
+  flex: 1;
+}
+
+.check-msg {
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.check-msg.success {
+  color: var(--success, #22c55e);
+}
+
+.check-msg.error {
+  color: var(--error, #ef4444);
 }
 </style>
