@@ -124,7 +124,23 @@
                   <div v-else-if="selectedBoard && selectedSectionId === section.id" class="detail-content edit-mode">
                     <div class="detail-header">
                       <span class="detail-tag">BOARD</span>
-                      <h3>{{ boardForm.name || 'Untitled' }}</h3>
+                      <h3>{{ selectedBoard.name }}</h3>
+                    </div>
+                    <div class="form-group">
+                      <label>Name</label>
+                      <div class="name-check-row">
+                        <input v-model="boardForm.name" class="form-input" @input="onBoardNameInput" />
+                        <button
+                          class="btn btn-secondary btn-sm"
+                          :disabled="!isBoardNameChanged || boardNameCheckLoading"
+                          @click="checkBoardNameDuplicate"
+                        >
+                          {{ boardNameCheckLoading ? '확인 중...' : '중복 검사' }}
+                        </button>
+                      </div>
+                      <span v-if="boardNameCheckResult !== null" :class="['check-msg', boardNameCheckResult.available ? 'success' : 'error']">
+                        {{ boardNameCheckResult.available ? '사용 가능한 이름입니다.' : boardNameCheckResult.reason }}
+                      </span>
                     </div>
                     <div class="form-group">
                       <label>Description</label>
@@ -142,7 +158,7 @@
                       </div>
                       <div class="action-btns">
                         <button class="btn btn-danger" @click="deleteBoard">Delete</button>
-                        <button class="btn btn-primary" @click="saveBoard">Save</button>
+                        <button class="btn btn-primary" :disabled="isBoardNameChanged && !boardNameCheckPassed" @click="saveBoard">Save</button>
                       </div>
                     </div>
 
@@ -257,6 +273,15 @@ const categories = ref([])
 // 편집 상태
 const boardForm = ref({ name: '', description: '' })
 const categoryForm = ref({ name: '' })
+
+// 이름 중복 검사 상태
+const boardNameCheckResult = ref(null)
+const boardNameCheckLoading = ref(false)
+const boardNameCheckPassed = ref(false)
+
+const isBoardNameChanged = computed(() => {
+  return selectedBoard.value && boardForm.value.name !== selectedBoard.value.name
+})
 const editingCategoryId = ref(null)
 const editingCategoryName = ref('')
 
@@ -334,6 +359,8 @@ const selectBoard = async (board, sectionId) => {
     name: board.name,
     description: board.description || ''
   }
+  boardNameCheckResult.value = null
+  boardNameCheckPassed.value = false
   await loadCategories(board.id)
 }
 
@@ -371,17 +398,55 @@ const createBoard = async (sectionId) => {
   }
 }
 
-// 게시판 저장 (description만 수정 가능)
+// 이름 입력 시 검사 상태 초기화
+const onBoardNameInput = () => {
+  boardNameCheckResult.value = null
+  boardNameCheckPassed.value = false
+}
+
+// 이름 중복 검사
+const checkBoardNameDuplicate = async () => {
+  const name = boardForm.value.name.trim()
+  if (!name) {
+    boardNameCheckResult.value = { available: false, reason: '이름을 입력해주세요.' }
+    return
+  }
+  boardNameCheckLoading.value = true
+  try {
+    const res = await api.get('/admin/boards/check-name', {
+      params: { name, excludeId: selectedBoard.value.id }
+    })
+    boardNameCheckResult.value = res.data
+    boardNameCheckPassed.value = res.data.available
+  } catch {
+    boardNameCheckResult.value = { available: false, reason: '검사 실패' }
+    boardNameCheckPassed.value = false
+  } finally {
+    boardNameCheckLoading.value = false
+  }
+}
+
+// 게시판 저장
 const saveBoard = async () => {
-  if (boardForm.value.description === (selectedBoard.value.description || '')) {
+  const nameChanged = boardForm.value.name !== (selectedBoard.value.name || '')
+  const descChanged = boardForm.value.description !== (selectedBoard.value.description || '')
+
+  if (!nameChanged && !descChanged) {
     toast.info('변경된 내용이 없습니다.')
     return
   }
 
+  if (nameChanged && !boardNameCheckPassed) {
+    toast.error('이름 중복 검사를 먼저 진행해주세요.')
+    return
+  }
+
   try {
-    await api.patch(`/admin/boards/${selectedBoard.value.id}`, {
-      description: boardForm.value.description
-    })
+    const payload = {}
+    if (nameChanged) payload.name = boardForm.value.name
+    if (descChanged) payload.description = boardForm.value.description
+
+    await api.patch(`/admin/boards/${selectedBoard.value.id}`, payload)
     await loadSectionBoards(selectedSectionId.value)
 
     // 선택된 게시판 갱신
@@ -392,6 +457,8 @@ const saveBoard = async () => {
       selectedBoard.value = { ...selectedBoard.value, ...updated }
       boardForm.value = { name: updated.name, description: updated.description || '' }
     }
+    boardNameCheckResult.value = null
+    boardNameCheckPassed.value = false
     toast.success('수정이 완료되었습니다.')
   } catch (err) {
     console.error(err)
@@ -1046,5 +1113,29 @@ const deleteSection = async (section) => {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.name-check-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.name-check-row .form-input {
+  flex: 1;
+}
+
+.check-msg {
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.check-msg.success {
+  color: var(--success, #22c55e);
+}
+
+.check-msg.error {
+  color: var(--error, #ef4444);
 }
 </style>
