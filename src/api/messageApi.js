@@ -5,30 +5,30 @@ export const searchUsers = (nickname) =>
   api.get('/users/search', { params: { nickname } })
 
 // 쪽지
-export const sendMessage = (userId, receiverId, content, point = 0) =>
-  api.post('/messages', { receiverId, content, point }, { params: { userId } })
+export const sendMessage = (receiverId, content, point = 0) =>
+  api.post('/messages', { receiverId, content, point })
 
-export const getReceivedMessages = (userId, page = 0, size = 20) =>
-  api.get('/messages/received', { params: { userId, page, size } })
+export const getReceivedMessages = (page = 0, size = 20) =>
+  api.get('/messages/received', { params: { page, size } })
 
-export const getSentMessages = (userId, page = 0, size = 20) =>
-  api.get('/messages/sent', { params: { userId, page, size } })
+export const getSentMessages = (page = 0, size = 20) =>
+  api.get('/messages/sent', { params: { page, size } })
 
-export const readMessage = (messageId, userId) =>
-  api.get(`/messages/${messageId}`, { params: { userId } })
+export const readMessage = (messageId) =>
+  api.get(`/messages/${messageId}`)
 
-export const deleteMessage = (messageId, userId) =>
-  api.delete(`/messages/${messageId}`, { params: { userId } })
+export const deleteMessage = (messageId) =>
+  api.delete(`/messages/${messageId}`)
 
-export const getUnreadCount = (userId) =>
-  api.get('/messages/unread-count', { params: { userId } })
+export const getUnreadCount = () =>
+  api.get('/messages/unread-count')
 
 // 차단
-export const blockUser = (userId, blockedId) =>
-  api.post(`/messages/blocks/${blockedId}`, null, { params: { userId } })
+export const blockUser = (blockedId) =>
+  api.post(`/messages/blocks/${blockedId}`)
 
-export const unblockUser = (userId, blockedId) =>
-  api.delete(`/messages/blocks/${blockedId}`, { params: { userId } })
+export const unblockUser = (blockedId) =>
+  api.delete(`/messages/blocks/${blockedId}`)
 
-export const getBlockList = (userId, page = 0, size = 20) =>
-  api.get('/messages/blocks', { params: { userId, page, size } })
+export const getBlockList = (page = 0, size = 20) =>
+  api.get('/messages/blocks', { params: { page, size } })
