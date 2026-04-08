@@ -9,20 +9,18 @@ export const useNotificationStore = defineStore('notification', {
     currentPage: 0
   }),
   actions: {
-    async fetchUnreadCount(userId) {
-      if (!userId) return
+    async fetchUnreadCount() {
       try {
-        const { data } = await getUnreadNotificationCount(userId)
+        const { data } = await getUnreadNotificationCount()
         this.unreadCount = data.count
       } catch (e) {
         console.error('[NotificationStore] unread count 조회 실패', e)
       }
     },
 
-    async fetchNotifications(userId, page = 0) {
-      if (!userId) return
+    async fetchNotifications(page = 0) {
       try {
-        const { data } = await getNotifications(userId, page)
+        const { data } = await getNotifications(page)
         this.notifications = data.content
         this.totalPages = data.totalPages
         this.currentPage = data.number
@@ -31,9 +29,9 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async markAsRead(notificationId, userId) {
+    async markAsRead(notificationId) {
       try {
-        await markAsRead(notificationId, userId)
+        await markAsRead(notificationId)
         const target = this.notifications.find(n => n.id === notificationId)
         if (target && !target.isRead) {
           target.isRead = true
@@ -44,9 +42,9 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async markAllAsRead(userId) {
+    async markAllAsRead() {
       try {
-        await markAllAsRead(userId)
+        await markAllAsRead()
         this.notifications.forEach(n => { n.isRead = true })
         this.unreadCount = 0
       } catch (e) {
@@ -54,10 +52,10 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async deleteOne(notificationId, userId) {
+    async deleteOne(notificationId) {
       try {
         const target = this.notifications.find(n => n.id === notificationId)
-        await deleteNotification(notificationId, userId)
+        await deleteNotification(notificationId)
         this.notifications = this.notifications.filter(n => n.id !== notificationId)
         if (target && !target.isRead) {
           this.unreadCount = Math.max(0, this.unreadCount - 1)
@@ -67,9 +65,9 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async deleteAll(userId) {
+    async deleteAll() {
       try {
-        await deleteAllNotifications(userId)
+        await deleteAllNotifications()
         this.notifications = []
         this.unreadCount = 0
       } catch (e) {
