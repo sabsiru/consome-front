@@ -173,7 +173,6 @@ const loadComments = async (p = 0) => {
       params: {
         page: p,
         size: commentSize.value,
-        userId: userStore.userId,
       },
     })
 
@@ -202,7 +201,6 @@ const createComment = async (payload, done, fail) => {
 
   try {
     await api.post(`/posts/${postId.value}/comments`, {
-      userId: userStore.userId,
       parentId: payload.parentId ?? null,
       content: payload.content,
     })
@@ -230,7 +228,6 @@ const editComment = async (payload, done, fail) => {
 
   try {
     await api.put(`/posts/${postId.value}/comments/${payload.commentId}`, {
-      userId: userStore.userId,
       content: payload.content,
     })
 
@@ -264,9 +261,7 @@ const deleteComment = async (commentId, done, fail) => {
   }
 
   try {
-    await api.delete(`/posts/${postId.value}/comments/${commentId}`, {
-      params: { userId: userStore.userId },
-    })
+    await api.delete(`/posts/${postId.value}/comments/${commentId}`)
 
     done?.()
 
@@ -316,9 +311,7 @@ const likeComment = async (commentId) => {
   })
 
   try {
-    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/like`, null, {
-      params: { userId: userStore.userId },
-    })
+    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/like`)
     // 백엔드 응답이 있으면 반영
     targets.forEach(c => {
       if (data?.likeCount !== undefined) c.likeCount = data.likeCount
@@ -357,9 +350,7 @@ const dislikeComment = async (commentId) => {
   })
 
   try {
-    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`, null, {
-      params: { userId: userStore.userId },
-    })
+    const { data } = await api.post(`/posts/${postId.value}/comments/${commentId}/dislike`)
     targets.forEach(c => {
       if (data?.dislikeCount !== undefined) c.dislikeCount = data.dislikeCount
       if (data?.hasDisliked !== undefined) c.hasDisliked = data.hasDisliked
@@ -420,11 +411,7 @@ const onDelete = async () => {
   if (!confirm('정말 삭제하시겠습니까?')) return
 
   try {
-    await api.delete(`/posts/${postId.value}`, {
-      params: {
-        userId: userStore.userId,
-      },
-    })
+    await api.delete(`/posts/${postId.value}`)
 
     // 삭제 후 게시판 목록으로 이동
     await router.push({
@@ -449,11 +436,7 @@ const onLike = async () => {
   hasLiked.value = !hasLiked.value
 
   try {
-    const { data } = await api.post(`/posts/${postId.value}/like`, null, {
-      params: {
-        userId: userStore.userId,
-      },
-    })
+    const { data } = await api.post(`/posts/${postId.value}/like`)
 
     // PostStatResponse 기준으로 카운트 반영
     if (post.value) {
@@ -484,11 +467,7 @@ const onDislike = async () => {
   hasDisliked.value = !hasDisliked.value
 
   try {
-    const { data } = await api.post(`/posts/${postId.value}/dislike`, null, {
-      params: {
-        userId: userStore.userId,
-      },
-    })
+    const { data } = await api.post(`/posts/${postId.value}/dislike`)
 
     if (post.value) {
       post.value.viewCount = data.viewCount

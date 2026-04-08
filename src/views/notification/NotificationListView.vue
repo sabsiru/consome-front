@@ -53,16 +53,16 @@ const notificationStore = useNotificationStore()
 const { notifications, unreadCount, totalPages, currentPage } = storeToRefs(notificationStore)
 
 onMounted(() => {
-  notificationStore.fetchNotifications(userStore.userId)
+  notificationStore.fetchNotifications()
 })
 
 const loadPage = (page) => {
-  notificationStore.fetchNotifications(userStore.userId, page)
+  notificationStore.fetchNotifications(page)
 }
 
 const handleClick = (notification) => {
   if (!notification.isRead) {
-    notificationStore.markAsRead(notification.id, userStore.userId)
+    notificationStore.markAsRead(notification.id)
   }
 
   if (notification.type === 'MESSAGE') {
@@ -73,15 +73,15 @@ const handleClick = (notification) => {
 }
 
 const handleDelete = (notificationId) => {
-  notificationStore.deleteOne(notificationId, userStore.userId)
+  notificationStore.deleteOne(notificationId)
 }
 
 const handleDeleteAll = () => {
-  notificationStore.deleteAll(userStore.userId)
+  notificationStore.deleteAll()
 }
 
 const handleMarkAllAsRead = () => {
-  notificationStore.markAllAsRead(userStore.userId)
+  notificationStore.markAllAsRead()
 }
 
 const typeLabel = (type) => {

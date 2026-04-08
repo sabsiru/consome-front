@@ -784,7 +784,6 @@ const submit = async () => {
 
   try {
     const payload = {
-      userId: userStore.userId,
       boardId: boardId.value,
       categoryId: Number(categoryId.value),
       title: title.value,
@@ -799,7 +798,6 @@ const submit = async () => {
         content: editor.value.getHTML(),
       })], { type: 'application/json' }))
       await api.put(`/posts/${editPostId.value}`, formData, {
-        params: { userId: userStore.userId },
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       await router.push({ name: 'PostDetail', params: { postId: editPostId.value } })

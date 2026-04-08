@@ -53,7 +53,7 @@ const isSender = computed(() => message.value?.senderId === userStore.userId)
 const fetchMessage = async () => {
   loading.value = true
   try {
-    const { data } = await readMessage(messageId.value, userStore.userId)
+    const { data } = await readMessage(messageId.value)
     message.value = data
     eventBus.emit('message-read')
   } catch (e) {
@@ -77,7 +77,7 @@ const reply = () => {
 const deleteMsg = async () => {
   if (!confirm('쪽지를 삭제하시겠습니까?')) return
   try {
-    await deleteMessage(messageId.value, userStore.userId)
+    await deleteMessage(messageId.value)
     router.push({ name: 'MessageList' })
   } catch (e) {
     toast.error('삭제에 실패했습니다.')

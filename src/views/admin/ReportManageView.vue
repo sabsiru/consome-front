@@ -290,15 +290,14 @@ const confirmResolve = async () => {
       await suspendUser(
         selectedReport.value.targetUserId,
         selectedSuspensionType.value,
-        suspendReason.value || '신고 처리',
-        userStore.userId
+        suspendReason.value || '신고 처리'
       )
     }
 
     // 모든 PENDING 신고 처리
     for (const rep of allReporters) {
       try {
-        await resolveReport(rep.reportId, userStore.userId, selectedSuspensionType.value || null)
+        await resolveReport(rep.reportId, selectedSuspensionType.value || null)
       } catch (e) {
         // 이미 처리된 신고는 무시
       }
@@ -318,7 +317,7 @@ const rejectAll = async (r) => {
     const { data: allReporters } = await getReportersByTarget(r.targetType, r.targetId)
     for (const rep of allReporters) {
       try {
-        await rejectReport(rep.reportId, userStore.userId)
+        await rejectReport(rep.reportId)
       } catch (e) {
         // 이미 처리된 신고는 무시
       }

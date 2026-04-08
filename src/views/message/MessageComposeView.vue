@@ -172,7 +172,7 @@ const send = async () => {
 
   sending.value = true
   try {
-    await sendMessage(userStore.userId, selectedReceiverId.value, content.value, point.value || 0)
+    await sendMessage(selectedReceiverId.value, content.value, point.value || 0)
     toast.success('쪽지를 보냈습니다.')
     router.push({ name: 'MessageList' })
   } catch (e) {
