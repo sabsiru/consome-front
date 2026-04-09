@@ -75,7 +75,7 @@ export function useNotification() {
   watch(() => userStore.token, (newToken) => {
     if (newToken) {
       connect()
-      notificationStore.fetchUnreadCount(userStore.userId)
+      notificationStore.fetchUnreadCount()
     } else {
       disconnect()
       notificationStore.clear()

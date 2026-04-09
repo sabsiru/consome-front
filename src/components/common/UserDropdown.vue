@@ -117,7 +117,7 @@ const close = () => {
 
 const fetchMyReports = async () => {
   try {
-    const { data } = await getMyReports(userStore.userId, 0, 5)
+    const { data } = await getMyReports(0, 5)
     myReports.value = data.content || []
   } catch {
     myReports.value = []
@@ -126,7 +126,7 @@ const fetchMyReports = async () => {
 
 const fetchUnreadMessages = async () => {
   try {
-    const { data } = await getUnreadCount(userStore.userId)
+    const { data } = await getUnreadCount()
     unreadMessageCount.value = data.count || 0
   } catch {
     unreadMessageCount.value = 0

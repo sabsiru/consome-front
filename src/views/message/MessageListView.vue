@@ -78,7 +78,7 @@ const fetchMessages = async () => {
   loading.value = true
   try {
     const api = activeTab.value === 'received' ? getReceivedMessages : getSentMessages
-    const { data } = await api(userStore.userId, page.value)
+    const { data } = await api(page.value)
     messages.value = data.content
     totalPages.value = data.totalPages
   } catch (e) {

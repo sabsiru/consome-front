@@ -1,19 +1,19 @@
 import api from '@/api/axios.js'
 
-export const getNotifications = (userId, page = 0, size = 20) =>
-  api.get('/notifications', { params: { userId, page, size } })
+export const getNotifications = (page = 0, size = 20) =>
+  api.get('/notifications', { params: { page, size } })
 
-export const getUnreadNotificationCount = (userId) =>
-  api.get('/notifications/unread-count', { params: { userId } })
+export const getUnreadNotificationCount = () =>
+  api.get('/notifications/unread-count')
 
-export const markAsRead = (notificationId, userId) =>
-  api.patch(`/notifications/${notificationId}/read`, null, { params: { userId } })
+export const markAsRead = (notificationId) =>
+  api.patch(`/notifications/${notificationId}/read`)
 
-export const markAllAsRead = (userId) =>
-  api.patch('/notifications/read-all', null, { params: { userId } })
+export const markAllAsRead = () =>
+  api.patch('/notifications/read-all')
 
-export const deleteNotification = (notificationId, userId) =>
-  api.delete(`/notifications/${notificationId}`, { params: { userId } })
+export const deleteNotification = (notificationId) =>
+  api.delete(`/notifications/${notificationId}`)
 
-export const deleteAllNotifications = (userId) =>
-  api.delete('/notifications', { params: { userId } })
+export const deleteAllNotifications = () =>
+  api.delete('/notifications')

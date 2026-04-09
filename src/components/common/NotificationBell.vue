@@ -59,13 +59,13 @@ const bellRef = ref(null)
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
-    notificationStore.fetchNotifications(userStore.userId)
+    notificationStore.fetchNotifications()
   }
 }
 
 const handleClick = (notification) => {
   if (!notification.isRead) {
-    notificationStore.markAsRead(notification.id, userStore.userId)
+    notificationStore.markAsRead(notification.id)
   }
 
   showDropdown.value = false
@@ -79,11 +79,11 @@ const handleClick = (notification) => {
 }
 
 const handleDelete = (notificationId) => {
-  notificationStore.deleteOne(notificationId, userStore.userId)
+  notificationStore.deleteOne(notificationId)
 }
 
 const handleMarkAllAsRead = () => {
-  notificationStore.markAllAsRead(userStore.userId)
+  notificationStore.markAllAsRead()
 }
 
 const typeLabel = (type) => {

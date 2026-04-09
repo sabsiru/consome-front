@@ -1,12 +1,12 @@
 import api from '@/api/axios.js'
 
 // 사용자 신고
-export const createReport = (userId, targetType, targetId, reason, description = '') =>
-  api.post('/reports', { targetType, targetId, reason, description }, { params: { userId } })
+export const createReport = (targetType, targetId, reason, description = '') =>
+  api.post('/reports', { targetType, targetId, reason, description })
 
 // 내 신고 목록
-export const getMyReports = (userId, page = 0, size = 5) =>
-  api.get('/reports/mine', { params: { userId, page, size } })
+export const getMyReports = (page = 0, size = 5) =>
+  api.get('/reports/mine', { params: { page, size } })
 
 // 관리자 신고 관리 - 그룹화된 목록
 export const getGroupedReports = (status = null, page = 0, size = 20) =>
@@ -23,8 +23,8 @@ export const getReports = (status = null, targetType = null, targetUserId = null
 export const getReportDetail = (reportId) =>
   api.get(`/admin/reports/${reportId}`)
 
-export const resolveReport = (reportId, userId, suspensionType = null) =>
-  api.patch(`/admin/reports/${reportId}/resolve`, null, { params: { userId, suspensionType } })
+export const resolveReport = (reportId, suspensionType = null) =>
+  api.patch(`/admin/reports/${reportId}/resolve`, null, { params: { suspensionType } })
 
-export const rejectReport = (reportId, userId) =>
-  api.patch(`/admin/reports/${reportId}/reject`, null, { params: { userId } })
+export const rejectReport = (reportId) =>
+  api.patch(`/admin/reports/${reportId}/reject`)

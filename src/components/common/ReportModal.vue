@@ -102,7 +102,6 @@ const submit = async () => {
   submitting.value = true
   try {
     await createReport(
-      userStore.userId,
       props.targetType,
       props.targetId,
       reason.value,
