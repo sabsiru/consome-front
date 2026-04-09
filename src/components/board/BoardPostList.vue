@@ -509,15 +509,21 @@ const onReport = (payload) => {
   emit('report', payload)
 }
 
+// HTML 특수문자 이스케이프 (XSS 방지)
+const escapeHtml = (str) =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
 // 검색어 강조 (TITLE, TITLE_CONTENT일 때만)
 const highlightKeyword = (text, keyword) => {
-  if (!keyword || !text) return text
+  if (!keyword || !text) return escapeHtml(text || '')
   // 제목/내용 검색일 때만 강조
-  if (!['TITLE', 'TITLE_CONTENT'].includes(props.searchType)) return text
-  // 정규식 특수문자 이스케이프
+  if (!['TITLE', 'TITLE_CONTENT'].includes(props.searchType)) return escapeHtml(text)
+  // 먼저 HTML 이스케이프 후 키워드 강조
+  const safeText = escapeHtml(text)
   const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const regex = new RegExp(`(${escaped})`, 'gi')
-  return text.replace(regex, '<mark>$1</mark>')
+  const safeEscaped = escapeHtml(escaped)
+  const regex = new RegExp(`(${safeEscaped})`, 'gi')
+  return safeText.replace(regex, '<mark>$1</mark>')
 }
 
 const formatDate = (isoString) => {
