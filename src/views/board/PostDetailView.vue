@@ -33,7 +33,7 @@
 
         <section class="post-body">
           <div class="post-content">
-            <div v-html="post.content"></div>
+            <div v-html="sanitizedContent"></div>
           </div>
 
           <div class="post-actions">
@@ -124,6 +124,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import DOMPurify from 'dompurify'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
 import { useReadPosts } from '@/composables/useReadPosts.js'
@@ -149,6 +150,15 @@ const searchType = computed(() => route.query.type ?? 'TITLE_CONTENT')
 const post = ref(null)
 const loading = ref(false)
 const error = ref(null)
+
+const sanitizedContent = computed(() => {
+  if (!post.value?.content) return ''
+  return DOMPurify.sanitize(post.value.content, {
+    ADD_TAGS: ['iframe', 'video', 'source', 'blockquote'],
+    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'controls', 'src', 'type', 'class', 'cite', 'data-instgrm-permalink', 'data-instgrm-version'],
+    ALLOW_DATA_ATTR: false,
+  })
+})
 
 // 투표 상태
 const hasLiked = ref(false)
