@@ -5,12 +5,50 @@ import AppHeader from './components/common/AppHeader.vue'
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
 import { getOnlineCount, getVisitedBoards } from '@/api/statisticsApi.js'
+import { refreshToken as refreshTokenApi } from '@/api/authApi.js'
 import { useUserStore } from '@/stores/userStore.js'
 import './assets/styles/layout.css'
 
 const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
+
+/**
+ * JWT 토큰 만료 여부 확인 (클라이언트 디코딩)
+ * base64url → JSON 파싱 후 exp 클레임 비교
+ */
+const isTokenExpired = (token) => {
+  if (!token) return true
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return payload.exp * 1000 < Date.now()
+  } catch {
+    return true
+  }
+}
+
+/**
+ * 앱 시작 시 토큰 유효성 검증
+ * accessToken 만료 → refreshToken으로 갱신 시도 → 실패 시 로그아웃
+ */
+const validateAuth = async () => {
+  if (!store.token) return
+
+  if (!isTokenExpired(store.token)) return
+
+  // accessToken 만료 → refresh 시도
+  if (!store.refreshToken) {
+    store.clearUser()
+    return
+  }
+
+  try {
+    const { data } = await refreshTokenApi(store.refreshToken)
+    store.setTokens(data.accessToken, data.refreshToken)
+  } catch {
+    store.clearUser()
+  }
+}
 
 const toasterTheme = ref(localStorage.getItem('colorMode') === 'light' ? 'light' : 'dark')
 
@@ -75,7 +113,10 @@ watch(() => route.path, () => {
 let onlineTimer = null
 let visitedTimer = null
 
-onMounted(() => {
+onMounted(async () => {
+  // 토큰 유효성 검증 (만료 시 refresh 또는 로그아웃)
+  await validateAuth()
+
   // Initialize theme
   const colorMode = localStorage.getItem('colorMode') || 'dark'
   if (colorMode === 'light') {
