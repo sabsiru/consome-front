@@ -151,12 +151,24 @@ const post = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
+const ALLOWED_IFRAME_ORIGINS = [
+  'https://www.youtube.com',
+  'https://www.youtube-nocookie.com',
+  'https://player.vimeo.com',
+  'https://www.instagram.com',
+]
+
 const sanitizedContent = computed(() => {
   if (!post.value?.content) return ''
-  return DOMPurify.sanitize(post.value.content, {
+  const clean = DOMPurify.sanitize(post.value.content, {
     ADD_TAGS: ['iframe', 'video', 'source', 'blockquote'],
     ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'controls', 'src', 'type', 'class', 'cite', 'data-instgrm-permalink', 'data-instgrm-version'],
     ALLOW_DATA_ATTR: false,
+  })
+  // iframe src 화이트리스트 필터링
+  return clean.replace(/<iframe[^>]*src="([^"]*)"[^>]*>.*?<\/iframe>/gi, (match, src) => {
+    const isAllowed = ALLOWED_IFRAME_ORIGINS.some(origin => src.startsWith(origin))
+    return isAllowed ? match : ''
   })
 })
 
