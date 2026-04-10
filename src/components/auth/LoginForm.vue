@@ -49,8 +49,9 @@ const login = async () => {
     localStorage.setItem('refreshToken', data.refreshToken)
 
     store.setUserData(data)
-    if (route.query.redirect) {
-      await router.push(route.query.redirect)
+    const redirect = route.query.redirect
+    if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+      await router.push(redirect)
     } else if (data.role === 'ADMIN') {
       await router.push('/admin')
     } else {
