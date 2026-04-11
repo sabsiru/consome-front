@@ -157,7 +157,9 @@ import api from '@/api/axios'
 import { useUserStore } from '@/stores/userStore'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/board-manage.css'
+import { useConfirm } from '@/composables/useConfirm.js'
 
+const { confirm } = useConfirm()
 const router = useRouter()
 const userStore = useUserStore()
 
@@ -358,7 +360,7 @@ const saveCategory = async (categoryId) => {
 
 // 카테고리 삭제
 const deleteCategory = async (categoryId) => {
-  if (!confirm('정말 삭제하시겠습니까?')) return
+  if (!await confirm('정말 삭제하시겠습니까?')) return
   try {
     await api.delete(`/admin/categorys/${categoryId}`)
     await loadCategories(selectedBoard.value.id)
