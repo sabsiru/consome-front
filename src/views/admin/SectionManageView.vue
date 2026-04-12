@@ -256,7 +256,9 @@ import {
 } from '@/api/sectionApi.js'
 import { eventBus } from '@/utils/eventBus.js'
 import '@/assets/styles/admin/admin.css'
+import { useConfirm } from '@/composables/useConfirm.js'
 
+const { confirm } = useConfirm()
 const sections = ref([])
 const originalOrder = ref([])
 const expandedId = ref(null)
@@ -467,7 +469,7 @@ const saveBoard = async () => {
 }
 
 const deleteBoard = async () => {
-  if (!confirm('정말 삭제하시겠습니까?')) return
+  if (!await confirm('정말 삭제하시겠습니까?')) return
   try {
     await api.delete(`/admin/boards/${selectedBoard.value.id}`)
     selectedBoard.value = null
@@ -541,7 +543,7 @@ const saveCategory = async (categoryId) => {
 }
 
 const deleteCategory = async (categoryId) => {
-  if (!confirm('정말 삭제하시겠습니까?')) return
+  if (!await confirm('정말 삭제하시겠습니까?')) return
   try {
     await api.delete(`/admin/categorys/${categoryId}`)
     await loadCategories(selectedBoard.value.id)
@@ -632,7 +634,7 @@ const deleteSection = async (section) => {
     toast.warning('소속 게시판이 있어 삭제할 수 없습니다.')
     return
   }
-  if (!confirm(`'${section.name}' 섹션을 삭제하시겠습니까?`)) return
+  if (!await confirm(`'${section.name}' 섹션을 삭제하시겠습니까?`)) return
   try {
     await deleteSectionApi(section.id)
     await loadSections()
