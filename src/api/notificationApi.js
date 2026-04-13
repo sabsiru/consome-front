@@ -17,3 +17,6 @@ export const deleteNotification = (notificationId) =>
 
 export const deleteAllNotifications = () =>
   api.delete('/notifications')
+
+export const createSseToken = () =>
+  api.post('/notifications/sse-token')
