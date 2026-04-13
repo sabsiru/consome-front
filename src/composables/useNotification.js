@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/userStore.js'
 import { useNotificationStore } from '@/stores/notificationStore.js'
 import { toast } from 'vue-sonner'
 import { eventBus } from '@/utils/eventBus.js'
+import { createSseToken } from '@/api/notificationApi.js'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
 
@@ -15,14 +16,20 @@ export function useNotification() {
   const userStore = useUserStore()
   const notificationStore = useNotificationStore()
 
-  function connect() {
+  async function connect() {
     disconnect()
 
     const token = userStore.token
     if (!token) return
 
-    const url = `${API_BASE}/notifications/subscribe?token=${encodeURIComponent(token)}`
-    eventSource = new EventSource(url)
+    try {
+      const { data } = await createSseToken()
+      const url = `${API_BASE}/notifications/subscribe?token=${encodeURIComponent(data.token)}`
+      eventSource = new EventSource(url)
+    } catch (e) {
+      console.error('[SSE] 토큰 발급 실패', e)
+      return
+    }
 
     eventSource.addEventListener('connect', () => {
       connected.value = true
