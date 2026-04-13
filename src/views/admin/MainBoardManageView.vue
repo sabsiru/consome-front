@@ -71,6 +71,9 @@ import api from '@/api/axios'
 import { eventBus } from '@/utils/eventBus.js'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/main-board-manage.css'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const { confirm } = useConfirm()
 
 const mainBoards = ref([])
 const originalOrder = ref([])
@@ -115,7 +118,7 @@ const saveOrder = async () => {
 }
 
 const removeFromMain = async (board) => {
-  if (!confirm(`'${board.boardName}'을(를) 주요 게시판에서 제거하시겠습니까?`)) return
+  if (!await confirm(`'${board.boardName}'을(를) 주요 게시판에서 제거하시겠습니까?`)) return
   try {
     await api.patch(`/admin/boards/${board.boardId}/main`)
     await loadMainBoards()

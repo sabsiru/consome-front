@@ -177,6 +177,9 @@ import Youtube from '@tiptap/extension-youtube'
 import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
 import { useUserStore } from '@/stores/userStore.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const { confirm } = useConfirm()
 
 const route = useRoute()
 const router = useRouter()
@@ -775,7 +778,7 @@ const submit = async () => {
     return
   }
 
-  if (isEditMode.value && !confirm('게시글을 수정하시겠습니까?')) {
+  if (isEditMode.value && !await confirm('게시글을 수정하시겠습니까?')) {
     return
   }
 

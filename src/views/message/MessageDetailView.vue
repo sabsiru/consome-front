@@ -39,6 +39,9 @@ import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
 import { readMessage, deleteMessage } from '@/api/messageApi.js'
 import { eventBus } from '@/utils/eventBus.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const { confirm } = useConfirm()
 
 const route = useRoute()
 const router = useRouter()
@@ -75,7 +78,7 @@ const reply = () => {
 }
 
 const deleteMsg = async () => {
-  if (!confirm('쪽지를 삭제하시겠습니까?')) return
+  if (!await confirm('쪽지를 삭제하시겠습니까?')) return
   try {
     await deleteMessage(messageId.value)
     router.push({ name: 'MessageList' })

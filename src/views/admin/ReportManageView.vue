@@ -196,6 +196,9 @@ import { getGroupedReports, getReportersByTarget, resolveReport, rejectReport } 
 import { suspendUser } from '@/api/adminApi.js'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore.js'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const { confirm } = useConfirm()
 
 const userStore = useUserStore()
 
@@ -312,7 +315,7 @@ const confirmResolve = async () => {
 }
 
 const rejectAll = async (r) => {
-  if (!confirm(`${r.reportCount}건의 신고를 모두 반려하시겠습니까?`)) return
+  if (!await confirm(`${r.reportCount}건의 신고를 모두 반려하시겠습니까?`)) return
   try {
     const { data: allReporters } = await getReportersByTarget(r.targetType, r.targetId)
     for (const rep of allReporters) {

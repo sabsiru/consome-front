@@ -2,6 +2,7 @@
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import AppHeader from './components/common/AppHeader.vue'
+import ConfirmModal from './components/common/ConfirmModal.vue'
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
 import { getOnlineCount, getVisitedBoards } from '@/api/statisticsApi.js'
@@ -201,6 +202,7 @@ watch(visitedBoards, () => {
   </div>
 
   <Toaster position="top-center" :duration="3000" :theme="toasterTheme" rich-colors close-button />
+  <ConfirmModal />
 
   <footer class="app-footer">
     <div class="app-footer__inner">

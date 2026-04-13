@@ -135,6 +135,9 @@ import PostCommentSection from '@/components/board/PostCommentSection.vue'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import ReportModal from '@/components/common/ReportModal.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
+import { useConfirm } from '@/composables/useConfirm.js'
+
+const { confirm } = useConfirm()
 
 const route = useRoute()
 const router = useRouter()
@@ -277,7 +280,7 @@ const deleteComment = async (commentId, done, fail) => {
     return
   }
 
-  if (!confirm('댓글을 삭제하시겠습니까?')) {
+  if (!await confirm('댓글을 삭제하시겠습니까?')) {
     fail?.()
     return
   }
@@ -430,7 +433,7 @@ const goEdit = () => {
 // 삭제
 const onDelete = async () => {
   if (!post.value) return
-  if (!confirm('정말 삭제하시겠습니까?')) return
+  if (!await confirm('정말 삭제하시겠습니까?')) return
 
   try {
     await api.delete(`/posts/${postId.value}`)

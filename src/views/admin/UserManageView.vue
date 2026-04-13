@@ -136,7 +136,9 @@ import { suspendUser, unsuspendUser } from '@/api/adminApi.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/user-manage.css'
+import { useConfirm } from '@/composables/useConfirm.js'
 
+const { confirm } = useConfirm()
 const users = ref([])
 
 const page = ref(0)
@@ -305,7 +307,7 @@ const closeSuspendModal = () => {
 const confirmSuspend = async () => {
   if (!selectedSuspensionType.value) return
   const typeLabel = suspensionTypes.find(t => t.value === selectedSuspensionType.value)?.label
-  if (!confirm(`${suspendTarget.value.nickname}님을 ${typeLabel} 처리하시겠습니까?`)) return
+  if (!await confirm(`${suspendTarget.value.nickname}님을 ${typeLabel} 처리하시겠습니까?`)) return
 
   try {
     await suspendUser(suspendTarget.value.userId, selectedSuspensionType.value, suspendReason.value)
@@ -318,7 +320,7 @@ const confirmSuspend = async () => {
 }
 
 const confirmUnsuspend = async () => {
-  if (!confirm(`${suspendTarget.value.nickname}님의 제재를 해제하시겠습니까?`)) return
+  if (!await confirm(`${suspendTarget.value.nickname}님의 제재를 해제하시겠습니까?`)) return
 
   try {
     await unsuspendUser(suspendTarget.value.userId)
