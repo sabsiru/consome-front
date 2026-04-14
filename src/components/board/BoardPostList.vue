@@ -159,40 +159,46 @@
         </tr>
 
         <!-- 일반 게시글 -->
-        <tr
-          v-for="post in regularPosts"
-          :key="post.postId"
-          :class="{ 'is-active': activePostId === post.postId, 'is-read': isRead(post.postId) }"
-          class="board-row"
-          @click="emitPostClick(post.postId)"
-        >
-          <td v-if="isAdmin && isManageMode" class="col-drag"></td>
-          <td v-if="isAdmin && isManageMode" class="col-pin" @click.stop>
-            <button
-              :class="['btn-pin', { 'is-pinned': post.isPinned }]"
-              @click="togglePin(post)"
-            >
-              {{ post.isPinned ? 'ON' : 'OFF' }}
-            </button>
-          </td>
-          <td class="col-category">{{ post.categoryName }}</td>
-          <td class="col-title">
-            <span v-if="isPopularPost(post)" class="post-badge--popular">인기</span>
-            <span v-html="highlightKeyword(post.title, props.keyword)"></span>
-            <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
-            <span v-if="post.commentCount > 0" class="post-comment-count">
-              [{{ post.commentCount }}]
-            </span>
-          </td>
-          <td class="col-author" @click.stop="openUserModal($event, post)">
-            <span class="author-link">
-              <LevelBadge :level="post.authorLevel" :role="post.authorRole" size="sm" /> {{ post.authorNickName }}
-            </span>
-          </td>
-          <td class="col-views">{{ post.viewCount }}</td>
-          <td class="col-like">{{ post.likeCount-post.dislikeCount }}</td>
-          <td class="col-date">{{ formatDate(post.createdAt) }}</td>
-        </tr>
+        <template v-for="(post, index) in regularPosts" :key="post.postId">
+          <tr
+            :class="{ 'is-active': activePostId === post.postId, 'is-read': isRead(post.postId) }"
+            class="board-row"
+            @click="emitPostClick(post.postId)"
+          >
+            <td v-if="isAdmin && isManageMode" class="col-drag"></td>
+            <td v-if="isAdmin && isManageMode" class="col-pin" @click.stop>
+              <button
+                :class="['btn-pin', { 'is-pinned': post.isPinned }]"
+                @click="togglePin(post)"
+              >
+                {{ post.isPinned ? 'ON' : 'OFF' }}
+              </button>
+            </td>
+            <td class="col-category">{{ post.categoryName }}</td>
+            <td class="col-title">
+              <span v-if="isPopularPost(post)" class="post-badge--popular">인기</span>
+              <span v-html="highlightKeyword(post.title, props.keyword)"></span>
+              <span v-if="post.hasMedia" class="post-media-icon" title="미디어 포함">🖼️</span>
+              <span v-if="post.commentCount > 0" class="post-comment-count">
+                [{{ post.commentCount }}]
+              </span>
+            </td>
+            <td class="col-author" @click.stop="openUserModal($event, post)">
+              <span class="author-link">
+                <LevelBadge :level="post.authorLevel" :role="post.authorRole" size="sm" /> {{ post.authorNickName }}
+              </span>
+            </td>
+            <td class="col-views">{{ post.viewCount }}</td>
+            <td class="col-like">{{ post.likeCount-post.dislikeCount }}</td>
+            <td class="col-date">{{ formatDate(post.createdAt) }}</td>
+          </tr>
+          <!-- 인피드 광고: 5번째 게시글 뒤 -->
+          <tr v-if="index === 4 && regularPosts.length > 5" class="ad-row">
+            <td :colspan="isAdmin && isManageMode ? 8 : 6">
+              <AdSlot placement="infeed" />
+            </td>
+          </tr>
+        </template>
 
         <tr v-if="posts.length === 0">
           <td class="board-empty" :colspan="isAdmin && isManageMode ? 8 : 6">게시글이 없습니다.</td>
@@ -280,6 +286,7 @@ import { toast } from 'vue-sonner'
 import api from '@/api/axios.js'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
+import AdSlot from '@/components/common/AdSlot.vue'
 import { useUserStore } from '@/stores/userStore.js'
 import { useReadPosts } from '@/composables/useReadPosts.js'
 import '@/assets/styles/components.css'

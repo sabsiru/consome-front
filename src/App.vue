@@ -3,6 +3,7 @@ import { RouterView, useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import AppHeader from './components/common/AppHeader.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
+import AdSlot from './components/common/AdSlot.vue'
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
 import { getOnlineCount, getVisitedBoards } from '@/api/statisticsApi.js'
@@ -195,10 +196,20 @@ watch(visitedBoards, () => {
     </div>
   </div>
 
-  <div class="app-shell">
-    <main class="app-content">
-      <RouterView />
-    </main>
+  <div class="app-with-sidebar">
+    <aside class="app-sidebar app-sidebar--left">
+      <AdSlot placement="sidebar" />
+    </aside>
+
+    <div class="app-shell">
+      <main class="app-content">
+        <RouterView />
+      </main>
+    </div>
+
+    <aside class="app-sidebar app-sidebar--right">
+      <AdSlot placement="sidebar" />
+    </aside>
   </div>
 
   <Toaster position="top-center" :duration="3000" :theme="toasterTheme" rich-colors close-button />
@@ -216,6 +227,40 @@ watch(visitedBoards, () => {
 </template>
 
 <style scoped>
+/* 사이드바 광고 레이아웃 */
+.app-with-sidebar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  max-width: calc(var(--app-max-width) + 160px * 2 + 16px * 2);
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.app-with-sidebar > .app-shell {
+  flex: 1;
+  max-width: var(--app-max-width);
+  min-width: 0;
+}
+
+.app-sidebar {
+  flex-shrink: 0;
+  padding-top: 24px;
+  position: sticky;
+  top: 0;
+  height: fit-content;
+}
+
+@media (max-width: 1439px) {
+  .app-sidebar {
+    display: none;
+  }
+
+  .app-with-sidebar {
+    padding: 0;
+  }
+}
+
 /* 최근 방문 탭 바 */
 .visited-bar {
   background: var(--bg-tertiary);

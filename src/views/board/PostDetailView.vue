@@ -36,6 +36,9 @@
             <div v-html="sanitizedContent"></div>
           </div>
 
+          <!-- 본문 하단 광고 -->
+          <AdSlot placement="content-bottom" />
+
           <div class="post-actions">
             <div class="post-actions__center">
               <button type="button" class="btn" :class="{ 'btn--voted': hasLiked }" :disabled="hasLiked" @click="onLike">추천</button>
@@ -135,6 +138,7 @@ import PostCommentSection from '@/components/board/PostCommentSection.vue'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import ReportModal from '@/components/common/ReportModal.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
+import AdSlot from '@/components/common/AdSlot.vue'
 import { useConfirm } from '@/composables/useConfirm.js'
 
 const { confirm } = useConfirm()
