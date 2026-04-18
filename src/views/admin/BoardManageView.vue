@@ -290,7 +290,7 @@ const saveBoard = async () => {
     return
   }
 
-  if (nameChanged && !nameCheckPassed) {
+  if (nameChanged && !nameCheckPassed.value) {
     toast.error('이름 중복 검사를 먼저 진행해주세요.')
     return
   }
