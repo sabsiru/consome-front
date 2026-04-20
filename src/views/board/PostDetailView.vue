@@ -120,6 +120,8 @@
       @close="closeReportModal"
       @success="closeReportModal"
     />
+
+    <PostDetailFab v-if="post" :show-comment="post.commentEnabled !== false" />
   </div>
 </template>
 
@@ -135,6 +137,7 @@ import '@/assets/styles/components.css'
 import '@/assets/styles/board/post.css'
 import BoardPostList from '@/components/board/BoardPostList.vue'
 import PostCommentSection from '@/components/board/PostCommentSection.vue'
+import PostDetailFab from '@/components/board/PostDetailFab.vue'
 import LevelBadge from '@/components/common/LevelBadge.vue'
 import ReportModal from '@/components/common/ReportModal.vue'
 import UserActionModal from '@/components/common/UserActionModal.vue'
