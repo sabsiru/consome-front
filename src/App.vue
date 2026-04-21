@@ -246,9 +246,6 @@ watch(visitedBoards, () => {
 .app-sidebar {
   flex-shrink: 0;
   padding-top: 24px;
-  position: sticky;
-  top: 0;
-  height: fit-content;
 }
 
 @media (max-width: 1439px) {
