@@ -130,6 +130,12 @@
   gap: 16px;
 }
 
+/* Stats Widgets - 인기 검색어 */
+.home__stats {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
 .home__section--board {
   min-height: 180px;
 }

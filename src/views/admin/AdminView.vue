@@ -61,6 +61,11 @@
         <p>홈으로 돌아가기</p>
       </div>
     </div>
+
+    <section class="admin-stats">
+      <h2 class="admin-stats__title">활동 분석</h2>
+      <ActivityHeatmap />
+    </section>
   </div>
 </template>
 
@@ -68,6 +73,7 @@
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { getAdminStatistics } from '@/api/statisticsApi.js'
+import ActivityHeatmap from '@/components/statistics/ActivityHeatmap.vue'
 import '@/assets/styles/admin/admin.css'
 import '@/assets/styles/admin/admin-dashboard.css'
 
