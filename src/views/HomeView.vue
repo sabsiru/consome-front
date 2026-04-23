@@ -87,6 +87,11 @@
           </section>
         </template>
       </div>
+
+      <!-- 인기 검색어 -->
+      <div class="home__stats">
+        <PopularKeywordsWidget @select="onKeywordSelect" />
+      </div>
     </div>
   </main>
 </template>
@@ -96,6 +101,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getPopularPostsPaged, getPopularBoards } from '@/api/navigationApi.js'
 import { useUserStore } from '@/stores/userStore.js'
+import PopularKeywordsWidget from '@/components/statistics/PopularKeywordsWidget.vue'
+import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const store = useUserStore()
@@ -160,6 +167,19 @@ const goToPost = (post) => {
 
 const goToBoard = (boardId) => {
   router.push(`/boards/${boardId}`)
+}
+
+const onKeywordSelect = (keyword) => {
+  const targetBoardId = popularBoards.value[0]?.boardId
+  if (!targetBoardId) {
+    toast.message('검색할 수 있는 게시판이 없습니다')
+    return
+  }
+  router.push({
+    name: 'BoardPosts',
+    params: { boardId: targetBoardId },
+    query: { keyword }
+  })
 }
 
 onMounted(() => {
